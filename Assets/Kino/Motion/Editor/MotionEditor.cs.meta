@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 27b58f59bad4f465898256e11c0532f3
+timeCreated: 1467355992
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - _blendingIcon: {fileID: 2800000, guid: 9ee0944ebff744551aad746d9251acb8, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

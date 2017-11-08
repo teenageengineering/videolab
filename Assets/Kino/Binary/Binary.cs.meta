@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 801e272fe799a4b1285b38cce9afa88d
+timeCreated: 1435063775
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - _shader: {fileID: 4800000, guid: 5374979fad08f417c8ce8360cbdfc4fc, type: 3}
+  - _ditherTexture2x2: {fileID: 2800000, guid: 154fd938bd1674daa81008e8865fc71c, type: 3}
+  - _ditherTexture3x3: {fileID: 2800000, guid: adbc8c1068bb14e46aff2da5b5a56ade, type: 3}
+  - _ditherTexture4x4: {fileID: 2800000, guid: dfd8142a3912e4e56b4b38d16a80fb2b, type: 3}
+  - _ditherTexture8x8: {fileID: 2800000, guid: d971e1109fb85431bbf91b6abe7be3e8, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
