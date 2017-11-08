@@ -2,4 +2,4 @@
 
 Toolkit for designing midi-controlled video content.
 
-Please read the Wiki for details.
+Please read the wiki for details.
