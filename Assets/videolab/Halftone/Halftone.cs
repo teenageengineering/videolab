@@ -76,7 +76,7 @@ namespace VideoLab
 
         #region Private Properties
 
-        [SerializeField]
+        [SerializeField, HideInInspector]
         Shader _shader;
 
         Material _material;
