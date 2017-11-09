@@ -8,37 +8,15 @@ namespace VideoLab
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
-    [AddComponentMenu("Image Effects/Shadertoy")]
-    public class Shadertoy : MonoBehaviour
+    [AddComponentMenu("Image Effects/Toy")]
+    public class Toy : MonoBehaviour
     {
-        const string kTemplatePath = "Assets/videolab/Shadertoy/Shadertoy.shader";
+        const string kTemplatePath = "Assets/videolab/Toy/Shader/Toy.shader";
 
         #region Public Properties
 
-        [SerializeField]
-        TextAsset _shadertoyText;
-        public TextAsset shadertoyText {
-            get { return _shadertoyText; }
-            set {
-                _shadertoyText = value;
-
-                if (_shadertoyText != null)
-                    ConvertShader();
-                else
-                    _shader = (Shader)AssetDatabase.LoadAssetAtPath(kTemplatePath, typeof(Shader));
-            }
-        }
-
-        [SerializeField]
-        bool _aggressiveMatching = true;
-        public bool aggressiveMatching {
-            get { return _aggressiveMatching; }
-            set {
-                _aggressiveMatching = value;
-
-                ConvertShader();
-            }
-        }
+        TextAsset _prevShadertoyText;
+        public TextAsset shadertoyText;
 
         public Vector2 _resolution = new Vector2(1280, 720);
 
@@ -65,9 +43,9 @@ namespace VideoLab
             string template = File.ReadAllText(kTemplatePath);
 
             // Rename shader.
-            template = template.Replace("/Shadertoy", "/" + Path.GetFileNameWithoutExtension(stPath));
+            template = template.Replace("Hidden/Toy", "Hidden/" + Path.GetFileNameWithoutExtension(stPath));
 
-            // Insert Shadertoy template.
+            // Insert Shadertoy code.
             template = template.Replace("fixed4 mainImage( float2 fragCoord ) { return fixed4(0, 0, 0, 0); }", stCode);
 
             // Rewrite entry point signature.
@@ -187,6 +165,19 @@ namespace VideoLab
             RenderTexture.ReleaseTemporary(rt);
 
             ++_frameCounter;
+        }
+
+        void OnValidate()
+        {
+            if (shadertoyText != _prevShadertoyText)
+            {
+                _prevShadertoyText = shadertoyText;
+
+                if (shadertoyText != null)
+                    ConvertShader();
+                else
+                    _shader = (Shader)AssetDatabase.LoadAssetAtPath(kTemplatePath, typeof(Shader));
+            }
         }
 
         #endregion

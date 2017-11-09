@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Shadertoy"
+﻿Shader "Hidden/Toy"
 {
     Properties {}
     SubShader
