@@ -61,6 +61,7 @@ namespace MidiJack
 
         public int TotalMessageCount {
             get {
+                UpdateIfNeeded();
                 return _totalMessageCount;
             }
         }
@@ -198,7 +199,7 @@ namespace MidiJack
             }
         }
 
-        public static void UpdateAll()
+        public static void Refresh()
         {
             Instance.UpdateIfNeeded();
         }

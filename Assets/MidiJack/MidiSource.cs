@@ -83,6 +83,7 @@ namespace MidiJack
 
         public float GetKey(MidiChannel channel, int noteNumber)
         {
+            MidiDriver.Refresh();
             var v = _channelArray[(int)channel]._noteArray[noteNumber];
             if (v > 1) return v - 1;
             if (v > 0) return v;
@@ -91,16 +92,19 @@ namespace MidiJack
 
         public bool GetKeyDown(MidiChannel channel, int noteNumber)
         {
+            MidiDriver.Refresh();
             return _channelArray[(int)channel]._noteArray[noteNumber] > 1;
         }
 
         public bool GetKeyUp(MidiChannel channel, int noteNumber)
         {
+            MidiDriver.Refresh();
             return _channelArray[(int)channel]._noteArray[noteNumber] < 0;
         }
 
         public int[] GetKnobNumbers(MidiChannel channel)
         {
+            MidiDriver.Refresh();
             var cs = _channelArray[(int)channel];
             var numbers = new int[cs._knobMap.Count];
             cs._knobMap.Keys.CopyTo(numbers, 0);
@@ -109,6 +113,7 @@ namespace MidiJack
 
         public float GetKnob(MidiChannel channel, int knobNumber, float defaultValue)
         {
+            MidiDriver.Refresh();
             var cs = _channelArray[(int)channel];
             if (cs._knobMap.ContainsKey(knobNumber)) return cs._knobMap[knobNumber];
             return defaultValue;
@@ -207,7 +212,7 @@ namespace MidiJack
                 }
             }
 
-            MidiDriver.UpdateAll();
+            MidiDriver.Refresh();
 
             // Process the message queue.
             while (true)
