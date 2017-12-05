@@ -40,6 +40,12 @@ namespace Klak.Midi
         MidiChannel _channel = MidiChannel.All;
 
         [SerializeField]
+        MidiMap _knobMap;
+
+        [SerializeField]
+        int _knobMapIndex;
+
+        [SerializeField]
         int _knobNumber = 0;
 
         [SerializeField]

@@ -23,6 +23,8 @@
 //
 using UnityEngine;
 using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Klak.Midi
 {
@@ -32,6 +34,8 @@ namespace Klak.Midi
     {
         SerializedProperty _source;
         SerializedProperty _channel;
+        SerializedProperty _knobMap;
+        SerializedProperty _knobMapIndex;
         SerializedProperty _knobNumber;
         SerializedProperty _responseCurve;
         SerializedProperty _interpolator;
@@ -43,6 +47,8 @@ namespace Klak.Midi
         {
             _source = serializedObject.FindProperty("_source");
             _channel = serializedObject.FindProperty("_channel");
+            _knobMap = serializedObject.FindProperty("_knobMap");
+            _knobMapIndex = serializedObject.FindProperty("_knobMapIndex");
             _knobNumber = serializedObject.FindProperty("_knobNumber");
             _responseCurve = serializedObject.FindProperty("_responseCurve");
             _interpolator = serializedObject.FindProperty("_interpolator");
@@ -60,7 +66,21 @@ namespace Klak.Midi
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(_channel);
-            EditorGUILayout.PropertyField(_knobNumber);
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.PropertyField(_knobMap);
+            if (_knobMap.objectReferenceValue != null)
+            {
+                MidiMap knobMap = (MidiMap)_knobMap.objectReferenceValue;
+                string[] knobNames = knobMap.GetNames();
+                _knobMapIndex.intValue = EditorGUILayout.Popup("Knobs", Mathf.Min(_knobMapIndex.intValue, knobNames.Length - 1), knobNames);
+                _knobNumber.intValue = knobMap.entries[_knobMapIndex.intValue].value;
+            }
+            else
+            {
+                EditorGUILayout.PropertyField(_knobNumber);
+            }
 
             EditorGUILayout.Space();
 
