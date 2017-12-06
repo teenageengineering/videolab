@@ -35,7 +35,7 @@ namespace MidiJack
             get { return _endpointId; }
             set {
                 _endpointId = value;
-                _endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
+                this.endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
             }
         }
 
