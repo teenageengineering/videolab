@@ -38,7 +38,7 @@ namespace MidiJack
                 MidiDriver.RemoveSource(this);
                 
                 _endpointId = value;
-                _endpointName = (_endpointId != 0) ? MidiDriver.GetSourceName(value) : "";
+                this.endpointName = (_endpointId != 0) ? MidiDriver.GetSourceName(value) : "";
 
                 MidiDriver.AddSource(this);
             }
@@ -48,7 +48,19 @@ namespace MidiJack
         private string _endpointName = "";
         public string endpointName {
             get { return _endpointName; }
+            set { 
+                _endpointName = value;
+
+                if (_autoAssignMap)
+                    AutoAssignMidiMap();
+            }
         }
+
+        [SerializeField]
+        MidiMap _midiMap;
+
+        [SerializeField]
+        bool _autoAssignMap = true;
         
         #region Internal Data
 
@@ -74,6 +86,13 @@ namespace MidiJack
 
         // Channel state array
         ChannelState[] _channelArray;
+
+        void AutoAssignMidiMap()
+        {
+            _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.persistentDataPath);
+            if (_midiMap == null)
+                _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.streamingAssetsPath);
+        }
 
         int _numSources = 0;
 
@@ -115,6 +134,7 @@ namespace MidiJack
         {
             MidiDriver.Refresh();
             var cs = _channelArray[(int)channel];
+            if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
             if (cs._knobMap.ContainsKey(knobNumber)) return cs._knobMap[knobNumber];
             return defaultValue;
         }
@@ -252,11 +272,13 @@ namespace MidiJack
                     // Normalize the value.
                     var level = 1.0f / 127 * message.data2;
                     // Update the channel if it already exists, or add a new channel.
-                    _channelArray[channelNumber]._knobMap[message.data1] = level;
+                    int knobNumber = message.data1;
+                    if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
+                    _channelArray[channelNumber]._knobMap[knobNumber] = level;
                     // Do again for All-ch.
-                    _channelArray[(int)MidiChannel.All]._knobMap[message.data1] = level;
+                    _channelArray[(int)MidiChannel.All]._knobMap[knobNumber] = level;
                     if (knobDelegate != null)
-                        knobDelegate((MidiChannel)channelNumber, message.data1, level);
+                        knobDelegate((MidiChannel)channelNumber, knobNumber, level);
                 }
 
                 // System message?

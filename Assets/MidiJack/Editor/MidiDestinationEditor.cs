@@ -9,6 +9,15 @@ namespace MidiJack
     [CustomEditor(typeof(MidiDestination))]
     public class MidiDestinationEditor : Editor {
 
+        SerializedProperty _midiMap;
+        SerializedProperty _autoAssignMap;
+
+        void OnEnable()
+        {
+            _midiMap = serializedObject.FindProperty("_midiMap");
+            _autoAssignMap = serializedObject.FindProperty("_autoAssignMap");
+        }
+
         public override void OnInspectorGUI()
         {
             MidiDestination destination = target as MidiDestination;
@@ -45,6 +54,21 @@ namespace MidiJack
                 if (destinationIds[destinationIndex] != destination.endpointId)
                     destination.endpointId = destinationIds[destinationIndex];
             }
+
+            EditorGUILayout.Space();
+
+            serializedObject.Update();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(_midiMap);
+            if (EditorGUI.EndChangeCheck())
+            {
+                _autoAssignMap.boolValue = (!_midiMap.objectReferenceValue);
+            }
+
+            EditorGUILayout.PropertyField(_autoAssignMap);
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

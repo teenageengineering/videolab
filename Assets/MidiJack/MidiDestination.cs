@@ -43,6 +43,25 @@ namespace MidiJack
         private string _endpointName = "";
         public string endpointName {
             get { return _endpointName; }
+            set { 
+                _endpointName = value;
+
+                if (_autoAssignMap)
+                    AutoAssignMidiMap();
+            }
+        }
+
+        [SerializeField]
+        MidiMap _midiMap;
+
+        [SerializeField]
+        bool _autoAssignMap = true;
+
+        void AutoAssignMidiMap()
+        {
+            _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.persistentDataPath);
+            if (_midiMap == null)
+                _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.streamingAssetsPath);
         }
 
         int _numDestinations = 0;
@@ -118,6 +137,7 @@ namespace MidiJack
         {
             MidiMessage msg = new MidiMessage();
             msg.status = (byte)(0xb0 | ((int)channel & 0x0f));
+            if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
             msg.data1 = (byte)knobNumber;
             msg.data2 = (byte)(value * 127);
 

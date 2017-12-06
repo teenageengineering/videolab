@@ -2,29 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MidiJack;
 
-namespace Klak.Midi
+namespace MidiJack
 {
-    [Serializable]
-    public struct MidiMapEntry
-    {
-        public string name;
-        public int value;
-    }
-
-    [CreateAssetMenu(fileName = "MidiMap", menuName = "Klak/MIDI/MidiMap")]
+    [CreateAssetMenu(fileName = "MidiMap", menuName = "MidiJack/MidiMap")]
     public class MidiMap : ScriptableObject
     {
-        public List<MidiMapEntry> entries;
-
-        public string[] GetNames()
+        [Serializable]
+        public class Entry
         {
-            List<string> names = new List<string>();
-            for (int i = 0; i < entries.Count; i++)
-                names.Add(entries[i].name);
+            public int from;
+            public int to;
+        }
 
-            return names.ToArray();
+        public List<Entry> entries = new List<Entry>();
+
+        public int Map(int from)
+        {
+            Entry entry = entries.Find(e => e.from == from);
+            if (entry != null)
+                return entry.to;
+
+            return from;
         }
     }
 }
