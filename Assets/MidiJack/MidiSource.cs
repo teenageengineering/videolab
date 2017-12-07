@@ -30,6 +30,16 @@ namespace MidiJack
 {
     public class MidiSource : MonoBehaviour
     {
+        // Only meant for MidiMaster source
+        [SerializeField]
+        bool _connectToAll;
+        public bool connectToAll {
+            get { return _connectToAll; }
+            set { 
+                _connectToAll = value;
+            }
+        }
+
         [SerializeField]
         private uint _endpointId = 0;
         public uint endpointId {
@@ -38,9 +48,18 @@ namespace MidiJack
                 MidiDriver.RemoveSource(this);
                 
                 _endpointId = value;
-                this.endpointName = (_endpointId != 0) ? MidiDriver.GetSourceName(value) : "";
 
-                MidiDriver.AddSource(this);
+                if (_endpointId != 0)
+                {
+                    endpointName = MidiDriver.GetSourceName(_endpointId);
+                    MidiDriver.AddSource(this);
+                }
+                else
+                { 
+                    endpointName = "";
+                    if (_connectToAll)
+                        MidiDriver.AddSource(this);
+                }
             }
         }
 
@@ -55,6 +74,12 @@ namespace MidiJack
                     AutoAssignMidiMap();
             }
         }
+
+        [SerializeField]
+        bool _autoConnect;
+
+        [SerializeField]
+        string _preferredName;
 
         [SerializeField]
         MidiMap _midiMap;
@@ -95,6 +120,54 @@ namespace MidiJack
         }
 
         int _numSources = 0;
+
+        void CheckConnection()
+        {
+            _numSources = MidiDriver.CountSources();
+
+            bool validId = false;
+            int indexOfName = -1;
+            int indexOfPreferredName = -1;
+
+            for (var i = 0; i < _numSources; i++)
+            {
+                var id = MidiDriver.GetSourceIdAtIndex(i);
+
+                // Device still available?
+                if (endpointId == id)
+                {
+                    validId = true;
+                    break;
+                }
+
+                string endpointName = MidiDriver.GetDestinationName(id);
+
+                // Device reconnected?
+                if (_endpointName == endpointName)
+                    indexOfName = i;
+
+                // Device with preferred name available?
+                if (_autoConnect && endpointName.IndexOf(_preferredName) != -1)
+                    indexOfPreferredName = i;
+            }
+
+            if (validId)
+            {
+                MidiDriver.AddSource(this);
+            }
+            else if (indexOfName != -1)
+            {
+                endpointId = MidiDriver.GetSourceIdAtIndex(indexOfName);
+            }
+            else if (indexOfPreferredName != -1)
+            {
+                endpointId = MidiDriver.GetSourceIdAtIndex(indexOfPreferredName);
+            }
+            else
+            {
+                endpointId = 0;
+            }
+        }
 
         #endregion
 
@@ -172,48 +245,6 @@ namespace MidiJack
             msgQueue = new Queue<MidiMessage>();
         }
 
-        void CheckConnection()
-        {
-            _numSources = MidiDriver.CountSources();
-
-            bool validId = false;
-            int indexOfName = -1;
-
-            // All sources?
-            if (endpointId == 0)
-                validId = true;
-            else
-            {
-                for (var i = 0; i < _numSources; i++)
-                {
-                    var id = MidiDriver.GetSourceIdAtIndex(i);
-
-                    // Device still available?
-                    if (endpointId == id)
-                    {
-                        validId = true;
-                        break;
-                    }
-
-                    // Device name available?
-                    if (_endpointName == MidiDriver.GetSourceName(id))
-                        indexOfName = i;
-                }
-            }
-
-            if (validId)
-            {
-                MidiDriver.AddSource(this);
-            }
-            else if (indexOfName != -1)
-            {
-                endpointId = MidiDriver.GetSourceIdAtIndex(indexOfName);
-                MidiDriver.AddSource(this);
-            }
-            else
-                MidiDriver.RemoveSource(this);
-        }
-
         void Update()
         {
             if (_numSources != MidiDriver.CountSources())
@@ -286,7 +317,6 @@ namespace MidiJack
                 {
                     if (realtimeDelegate != null) 
                     {
-
                         if (message.status == (byte)MidiRealtime.Clock)
                             realtimeDelegate(MidiRealtime.Clock);
                         

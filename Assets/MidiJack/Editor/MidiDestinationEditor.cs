@@ -9,18 +9,28 @@ namespace MidiJack
     [CustomEditor(typeof(MidiDestination))]
     public class MidiDestinationEditor : Editor {
 
+        SerializedProperty _autoConnect;
+        SerializedProperty _preferredName;
         SerializedProperty _midiMap;
         SerializedProperty _autoAssignMap;
 
         void OnEnable()
         {
-            _midiMap = serializedObject.FindProperty("_midiMap");
-            _autoAssignMap = serializedObject.FindProperty("_autoAssignMap");
+            _autoConnect    = serializedObject.FindProperty("_autoConnect");
+            _preferredName  = serializedObject.FindProperty("_preferredName");
+            _midiMap        = serializedObject.FindProperty("_midiMap");
+            _autoAssignMap  = serializedObject.FindProperty("_autoAssignMap");
         }
 
         public override void OnInspectorGUI()
         {
             MidiDestination destination = target as MidiDestination;
+
+            if (destination.connectToAll)
+            {
+                EditorGUILayout.LabelField("Sends to all outputs.");
+                return;
+            }
 
             var destinationCount = MidiDriver.CountDestinations();
 
@@ -28,7 +38,7 @@ namespace MidiJack
             List<string> destinationNames = new List<string>();
 
             destinationIds.Add(0);
-            destinationNames.Add("All");
+            destinationNames.Add("No connection");
 
             for (var i = 0; i < destinationCount; i++)
             {
@@ -55,9 +65,14 @@ namespace MidiJack
                     destination.endpointId = destinationIds[destinationIndex];
             }
 
-            EditorGUILayout.Space();
-
             serializedObject.Update();
+
+            EditorGUILayout.PropertyField(_autoConnect);
+
+            if (_autoConnect.boolValue)
+                EditorGUILayout.PropertyField(_preferredName);
+
+            EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(_midiMap);

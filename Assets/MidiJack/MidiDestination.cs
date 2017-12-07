@@ -29,13 +29,23 @@ namespace MidiJack
 {
     public class MidiDestination : MonoBehaviour
     {
+        // Only meant for MidiMaster destination
+        [SerializeField]
+        bool _connectToAll;
+        public bool connectToAll {
+            get { return _connectToAll; }
+            set { 
+                _connectToAll = value;
+            }
+        }
+
         [SerializeField]
         private uint _endpointId = 0;
         public uint endpointId {
             get { return _endpointId; }
             set {
                 _endpointId = value;
-                this.endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
+                endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
             }
         }
 
@@ -52,6 +62,12 @@ namespace MidiJack
         }
 
         [SerializeField]
+        bool _autoConnect;
+
+        [SerializeField]
+        string _preferredName;
+
+        [SerializeField]
         MidiMap _midiMap;
 
         [SerializeField]
@@ -66,39 +82,45 @@ namespace MidiJack
 
         int _numDestinations = 0;
 
-        void Update()
-        {
-            if (_numDestinations != MidiDriver.CountDestinations())
-                CheckConnection();
-        }
-
         void CheckConnection()
         {
             _numDestinations = MidiDriver.CountDestinations();
 
-            // All destinations?
-            if (endpointId == 0)
-                return;
-
-            // Restore MidiDriver connection
+            // Restore MidiDriver connection.
             int indexOfName = -1;
+            int indexOfPreferredName = -1;
             for (var i = 0; i < _numDestinations; i++)
             {
                 var id = MidiDriver.GetDestinationIdAtIndex(i);
                 if (endpointId == id)
                     break;
 
-                if (_endpointName == MidiDriver.GetDestinationName(id))
+                string endpointName = MidiDriver.GetDestinationName(id);
+
+                // Device reconnected?
+                if (_endpointName == endpointName)
                     indexOfName = i;
+
+                // Device with preferred name available?
+                if (_autoConnect && endpointName.IndexOf(_preferredName) != -1)
+                    indexOfPreferredName = i;
             }
 
             if (indexOfName != -1)
                 endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfName);
+            else if (indexOfPreferredName != -1)
+                endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfPreferredName);
+        }
+
+        void Update()
+        {
+            if (_numDestinations != MidiDriver.CountDestinations())
+                CheckConnection();
         }
 
         public void SendMessage(MidiMessage msg)
         {
-            if (endpointId == 0)
+            if (_connectToAll)
             {
                 // Send to all.
                 for (var i = 0; i < MidiDriver.CountDestinations(); i++)
@@ -107,7 +129,7 @@ namespace MidiJack
                     MidiDriver.SendMessage(msg.Encode64Bit());
                 }
             }
-            else
+            else if (endpointId != 0)
             {
                 msg.endpoint = endpointId;
                 MidiDriver.SendMessage(msg.Encode64Bit());

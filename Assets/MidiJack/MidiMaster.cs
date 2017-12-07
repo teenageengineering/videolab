@@ -36,10 +36,12 @@ namespace MidiJack
             GameObject sourceGo = new GameObject("Midi Master Source");
             sourceGo.hideFlags = HideFlags.HideInHierarchy;
             _source = sourceGo.AddComponent<MidiSource>();
+            _source.connectToAll = true;
 
             GameObject destinationGo = new GameObject("Midi Master Destination");
             destinationGo.hideFlags = HideFlags.HideInHierarchy;
             _destination = destinationGo.AddComponent<MidiDestination>();
+            _destination.connectToAll = true;
         }
         
         #region Singleton
