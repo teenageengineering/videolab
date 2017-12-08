@@ -69,6 +69,9 @@ namespace MidiJack
 
         MidiMap FindMapAtPath(string path)
         {
+            if (!Directory.Exists(path))
+                return null;
+            
             var mapFiles = Directory.GetFiles(path).Where(p => Path.GetExtension(p) == ".json");
 
             foreach (string mapFile in mapFiles)
