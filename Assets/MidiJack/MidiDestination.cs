@@ -23,104 +23,29 @@
 //
 using UnityEngine;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace MidiJack
 {
-    public class MidiDestination : MonoBehaviour
+    public class MidiDestination : MidiEndpoint
     {
-        // Only meant for MidiMaster destination
-        [SerializeField]
-        bool _connectToAll;
-        public bool connectToAll {
-            get { return _connectToAll; }
-            set { 
-                _connectToAll = value;
-            }
-        }
-
-        [SerializeField]
-        private uint _endpointId = 0;
-        public uint endpointId {
-            get { return _endpointId; }
-            set {
-                _endpointId = value;
-                endpointName = (_endpointId != 0) ? MidiDriver.GetDestinationName(value) : "";
-            }
-        }
-
-        [SerializeField]
-        private string _endpointName = "";
-        public string endpointName {
-            get { return _endpointName; }
-            set { 
-                _endpointName = value;
-
-                if (_autoAssignMap)
-                    AutoAssignMidiMap();
-            }
-        }
-
-        [SerializeField]
-        bool _autoConnect;
-
-        [SerializeField]
-        string _preferredName;
-
-        [SerializeField]
-        MidiMap _midiMap;
-
-        [SerializeField]
-        bool _autoAssignMap = true;
-
-        void AutoAssignMidiMap()
+        public override uint GetEndpointIdAtIndex(int index)
         {
-            _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.persistentDataPath);
-            if (_midiMap == null)
-                _midiMap = MidiDriver.FindMapAtPath(_endpointName, Application.streamingAssetsPath);
+            return MidiDriver.GetDestinationIdAtIndex(index);
         }
 
-        int _numDestinations = 0;
-
-        void CheckConnection()
+        public override string GetEndpointName(uint endpointId)
         {
-            _numDestinations = MidiDriver.CountDestinations();
-
-            // Restore MidiDriver connection.
-            int indexOfName = -1;
-            int indexOfPreferredName = -1;
-            for (var i = 0; i < _numDestinations; i++)
-            {
-                var id = MidiDriver.GetDestinationIdAtIndex(i);
-                if (endpointId == id)
-                    break;
-
-                string endpointName = MidiDriver.GetDestinationName(id);
-
-                // Device reconnected?
-                if (_endpointName == endpointName)
-                    indexOfName = i;
-
-                // Device with preferred name available?
-                if (_autoConnect && endpointName.IndexOf(_preferredName) != -1)
-                    indexOfPreferredName = i;
-            }
-
-            if (indexOfName != -1)
-                endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfName);
-            else if (indexOfPreferredName != -1)
-                endpointId = MidiDriver.GetDestinationIdAtIndex(indexOfPreferredName);
+            return MidiDriver.GetDestinationName(endpointId);
         }
 
-        void Update()
+        public override int CountEndpoints()
         {
-            if (_numDestinations != MidiDriver.CountDestinations())
-                CheckConnection();
+            return MidiDriver.CountDestinations();
         }
 
         public void SendMessage(MidiMessage msg)
         {
-            if (_connectToAll)
+            if (_endpointId == uint.MaxValue)
             {
                 // Send to all.
                 for (var i = 0; i < MidiDriver.CountDestinations(); i++)
@@ -129,9 +54,9 @@ namespace MidiJack
                     MidiDriver.SendMessage(msg.Encode64Bit());
                 }
             }
-            else if (endpointId != 0)
+            else if (_endpointId != 0)
             {
-                msg.endpoint = endpointId;
+                msg.endpoint = _endpointId;
                 MidiDriver.SendMessage(msg.Encode64Bit());
             }
         }
@@ -159,7 +84,7 @@ namespace MidiJack
         {
             MidiMessage msg = new MidiMessage();
             msg.status = (byte)(0xb0 | ((int)channel & 0x0f));
-            if (_midiMap) knobNumber = _midiMap.Map(knobNumber);
+            if (_midiMap) knobNumber = _midiMap.DeviceValue(knobNumber);
             msg.data1 = (byte)knobNumber;
             msg.data2 = (byte)(value * 127);
 
@@ -173,5 +98,14 @@ namespace MidiJack
 
             SendMessage(msg);
         }
+
+        #region Monobehaviour
+
+        void Update()
+        {
+            Refresh();   
+        }
+
+        #endregion
     }
 }

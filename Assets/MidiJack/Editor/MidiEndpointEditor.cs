@@ -6,8 +6,8 @@ using UnityEditor;
 
 namespace MidiJack
 {
-    [CustomEditor(typeof(MidiSource))]
-    public class MidiSourceEditor : Editor {
+    [CustomEditor(typeof(MidiEndpoint), true)]
+    public class MidiEndpointEditor : Editor {
 
         SerializedProperty _autoConnect;
         SerializedProperty _preferredName;
@@ -24,46 +24,43 @@ namespace MidiJack
 
         public override void OnInspectorGUI()
         {
-            MidiSource source = target as MidiSource;
+            MidiEndpoint endpoint = target as MidiEndpoint;
 
-            if (source.connectToAll)
+            if (endpoint.endpointId == uint.MaxValue)
             {
-                EditorGUILayout.LabelField("Receives from all inputs.");
+                EditorGUILayout.LabelField("Connect to all.");
                 return;
             }
 
-            var sourceCount = MidiDriver.CountSources();
+            int endpointCount = endpoint.CountEndpoints();
 
-            List<uint> sourceIds = new List<uint>();
-            List<string> sourceNames = new List<string>();
+            List<uint> endpointIds = new List<uint>();
+            List<string> endpointNames = new List<string>();
 
-            sourceIds.Add(0);
-            sourceNames.Add("No connection");
+            endpointIds.Add(0);
+            endpointNames.Add("No connection");
 
-            for (var i = 0; i < sourceCount; i++)
+            for (var i = 0; i < endpointCount; i++)
             {
-                var id = MidiDriver.GetSourceIdAtIndex(i);
-                sourceIds.Add(id);
-                sourceNames.Add(MidiDriver.GetSourceName(id));
+                uint id = endpoint.GetEndpointIdAtIndex(i);
+                endpointIds.Add(id);
+                endpointNames.Add(endpoint.GetEndpointName(id));
             }
 
-            int sourceIndex = sourceIds.FindIndex(x => x == source.endpointId);
+            int endpointIndex = endpointIds.FindIndex(x => x == endpoint.endpointId);
 
             // Show missing endpoint.
-            if (sourceIndex == -1)
+            if (endpointIndex == -1)
             {
-                sourceIds.Add(source.endpointId);
-                sourceNames.Add(source.endpointName + " *");
-                sourceIndex = sourceIds.Count - 1;
+                endpointIds.Add(endpoint.endpointId);
+                endpointNames.Add(endpoint.endpointName + " *");
+                endpointIndex = endpointIds.Count - 1;
             }
 
             EditorGUI.BeginChangeCheck();
-            sourceIndex = EditorGUILayout.Popup("Source", sourceIndex, sourceNames.ToArray());
+            endpointIndex = EditorGUILayout.Popup("Endpoint", endpointIndex, endpointNames.ToArray());
             if (EditorGUI.EndChangeCheck())
-            {
-                if (sourceIds[sourceIndex] != source.endpointId)
-                    source.endpointId = sourceIds[sourceIndex];
-            }
+                endpoint.endpointId = endpointIds[endpointIndex];
 
             serializedObject.Update();
 
@@ -77,9 +74,7 @@ namespace MidiJack
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(_midiMap);
             if (EditorGUI.EndChangeCheck())
-            {
                 _autoAssignMap.boolValue = (!_midiMap.objectReferenceValue);
-            }
 
             EditorGUILayout.PropertyField(_autoAssignMap);
 

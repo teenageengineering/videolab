@@ -24,8 +24,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.IO;
-using System.Linq;
 
 namespace MidiJack
 {
@@ -130,9 +128,9 @@ namespace MidiJack
                 }
 
                 // Send to all?
-                if (_sourceMap.ContainsKey(0))
+                if (_sourceMap.ContainsKey(uint.MaxValue))
                 {
-                    MidiSource source = _sourceMap[0];
+                    MidiSource source = _sourceMap[uint.MaxValue];
                     source.msgQueue.Enqueue(message);
                 }
 
@@ -249,31 +247,9 @@ namespace MidiJack
             Instance._sourceMap[source.endpointId] = source;
         }
 
-        public static void RemoveSource(MidiSource source)
+        public static void RemoveSource(uint endpointId)
         {
-            Instance._sourceMap.Remove(source.endpointId);
-        }
-
-        public static MidiMap FindMapAtPath(string endpointName, string path)
-        {
-            var mapFiles = Directory.GetFiles(path).Where(p => Path.GetExtension(p) == ".json");
-
-            foreach (string mapFile in mapFiles)
-            {
-                string name = Path.GetFileNameWithoutExtension(mapFile);
-                int i = endpointName.IndexOf(name);
-                if (i > -1)
-                {
-                    MidiMap midiMap = ScriptableObject.CreateInstance<MidiMap>();
-                    midiMap.name = name;
-                    string mapJson = File.ReadAllText(mapFile);
-                    JsonUtility.FromJsonOverwrite(mapJson, midiMap);
-
-                    return midiMap;
-                }
-            }
-
-            return null;
+            Instance._sourceMap.Remove(endpointId);
         }
 
         #endregion

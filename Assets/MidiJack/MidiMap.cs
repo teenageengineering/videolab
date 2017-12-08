@@ -11,19 +11,28 @@ namespace MidiJack
         [Serializable]
         public class Entry
         {
-            public int from;
-            public int to;
+            public int deviceValue;
+            public int jackValue;
         }
 
         public List<Entry> entries = new List<Entry>();
 
-        public int Map(int from)
+        public int JackValue(int deviceValue)
         {
-            Entry entry = entries.Find(e => e.from == from);
+            Entry entry = entries.Find(e => e.deviceValue == deviceValue);
             if (entry != null)
-                return entry.to;
+                return entry.jackValue;
 
-            return from;
+            return deviceValue;
+        }
+
+        public int DeviceValue(int jackValue)
+        {
+            Entry entry = entries.Find(e => e.jackValue == jackValue);
+            if (entry != null)
+                return entry.deviceValue;
+
+            return jackValue;
         }
     }
 }
