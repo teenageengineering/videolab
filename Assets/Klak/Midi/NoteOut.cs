@@ -13,6 +13,10 @@ namespace Klak.Midi
         [SerializeField]
         MidiDestination _destination;
 
+        MidiDestination destination {
+            get { return (!_destination) ? MidiMaster.GetDestination() : _destination; }
+        }
+
         [SerializeField]
         MidiChannel _channel = MidiChannel.All;
 
@@ -44,23 +48,13 @@ namespace Klak.Midi
         [Inlet]
         public void NoteOn()
         {
-            _destination.SendKeyDown(_channel, _noteNumber, _velocity);
+            destination.SendKeyDown(_channel, _noteNumber, _velocity);
         }
 
         [Inlet]
         public void NoteOff()
         {
-            _destination.SendKeyUp(_channel, _noteNumber);
-        }
-
-        #endregion
-
-        #region MonoBehaviour functions
-
-        void OnEnable()
-        {
-            if (_destination == null)
-                _destination = MidiMaster.GetDestination();
+            destination.SendKeyUp(_channel, _noteNumber);
         }
 
         #endregion

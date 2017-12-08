@@ -13,6 +13,10 @@ namespace Klak.Midi
         [SerializeField]
         MidiDestination _destination;
 
+        MidiDestination destination {
+            get { return (!_destination) ? MidiMaster.GetDestination() : _destination; }
+        }
+
         #endregion
 
         #region Node I/O
@@ -20,25 +24,25 @@ namespace Klak.Midi
         [Inlet]
         public void ClockTick()
         {
-            _destination.SendRealtime(MidiRealtime.Clock);
+            destination.SendRealtime(MidiRealtime.Clock);
         }
 
         [Inlet]
         public void StartPlayback()
         {
-            _destination.SendRealtime(MidiRealtime.Start);
+            destination.SendRealtime(MidiRealtime.Start);
         }
 
         [Inlet]
         public void ResumePlayback()
         {
-            _destination.SendRealtime(MidiRealtime.Continue);
+            destination.SendRealtime(MidiRealtime.Continue);
         }
 
         [Inlet]
         public void StopPlayback()
         {
-            _destination.SendRealtime(MidiRealtime.Stop);
+            destination.SendRealtime(MidiRealtime.Stop);
         }
 
         #endregion

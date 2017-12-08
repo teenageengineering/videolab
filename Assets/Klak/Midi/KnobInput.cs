@@ -101,17 +101,24 @@ namespace Klak.Midi
             _lastInputValue = inputValue;
         }
 
+        MidiSource _prevSource;
+
+        void SwitchSource()
+        {
+            if (_prevSource)
+                _prevSource.knobDelegate -= OnKnobUpdate;
+
+            if (!_source)
+                _source = MidiMaster.GetSource();
+                
+            _source.knobDelegate += OnKnobUpdate;
+
+            _prevSource = _source;
+        }
+
         #endregion
 
         #region MonoBehaviour functions
-
-        void OnEnable()
-        {
-            if (_source == null)
-                _source = MidiMaster.GetSource();
-            
-            _source.knobDelegate += OnKnobUpdate;
-        }
 
         void OnDisable()
         {
@@ -120,6 +127,8 @@ namespace Klak.Midi
 
         void Start()
         {
+            SwitchSource();
+
             _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
 
             _floatValue = new FloatInterpolator(
@@ -129,6 +138,9 @@ namespace Klak.Midi
 
         void Update()
         {
+            if (_source != _prevSource)
+                SwitchSource();
+            
             if (_interpolator.enabled)
                 _valueEvent.Invoke(_floatValue.Step());
         }

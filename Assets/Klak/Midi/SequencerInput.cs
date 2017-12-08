@@ -66,25 +66,40 @@ namespace Klak.Midi
             }
         }
 
-        #endregion
+        MidiSource _prevSource;
 
-        #region MonoBehaviour functions
-
-        void OnEnable()
+        void SwitchSource()
         {
-            if (_source == null)
+            if (_prevSource)
+                _prevSource.realtimeDelegate -= OnRealtime;
+
+            if (!_source)
                 _source = MidiMaster.GetSource();
 
             _source.realtimeDelegate += OnRealtime;
+
+            _prevSource = _source;
         }
+
+        #endregion
+
+        #region MonoBehaviour functions
 
         void OnDisable()
         {
             _source.realtimeDelegate -= OnRealtime;
         }
 
+        void Start()
+        {
+            SwitchSource();
+        }
+
         void Update()
         {
+            if (_source != _prevSource)
+                SwitchSource();
+            
             _playingEvent.Invoke((_playing) ? 1 : 0);   
             _playPositionEvent.Invoke(_ppgCounter);  
         }

@@ -12,6 +12,10 @@ namespace Klak.Midi
         [SerializeField]
         MidiDestination _destination;
 
+        MidiDestination destination {
+            get { return (!_destination) ? MidiMaster.GetDestination() : _destination; }
+        }
+
         [SerializeField]
         MidiChannel _channel = MidiChannel.All;
 
@@ -35,7 +39,7 @@ namespace Klak.Midi
                     return;
                 
                 float newValue = Mathf.Clamp(value, 0, 1);
-                _destination.SendKnob(_channel, _knobNumber, newValue);
+                destination.SendKnob(_channel, _knobNumber, newValue);
                 _currentAbsoluteValue = newValue;
             }
         }
@@ -47,19 +51,9 @@ namespace Klak.Midi
                     return;
 
                 float newValue = Mathf.Clamp(_currentAbsoluteValue + value, 0, 1);
-                _destination.SendKnob(_channel, _knobNumber, newValue);
+                destination.SendKnob(_channel, _knobNumber, newValue);
                 _currentAbsoluteValue = newValue;
             }
-        }
-
-        #endregion
-
-        #region MonoBehaviour functions
-
-        void OnEnable()
-        {
-            if (_destination == null)
-                _destination = MidiMaster.GetDestination();
         }
 
         #endregion

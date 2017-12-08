@@ -44,6 +44,15 @@ namespace Klak.Midi
         [SerializeField]
         MidiSource _source;
 
+        MidiSource source {
+            get { 
+                if (_source == null)
+                    return MidiMaster.GetSource();
+
+                return _source;
+            }
+        }
+
         [SerializeField]
         MidiChannel _channel = MidiChannel.All;
 
@@ -131,18 +140,28 @@ namespace Klak.Midi
             _floatValue.targetValue = _offValue;
         }
 
+        MidiSource _prevSource;
+
+        void SwitchSource()
+        {
+            if (_prevSource)
+            {
+                _prevSource.noteOnDelegate -= NoteOn;
+                _prevSource.noteOffDelegate -= NoteOff;
+            }
+
+            if (!_source)
+                _source = MidiMaster.GetSource();
+
+            _source.noteOnDelegate += NoteOn;
+            _source.noteOffDelegate += NoteOff;
+
+            _prevSource = _source;
+        }
+
         #endregion
 
         #region MonoBehaviour functions
-
-        void OnEnable()
-        {
-            if (_source == null)
-                _source = MidiMaster.GetSource();
-            
-            _source.noteOnDelegate += NoteOn;
-            _source.noteOffDelegate += NoteOff;
-        }
 
         void OnDisable()
         {
@@ -152,11 +171,16 @@ namespace Klak.Midi
 
         void Start()
         {
+            SwitchSource();
+
             _floatValue = new FloatInterpolator(_offValue, _interpolator);
         }
 
         void Update()
         {
+            if (_source != _prevSource)
+                SwitchSource();
+            
             _valueEvent.Invoke(_floatValue.Step());
         }
 
