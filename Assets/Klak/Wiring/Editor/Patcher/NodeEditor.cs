@@ -46,7 +46,7 @@ namespace Klak.Wiring.Patcher
 
         public override bool RequiresConstantRepaint()
         {
-            return _editor.RequiresConstantRepaint();
+            return (_editor && _editor.RequiresConstantRepaint());
         }
 
         protected override void OnHeaderGUI()
@@ -62,7 +62,7 @@ namespace Klak.Wiring.Patcher
             var title = ObjectNames.NicifyVariableName(instance.GetType().Name);
 
             // Show the header title.
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal(); 
             GUILayout.Space(14);
             EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
