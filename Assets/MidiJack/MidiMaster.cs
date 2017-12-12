@@ -41,7 +41,7 @@ namespace MidiJack
             GameObject destinationGo = new GameObject("Midi Master Destination");
             destinationGo.hideFlags = HideFlags.HideInHierarchy;
             _destination = destinationGo.AddComponent<MidiDestination>();
-            _source.endpointId = uint.MaxValue;
+            _destination.endpointId = uint.MaxValue;
         }
         
         #region Singleton
