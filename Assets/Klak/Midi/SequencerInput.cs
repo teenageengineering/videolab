@@ -29,9 +29,6 @@ namespace Klak.Midi
         VoidEvent _stopEvent = new VoidEvent();
 
         [SerializeField, Outlet]
-        FloatEvent _playingEvent = new FloatEvent();
-
-        [SerializeField, Outlet]
         FloatEvent _playPositionEvent = new FloatEvent();
 
         #endregion
@@ -39,18 +36,20 @@ namespace Klak.Midi
         #region Private members
 
         bool _playing;
-        int _ppgCounter;
+        int _ppqCounter;
 
         void OnRealtime(MidiRealtime realtimeMsg)
         {
             if (realtimeMsg == MidiRealtime.Clock)
             {
-                ++_ppgCounter;
                 _clockEvent.Invoke();
+
+                if (_playing)
+                    _playPositionEvent.Invoke((float)++_ppqCounter / 96);
             }
             else if (realtimeMsg == MidiRealtime.Start)
             {
-                _ppgCounter = 0;
+                _ppqCounter = 0;
                 _playing = true;
                 _startEvent.Invoke();
             }
@@ -78,6 +77,8 @@ namespace Klak.Midi
 
             _source.realtimeDelegate += OnRealtime;
 
+            _playing = false;
+
             _prevSource = _source;
         }
 
@@ -99,9 +100,6 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
-            
-            _playingEvent.Invoke((_playing) ? 1 : 0);   
-            _playPositionEvent.Invoke(_ppgCounter);  
         }
 
         #endregion
