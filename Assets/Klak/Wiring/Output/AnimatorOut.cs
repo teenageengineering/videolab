@@ -49,6 +49,14 @@ namespace Klak.Wiring
         }
 
         [Inlet]
+        public float normalizedTime {
+            set {
+                if (!enabled || _animator == null) return;
+                _animator.Play(0, -1, value % 1);
+            }
+        }
+
+        [Inlet]
         public void ChangeState()
         {
             _animator.Play(_changeStateTo);
