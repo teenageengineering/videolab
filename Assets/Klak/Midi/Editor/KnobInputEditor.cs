@@ -23,8 +23,6 @@
 //
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Klak.Midi
 {
@@ -35,6 +33,7 @@ namespace Klak.Midi
         SerializedProperty _source;
         SerializedProperty _channel;
         SerializedProperty _knobNumber;
+        SerializedProperty _isRelative;
         SerializedProperty _responseCurve;
         SerializedProperty _interpolator;
         SerializedProperty _onEvent;
@@ -46,6 +45,7 @@ namespace Klak.Midi
             _source = serializedObject.FindProperty("_source");
             _channel = serializedObject.FindProperty("_channel");
             _knobNumber = serializedObject.FindProperty("_knobNumber");
+            _isRelative = serializedObject.FindProperty("_isRelative");
             _responseCurve = serializedObject.FindProperty("_responseCurve");
             _interpolator = serializedObject.FindProperty("_interpolator");
             _onEvent = serializedObject.FindProperty("_onEvent");
@@ -63,15 +63,18 @@ namespace Klak.Midi
 
             EditorGUILayout.PropertyField(_channel);
 
-            EditorGUILayout.Space();
-
             EditorGUILayout.HelpBox("ModWheel is 1, generic knobs are 12 - 31.", MessageType.Info);
             EditorGUILayout.PropertyField(_knobNumber);
 
             EditorGUILayout.Space();
 
-            EditorGUILayout.PropertyField(_responseCurve);
-            EditorGUILayout.PropertyField(_interpolator);
+            EditorGUILayout.PropertyField(_isRelative);
+
+            if (!_isRelative.boolValue)
+            {
+                EditorGUILayout.PropertyField(_responseCurve);
+                EditorGUILayout.PropertyField(_interpolator);
+            }
 
             EditorGUILayout.Space();
 
