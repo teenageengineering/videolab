@@ -1,25 +1,6 @@
-﻿//
-// KinoBinary - 1-bit monochrome image effect
-//
-// Copyright (C) 2015 Keijiro Takahashi
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy of
-// this software and associated documentation files (the "Software"), to deal in
-// the Software without restriction, including without limitation the rights to
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-// the Software, and to permit persons to whom the Software is furnished to do so,
-// subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
+﻿// KinoBinary - Binary image effect for Unity
+// https://github.com/keijiro/KinoBinary
+
 using UnityEngine;
 
 namespace Kino
@@ -29,36 +10,30 @@ namespace Kino
     [AddComponentMenu("Kino Image Effects/Binary")]
     public class Binary : MonoBehaviour
     {
-        #region Public Properties
+        #region Editable attributes
 
-        // Dither matrix selector
-
-        public enum DitherMatrix {
-            Bayer2x2, Bayer3x3, Bayer4x4, Bayer8x8
+        // Dither type selector
+        public enum DitherType {
+            Bayer2x2, Bayer3x3, Bayer4x4, Bayer8x8, BlueNoise64x64
         };
 
-        [SerializeField]
-        DitherMatrix _ditherMatrix;
+        [SerializeField] DitherType _ditherType;
 
-        public DitherMatrix ditherMatrix {
-            get { return _ditherMatrix; }
-            set { _ditherMatrix = value; }
+        public DitherType ditherType {
+            get { return _ditherType; }
+            set { _ditherType = value; }
         }
 
-        // Scale factor for dither matrix
+        // Scale factor of dither pattan
+        [SerializeField, Range(1, 8)] int _ditherScale = 1;
 
-        [SerializeField, Range(1, 8)]
-        float _ditherScale = 1;
-
-        public float ditherScale {
+        public int ditherScale {
             get { return _ditherScale; }
             set { _ditherScale = value; }
         }
 
         // Color (dark)
-
-        [SerializeField]
-        Color _color0 = Color.black;
+        [SerializeField] Color _color0 = Color.black;
 
         public Color color0 {
             get { return _color0; }
@@ -66,56 +41,41 @@ namespace Kino
         }
 
         // Color (light)
-
-        [SerializeField]
-        Color _color1 = Color.white;
+        [SerializeField] Color _color1 = Color.white;
 
         public Color color1 {
             get { return _color1; }
             set { _color1 = value; }
         }
 
-        // Blend mode selector
+        // Opacity
+        [SerializeField, Range(0, 1)] float _opacity = 1.0f;
 
-        public enum BlendMode {
-            Direct, Midpoint
-        }
-
-        [SerializeField]
-        BlendMode _blendMode;
-
-        public BlendMode blendMode {
-            get { return _blendMode; }
-            set { _blendMode = value; }
-        }
-
-        // Blend factor
-
-        [SerializeField, Range(0, 1)]
-        float _blendFactor = 1.0f;
-
-        public float blendFactor {
-            get { return _blendFactor; }
-            set { _blendFactor = value; }
+        public float Opacity {
+            get { return _opacity; }
+            set { _opacity = value; }
         }
 
         #endregion
 
-        #region Private Resources
+        #region Private resources
 
-        [SerializeField] Shader _shader;
-        [SerializeField] Texture2D _ditherTexture2x2;
-        [SerializeField] Texture2D _ditherTexture3x3;
-        [SerializeField] Texture2D _ditherTexture4x4;
-        [SerializeField] Texture2D _ditherTexture8x8;
+        [SerializeField, HideInInspector] Shader _shader;
 
-        Texture2D DitherMatrixTexture {
+        [SerializeField, HideInInspector] Texture2D _bayer2x2Texture;
+        [SerializeField, HideInInspector] Texture2D _bayer3x3Texture;
+        [SerializeField, HideInInspector] Texture2D _bayer4x4Texture;
+        [SerializeField, HideInInspector] Texture2D _bayer8x8Texture;
+        [SerializeField, HideInInspector] Texture2D _bnoise64x64Texture;
+
+        Texture2D DitherTexture {
             get {
-                switch (_ditherMatrix) {
-                    case DitherMatrix.Bayer2x2: return _ditherTexture2x2;
-                    case DitherMatrix.Bayer3x3: return _ditherTexture3x3;
-                    case DitherMatrix.Bayer4x4: return _ditherTexture4x4;
-                    default: return _ditherTexture8x8;
+                switch (_ditherType) {
+                    case DitherType.Bayer2x2: return _bayer2x2Texture;
+                    case DitherType.Bayer3x3: return _bayer3x3Texture;
+                    case DitherType.Bayer4x4: return _bayer4x4Texture;
+                    case DitherType.Bayer8x8: return _bayer8x8Texture;
+                    default: return _bnoise64x64Texture;
                 }
             }
         }
@@ -124,25 +84,30 @@ namespace Kino
 
         #endregion
 
-        #region MonoBehaviour Functions
+        #region MonoBehaviour implementation
+
+        void OnDestroy()
+        {
+            if (_material != null)
+                if (Application.isPlaying)
+                    Destroy(_material);
+                else
+                    DestroyImmediate(_material);
+        }
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            if (_material == null) {
+            if (_material == null)
+            {
                 _material = new Material(_shader);
                 _material.hideFlags = HideFlags.DontSave;
             }
 
-            if (_blendMode == BlendMode.Midpoint)
-                _material.EnableKeyword("BLEND_MIDPOINT");
-            else
-                _material.DisableKeyword("BLEND_MIDPOINT");
-
-            _material.SetTexture("_DitherTex", DitherMatrixTexture);
-            _material.SetFloat("_DitherScale", _ditherScale);
+            _material.SetTexture("_DitherTex", DitherTexture);
+            _material.SetFloat("_Scale", _ditherScale);
             _material.SetColor("_Color0", _color0);
             _material.SetColor("_Color1", _color1);
-            _material.SetFloat("_BlendFactor", _blendFactor);
+            _material.SetFloat("_Opacity", _opacity);
 
             Graphics.Blit(source, destination, _material);
         }
