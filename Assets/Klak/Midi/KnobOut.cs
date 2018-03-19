@@ -24,12 +24,6 @@ namespace Klak.Midi
 
         #endregion
 
-        #region Private members
-
-        float _currentAbsoluteValue = 0;
-
-        #endregion
-
         #region Node I/O
 
         [Inlet]
@@ -37,10 +31,9 @@ namespace Klak.Midi
             set {
                 if (!enabled)
                     return;
-                
+
                 float newValue = Mathf.Clamp(value, 0, 1);
                 destination.SendKnob(_channel, _knobNumber, newValue);
-                _currentAbsoluteValue = newValue;
             }
         }
 
@@ -50,9 +43,10 @@ namespace Klak.Midi
                 if (!enabled)
                     return;
 
-                float newValue = Mathf.Clamp(_currentAbsoluteValue + value, 0, 1);
-                destination.SendKnob(_channel, _knobNumber, newValue);
-                _currentAbsoluteValue = newValue;
+                float newValue = Mathf.Clamp(value, -1, 1);
+                float relValue = (newValue >= 0) ? 1f / 127 : 1f;
+                for (float acc = 0; acc < Mathf.Abs(newValue); acc += 1f / 127)
+                    destination.SendKnob(_channel, _knobNumber, relValue);
             }
         }
 

@@ -88,10 +88,8 @@ namespace Klak.Midi
 
             if (_isRelative)
             {
-                if (inputValue < 0.5f)
-                    _valueEvent.Invoke(1.0f / 127);
-                else
-                    _valueEvent.Invoke(-1.0f / 127);
+                float relValue = (inputValue < 0.5f) ? 1 : -1;
+                _valueEvent.Invoke(relValue / 127);
             }
             else
             {
@@ -125,7 +123,7 @@ namespace Klak.Midi
 
             if (!_source)
                 _source = MidiMaster.GetSource();
-            
+
             _source.knobDelegate += OnKnobUpdate;
 
             _prevSource = _source;
@@ -153,7 +151,7 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
-                
+
             if (!_isRelative && _interpolator.enabled)
                 _valueEvent.Invoke(_floatValue.Step());
         }
