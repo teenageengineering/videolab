@@ -55,9 +55,7 @@ public class Spawner : MonoBehaviour
     {
         var prefab = prefabs[Random.Range(0, prefabs.Length)];
 
-        // Get an initial position and rotation.
-        Vector3 position;
-        Quaternion rotation;
+        Quaternion rotation = randomRotation ? Random.rotation : prefab.transform.localRotation;
 
         if (distribution == Distribution.AtPoints)
         {
@@ -66,29 +64,26 @@ public class Spawner : MonoBehaviour
             spawnPointIndex %= spawnPoints.Length;
             var pt = spawnPoints[spawnPointIndex];
 
-            position = pt.position;
-            rotation = randomRotation ? Random.rotation : prefab.transform.rotation * pt.rotation;
+            var instance = Instantiate(prefab, Vector2.zero, rotation) as GameObject;
+            instance.transform.SetParent(pt, false);
         }
         else
         {
+            Vector2 position;
+                
             if (distribution == Distribution.InSphere)
             {
-                position = transform.TransformPoint(Random.insideUnitSphere * sphereRadius);
+                position = Random.insideUnitSphere * sphereRadius;
             }
             else // Distribution.InBox
             {
                 var rv = new Vector3(Random.value, Random.value, Random.value);
-                position = transform.TransformPoint(Vector3.Scale(rv - Vector3.one * 0.5f, boxSize));
+                position = Vector3.Scale(rv - Vector3.one * 0.5f, boxSize);
             }
 
-            rotation = randomRotation ? Random.rotation : prefab.transform.rotation * transform.rotation;
+            var instance = Instantiate(prefab, position, rotation) as GameObject;
+            instance.transform.SetParent(transform, false);
         }
-
-        // Instantiate.
-        var instance = Instantiate(prefab, position, rotation) as GameObject;
-
-        // Parenting.
-        instance.transform.SetParent(transform, false);
     }
 
     // Make some instances.
