@@ -31,8 +31,23 @@ public class Spawner : MonoBehaviour
     public GameObject[] prefabs;
 
     // Spawn rate settings.
-    public float spawnRate;
-    public float spawnRateRandomness;
+    [SerializeField]
+    float _spawnRate;
+    public float spawnRate {
+        get { return _spawnRate; }
+        set { 
+            _spawnRate = value;
+        }
+    }
+
+    [SerializeField]
+    float _spawnRateRandomness;
+    public float spawnRateRandomness {
+        get { return _spawnRateRandomness; }
+        set { 
+            _spawnRateRandomness = value;
+        }
+    }
 
     // Distribution settings.
     public enum Distribution { InSphere, InBox, AtPoints }

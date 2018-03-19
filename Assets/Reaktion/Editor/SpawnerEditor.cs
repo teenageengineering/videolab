@@ -19,8 +19,8 @@ public class SpawnerEditor : Editor
     void OnEnable()
     {
         _prefabs = serializedObject.FindProperty("prefabs");
-        _spawnRate = serializedObject.FindProperty("spawnRate");
-        _spawnRateRandomness = serializedObject.FindProperty("spawnRateRandomness");
+        _spawnRate = serializedObject.FindProperty("_spawnRate");
+        _spawnRateRandomness = serializedObject.FindProperty("_spawnRateRandomness");
         _distribution = serializedObject.FindProperty("distribution");
         _sphereRadius = serializedObject.FindProperty("sphereRadius");
         _boxSize = serializedObject.FindProperty("boxSize");
