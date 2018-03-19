@@ -9,7 +9,7 @@ namespace Klak.Wiring
         #region Editable properties
 
         [SerializeField]
-        EventTrigger _trigger;
+        RectTransform _triggerRect;
 
         #endregion
 
@@ -41,19 +41,21 @@ namespace Klak.Wiring
 
         void Start()
         {
+            EventTrigger trigger = _triggerRect.gameObject.AddComponent<EventTrigger>();
+
             EventTrigger.Entry pointerDownEntry = new EventTrigger.Entry();
             pointerDownEntry.eventID = EventTriggerType.PointerDown;
             pointerDownEntry.callback.AddListener((data) => {
                 PointerDown((PointerEventData)data);
             });
-            _trigger.triggers.Add(pointerDownEntry);
+            trigger.triggers.Add(pointerDownEntry);
 
             EventTrigger.Entry pointerUpEntry = new EventTrigger.Entry();
             pointerUpEntry.eventID = EventTriggerType.PointerUp;
             pointerUpEntry.callback.AddListener((data) => {
                 PointerUp((PointerEventData)data);
             });
-            _trigger.triggers.Add(pointerUpEntry);
+            trigger.triggers.Add(pointerUpEntry);
         }
 
         #endregion

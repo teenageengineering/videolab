@@ -17,7 +17,7 @@ namespace Klak.Wiring
         #region Editable properties
 
         [SerializeField]
-        EventTrigger _trigger;
+        RectTransform _triggerRect;
 
         [SerializeField]
         DragAxis _axis = DragAxis.Vertical;
@@ -47,29 +47,24 @@ namespace Klak.Wiring
 
         void DragRelative(PointerEventData pointerData)
         {
-
             Vector2 position = Vector2.zero;
-            var rectTransform = _trigger.GetComponent<RectTransform>();
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pointerData.position, pointerData.pressEventCamera, out position);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_triggerRect, pointerData.position, pointerData.pressEventCamera, out position);
 
             Vector2 prevPos = position - pointerData.delta;
             float delta = 0;
 
-            // only supports uniform scale
-            float scaledRange = _range * rectTransform.localScale.x;
-
             switch (_axis) {
 
             case DragAxis.Horizontal:
-                delta = pointerData.delta.x / scaledRange;
+                delta = pointerData.delta.x / _range;
                 break;
 
             case DragAxis.Vertical:
-                delta = pointerData.delta.y / scaledRange;
+                delta = pointerData.delta.y / _range;
                 break;
 
             case DragAxis.Radial:
-                delta = (position.magnitude - prevPos.magnitude) / scaledRange;
+                delta = (position.magnitude - prevPos.magnitude) / _range;
                 break;
 
             case DragAxis.Angular:
@@ -84,9 +79,8 @@ namespace Klak.Wiring
         {
 
             Vector2 position = Vector2.zero;
-            var rectTransform = _trigger.GetComponent<RectTransform>();
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pointerData.position, pointerData.pressEventCamera, out position);
-        
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_triggerRect, pointerData.position, pointerData.pressEventCamera, out position);
+
             float value = 0;
 
             switch (_axis) {
@@ -135,19 +129,21 @@ namespace Klak.Wiring
 
         void Start()
         {
+            EventTrigger trigger = _triggerRect.gameObject.AddComponent<EventTrigger>();
+
             EventTrigger.Entry pointerDownEntry = new EventTrigger.Entry();
             pointerDownEntry.eventID = EventTriggerType.PointerDown;
             pointerDownEntry.callback.AddListener((data) => {
                 PointerDown((PointerEventData)data);
             });
-            _trigger.triggers.Add(pointerDownEntry);
+            trigger.triggers.Add(pointerDownEntry);
 
             EventTrigger.Entry dragEntry = new EventTrigger.Entry();
             dragEntry.eventID = EventTriggerType.Drag;
             dragEntry.callback.AddListener((data) => {
                 Drag((PointerEventData)data);
             });
-            _trigger.triggers.Add(dragEntry);
+            trigger.triggers.Add(dragEntry);
         }
 
         #endregion
