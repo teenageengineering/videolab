@@ -45,9 +45,6 @@ public class Spawner : MonoBehaviour
     // Rotation settings.
     public bool randomRotation;
 
-    // Parenting option.
-    public Transform parent;
-
     // Private variables.
     float randomValue;
     float timer;
@@ -91,7 +88,7 @@ public class Spawner : MonoBehaviour
         var instance = Instantiate(prefab, position, rotation) as GameObject;
 
         // Parenting.
-        if (parent != null) instance.transform.parent = parent;
+        instance.transform.SetParent(transform, false);
     }
 
     // Make some instances.
@@ -122,7 +119,8 @@ public class Spawner : MonoBehaviour
         if (distribution == Distribution.AtPoints)
         {
             foreach (var pt in spawnPoints)
-                Gizmos.DrawWireCube(pt.position, Vector3.one * 0.1f);
+                if (pt != null)
+                    Gizmos.DrawWireCube(pt.position, Vector3.one * 0.1f);
         }
         else if (distribution == Distribution.InSphere)
         {

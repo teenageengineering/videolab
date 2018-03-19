@@ -27,7 +27,7 @@ namespace Reaktion {
 
 public class SelfDestruction : MonoBehaviour
 {
-    public enum ConditionType { Distance, Bounds, Time, ParticleSystem }
+    public enum ConditionType { Distance, Bounds, Time }
     public enum ReferenceType { Origin, Point, InitialPosition, GameObject, GameObjectName }
 
     public ConditionType conditionType = ConditionType.Distance;
@@ -79,11 +79,7 @@ public class SelfDestruction : MonoBehaviour
         if (conditionType == ConditionType.Bounds)
             return bounds.Contains(transform.position - GetReferencePoint());
 
-        if (conditionType == ConditionType.Time)
-            return timer < lifetime;
-
-        // conditionType == ConditionType.ParticleSystem:
-        return GetComponent<ParticleSystem>() != null && GetComponent<ParticleSystem>().IsAlive();
+        return timer < lifetime;
     }
 
     void Start()
