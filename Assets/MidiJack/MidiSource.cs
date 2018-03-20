@@ -126,11 +126,13 @@ namespace MidiJack
         public delegate void NoteOffDelegate(MidiChannel channel, int note);
         public delegate void KnobDelegate(MidiChannel channel, int knobNumber, float knobValue);
         public delegate void RealtimeDelegate(MidiRealtime realtimeMsg);
+        public delegate void SysexDelegate(int data1, int data2);
 
         public NoteOnDelegate noteOnDelegate { get; set; }
         public NoteOffDelegate noteOffDelegate { get; set; }
         public KnobDelegate knobDelegate { get; set; }
         public RealtimeDelegate realtimeDelegate { get; set; }
+        public SysexDelegate sysexDelegate { get; set; }
 
         #endregion
 
@@ -218,13 +220,18 @@ namespace MidiJack
                 }
 
                 // System message?
-                if (statusCode == 0xf) 
+                if (statusCode == 0xf)
                 {
-                    if (realtimeDelegate != null) 
+                    if (channelNumber == 0)
+                    {
+                        if (sysexDelegate != null)
+                            sysexDelegate(message.data1, message.data2);
+                    }
+                    else if (realtimeDelegate != null) 
                     {
                         if (message.status == (byte)MidiRealtime.Clock)
                             realtimeDelegate(MidiRealtime.Clock);
-                        
+
                         if (message.status == (byte)MidiRealtime.Start)
                             realtimeDelegate(MidiRealtime.Start);
 

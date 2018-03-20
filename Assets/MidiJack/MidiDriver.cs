@@ -153,74 +153,42 @@ namespace MidiJack
         #region Native Plugin Interface
 
         #if (!UNITY_IOS && !UNITY_TVOS)
+        const string _libName = "MidiJackPlugin";
+        #else
+        const string _libName = "__Internal";
+        #endif
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackCountSources")]
+        [DllImport(_libName, EntryPoint="MidiJackCountSources")]
         public static extern int CountSources();
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackCountDestinations")]
+        [DllImport(_libName, EntryPoint="MidiJackCountDestinations")]
         public static extern int CountDestinations();
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackGetSourceIDAtIndex")]
+        [DllImport(_libName, EntryPoint="MidiJackGetSourceIDAtIndex")]
         public static extern uint GetSourceIdAtIndex(int index);
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackGetDestinationIDAtIndex")]
+        [DllImport(_libName, EntryPoint="MidiJackGetDestinationIDAtIndex")]
         public static extern uint GetDestinationIdAtIndex(int index);
 
-        [DllImport("MidiJackPlugin")]
+        [DllImport(_libName)]
         public static extern System.IntPtr MidiJackGetSourceName(uint id);
 
         public static string GetSourceName(uint id) {
         return Marshal.PtrToStringAnsi(MidiJackGetSourceName(id));
         }
 
-        [DllImport("MidiJackPlugin")]
+        [DllImport(_libName)]
         public static extern System.IntPtr MidiJackGetDestinationName(uint id);
 
         public static string GetDestinationName(uint id) {
         return Marshal.PtrToStringAnsi(MidiJackGetDestinationName(id));
         }
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackDequeueIncomingData")]
+        [DllImport(_libName, EntryPoint="MidiJackDequeueIncomingData")]
         public static extern ulong DequeueIncomingData();
 
-        [DllImport("MidiJackPlugin", EntryPoint="MidiJackSendMessage")]
+        [DllImport(_libName, EntryPoint="MidiJackSendMessage")]
         public static extern void SendMessage(ulong msg);
-
-        #else
-
-        [DllImport("__Internal", EntryPoint="MidiJackCountSources")]
-        public static extern int CountSources();
-
-        [DllImport("__Internal", EntryPoint="MidiJackCountDestinations")]
-        public static extern int CountDestinations();
-
-        [DllImport("__Internal", EntryPoint="MidiJackGetSourceIDAtIndex")]
-        public static extern uint GetSourceIdAtIndex(int index);
-
-        [DllImport("__Internal", EntryPoint="MidiJackGetDestinationIDAtIndex")]
-        public static extern uint GetDestinationIdAtIndex(int index);
-
-        [DllImport("__Internal")]
-        public static extern System.IntPtr MidiJackGetSourceName(uint id);
-
-        public static string GetSourceName(uint id) {
-            return Marshal.PtrToStringAnsi(MidiJackGetSourceName(id));
-        }
-
-        [DllImport("__Internal")]
-        public static extern System.IntPtr MidiJackGetDestinationName(uint id);
-
-        public static string GetDestinationName(uint id) {
-            return Marshal.PtrToStringAnsi(MidiJackGetDestinationName(id));
-        }
-
-        [DllImport("__Internal", EntryPoint="MidiJackDequeueIncomingData")]
-        public static extern ulong DequeueIncomingData();
-
-        [DllImport("__Internal", EntryPoint="MidiJackSendMessage")]
-        public static extern void SendMessage(ulong msg);
-
-        #endif
 
         #endregion
 
