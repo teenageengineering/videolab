@@ -38,27 +38,40 @@ namespace Klak.Midi
 
         #region Private members
 
+        bool _playing;
+        bool playing {
+            set {
+                _playing = value;
+                _playingEvent.Invoke(value ? 1 : 0);
+            }
+        }
+
         void OnRealtime(MidiRealtime realtimeMsg)
         {
             if (realtimeMsg == MidiRealtime.Clock)
             {
                 _clockEvent.Invoke();
-                _stepEvent.Invoke(1f / 96);
+
+                if (_playing)
+                    _stepEvent.Invoke(1f / 96);
             }
             else if (realtimeMsg == MidiRealtime.Start)
             {
                 _startEvent.Invoke();
-                _playingEvent.Invoke(1);
+
+                playing = true;
             }
             else if (realtimeMsg == MidiRealtime.Continue)
             {
                 _continueEvent.Invoke();
-                _playingEvent.Invoke(1);
+
+                playing = true;
             }
             else if (realtimeMsg == MidiRealtime.Stop)
             {
                 _stopEvent.Invoke();
-                _playingEvent.Invoke(0);
+
+                playing = false;
             }
         }
 
