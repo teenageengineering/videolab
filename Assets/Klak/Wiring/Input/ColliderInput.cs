@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Events;
-using Reaction;
+using Klak.Motion;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Input/Dynamics/Collider Input")]
-    public class ColliderIput : NodeBase
+    [AddComponentMenu("Klak/Wiring/Input/Component/Collider Input")]
+    public class ColliderInput : NodeBase
     {
         #region Editable properties
 
@@ -39,32 +37,32 @@ namespace Klak.Wiring
 
         #region Collision Dispatcher events
 
-        void OnCollisionEnter(Collision collision)
+        void OnCollisionEnter()
         {
             _collisionEnterEvent.Invoke();
         }
 
-        void OnCollisionStay(Collision collision)
+        void OnCollisionStay()
         {
             _collisionStayEvent.Invoke();
         }
 
-        void OnCollisionExit(Collision collision)
+        void OnCollisionExit()
         {
             _collisionExitEvent.Invoke();
         }
 
-        void OnTriggerEnter(Collider collider)
+        void OnTriggerEnter()
         {
             _triggerEnterEvent.Invoke();
         }
 
-        void OnTriggerStay(Collider collider)
+        void OnTriggerStay()
         {
             _triggerStayEvent.Invoke();
         }
 
-        void OnTriggerExit(Collider collider)
+        void OnTriggerExit()
         {
             _triggerExitEvent.Invoke();
         }
@@ -89,22 +87,22 @@ namespace Klak.Wiring
 
         void OnEnable()
         {
-            dispatch.onCollisionEnter += OnCollisionEnter;
-            dispatch.onCollisionStay += OnCollisionStay;
-            dispatch.onCollisionExit += OnCollisionExit;
-            dispatch.onTriggerEnter += OnTriggerEnter;
-            dispatch.onTriggerStay += OnTriggerStay;
-            dispatch.onTriggerExit += OnTriggerExit;
+            dispatch.CollisionEnterEvent.AddListener(OnCollisionEnter);
+            dispatch.CollisionStayEvent.AddListener(OnCollisionStay);
+            dispatch.CollisionExitEvent.AddListener(OnCollisionExit);
+            dispatch.TriggerEnterEvent.AddListener(OnTriggerEnter);
+            dispatch.TriggerStayEvent.AddListener(OnTriggerStay);
+            dispatch.TriggerExitEvent.AddListener(OnTriggerExit);
         }
 
         void OnDisable()
         {
-            dispatch.onCollisionEnter -= OnCollisionEnter;
-            dispatch.onCollisionStay -= OnCollisionStay;
-            dispatch.onCollisionExit -= OnCollisionExit;
-            dispatch.onTriggerEnter -= OnTriggerEnter;
-            dispatch.onTriggerStay -= OnTriggerStay;
-            dispatch.onTriggerExit -= OnTriggerExit;
+            dispatch.CollisionEnterEvent.RemoveListener(OnCollisionEnter);
+            dispatch.CollisionStayEvent.RemoveListener(OnCollisionStay);
+            dispatch.CollisionExitEvent.RemoveListener(OnCollisionExit);
+            dispatch.TriggerEnterEvent.RemoveListener(OnTriggerEnter);
+            dispatch.TriggerStayEvent.RemoveListener(OnTriggerStay);
+            dispatch.TriggerExitEvent.RemoveListener(OnTriggerExit);
         }
 
         #endregion

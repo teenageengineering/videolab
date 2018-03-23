@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(TransformOut))]
-    public class TransformOutEditor : Editor
+    [CustomEditor(typeof(ColliderInput))]
+    public class ColliderInputEditor : Editor
     {
         public override void OnInspectorGUI()
         {

@@ -2,7 +2,7 @@
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Input/Transform Input")]
+    [AddComponentMenu("Klak/Wiring/Input/Component/Transform Input")]
     public class TransformInput : NodeBase
     {
         #region Editable properties

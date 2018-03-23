@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
-namespace Klak.Wiring
+namespace Klak.Motion
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(TransformOut))]
-    public class TransformOutEditor : Editor
+    [CustomEditor(typeof(CollisionDispatch))]
+    public class CollisionDispatchEditor : Editor
     {
         public override void OnInspectorGUI()
         {
