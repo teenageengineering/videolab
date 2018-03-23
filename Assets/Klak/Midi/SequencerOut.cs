@@ -14,7 +14,12 @@ namespace Klak.Midi
         MidiDestination _destination;
 
         MidiDestination destination {
-            get { return (!_destination) ? MidiMaster.GetDestination() : _destination; }
+            get { 
+                if (!_destination) 
+                    _destination = MidiMaster.GetDestination();
+
+                return _destination;
+            }
         }
 
         #endregion
@@ -51,7 +56,7 @@ namespace Klak.Midi
 
         void OnEnable()
         {
-            if (_destination == null)
+            if (!_destination) 
                 _destination = MidiMaster.GetDestination();
         }
 

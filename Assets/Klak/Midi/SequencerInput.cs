@@ -98,7 +98,8 @@ namespace Klak.Midi
 
         void OnDisable()
         {
-            _source.realtimeDelegate -= OnRealtime;
+            if (_source)
+                _source.realtimeDelegate -= OnRealtime;
         }
 
         void Start()

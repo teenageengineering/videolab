@@ -133,7 +133,8 @@ namespace Klak.Midi
 
         void OnDisable()
         {
-            _source.knobDelegate -= OnKnobUpdate;
+            if (_source)
+                _source.knobDelegate -= OnKnobUpdate;
         }
 
         void Start()

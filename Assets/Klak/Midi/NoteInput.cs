@@ -165,8 +165,11 @@ namespace Klak.Midi
 
         void OnDisable()
         {
-            _source.noteOnDelegate -= NoteOn;
-            _source.noteOffDelegate -= NoteOff;
+            if (_source)
+            {
+                _source.noteOnDelegate -= NoteOn;
+                _source.noteOffDelegate -= NoteOff;
+            }
         }
 
         void Start()

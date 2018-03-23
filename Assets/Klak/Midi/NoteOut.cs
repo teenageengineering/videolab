@@ -14,7 +14,12 @@ namespace Klak.Midi
         MidiDestination _destination;
 
         MidiDestination destination {
-            get { return (!_destination) ? MidiMaster.GetDestination() : _destination; }
+            get { 
+                if (!_destination) 
+                    _destination = MidiMaster.GetDestination();
+
+                return _destination;
+            }
         }
 
         [SerializeField]
@@ -55,6 +60,16 @@ namespace Klak.Midi
         public void NoteOff()
         {
             destination.SendKeyUp(_channel, _noteNumber);
+        }
+
+        #endregion
+
+        #region MonoBehaviour functions
+
+        void OnEnable()
+        {
+            if (!_destination) 
+                _destination = MidiMaster.GetDestination();
         }
 
         #endregion
