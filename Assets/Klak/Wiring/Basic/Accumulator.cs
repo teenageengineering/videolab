@@ -42,7 +42,6 @@ namespace Klak.Wiring
             set {
                 if (!enabled) return;
                 _floatValue = 0;
-                ValueUpdate();
             }
         }
 
@@ -51,7 +50,6 @@ namespace Klak.Wiring
             set {
                 if (!enabled) return;
                 _floatValue += value;
-                ValueUpdate();
             }
         }
 
@@ -62,18 +60,13 @@ namespace Klak.Wiring
 
         float _prevValue;
 
-        void ValueUpdate()
-        {
-            _valueEvent.Invoke(_floatValue);
-        }
-
         #region Monobehaviour
 
         void Update()
         {
             if (floatValue != _prevValue)
-            {
-                ValueUpdate(); 
+			{
+				_valueEvent.Invoke(_floatValue); 
                 _prevValue = _floatValue;
             }
         }
