@@ -59,6 +59,7 @@ public class Spawner : MonoBehaviour
 
     // Rotation settings.
     public bool randomRotation;
+    public bool invertSortOrder;
 
     // Private variables.
     float randomValue;
@@ -81,6 +82,7 @@ public class Spawner : MonoBehaviour
 
             var instance = Instantiate(prefab, Vector2.zero, rotation) as GameObject;
             instance.transform.SetParent(pt, false);
+            if (invertSortOrder) instance.transform.SetSiblingIndex(0);
         }
         else
         {
@@ -98,6 +100,7 @@ public class Spawner : MonoBehaviour
 
             var instance = Instantiate(prefab, position, rotation) as GameObject;
             instance.transform.SetParent(transform, false);
+            if (invertSortOrder) instance.transform.SetSiblingIndex(0);
         }
     }
 
