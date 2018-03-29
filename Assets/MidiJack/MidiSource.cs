@@ -126,7 +126,7 @@ namespace MidiJack
         public delegate void NoteOffDelegate(MidiChannel channel, int note);
         public delegate void KnobDelegate(MidiChannel channel, int knobNumber, float knobValue);
         public delegate void RealtimeDelegate(MidiRealtime realtimeMsg);
-        public delegate void SysexDelegate(int data1, int data2);
+        public delegate void SysexDelegate(MidiSysex id, int value);
 
         public NoteOnDelegate noteOnDelegate { get; set; }
         public NoteOffDelegate noteOffDelegate { get; set; }
@@ -225,7 +225,7 @@ namespace MidiJack
                     if (channelNumber == 0)
                     {
                         if (sysexDelegate != null)
-                            sysexDelegate(message.data1, message.data2);
+                            sysexDelegate((MidiSysex)message.data1, message.data2);
                     }
                     else if (realtimeDelegate != null) 
                     {

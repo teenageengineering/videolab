@@ -84,4 +84,13 @@ namespace MidiJack
         Continue,
         Stop
     }
+
+    public enum MidiSysex
+    {
+        ActiveTrack,
+        ActivePattern,
+        ActiveProject,
+        MasterVolume,
+        BatteryLevel,
+    }
 }
