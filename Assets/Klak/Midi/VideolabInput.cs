@@ -12,24 +12,70 @@ namespace Klak.Midi
         [SerializeField]
         MidiSource _source;
 
+        // ivar only for debugging, no need to serialize
+        float _activeTrack;
+        public float activeTrack {
+            get { return _activeTrack; }
+            set {
+                _activeTrack = value;
+                _activeTrackEvent.Invoke(_activeTrack);
+            }
+        }
+
+        float _activePattern;
+        public float activePattern {
+            get { return _activePattern; }
+            set {
+                _activePattern = value;
+                _activePatternEvent.Invoke(_activePattern);
+            }
+        }
+
+        float _activeProject;
+        public float activeProject {
+            get { return _activeProject; }
+            set {
+                _activeProject = value;
+                _activeProjectEvent.Invoke(_activeProject);
+            }
+        }
+
+        float _masterVolume;
+        public float masterVolume {
+            get { return _masterVolume; }
+            set {
+                _masterVolume = value;
+                _masterVolumeEvent.Invoke(_masterVolume);
+            }
+        }
+
+        float _batteryLevel;
+        public float batteryLevel {
+            get { return _batteryLevel; }
+            set {
+                _batteryLevel = value;
+                _batteryLevelEvent.Invoke(_batteryLevel);
+            }
+        }
+
         #endregion
 
         #region Node I/O
 
         [SerializeField, Outlet]
-        FloatEvent _activeTrack = new FloatEvent();
+        FloatEvent _activeTrackEvent = new FloatEvent();
 
         [SerializeField, Outlet]
-        FloatEvent _activePattern = new FloatEvent();
+        FloatEvent _activePatternEvent = new FloatEvent();
 
         [SerializeField, Outlet]
-        FloatEvent _activeProject = new FloatEvent();
+        FloatEvent _activeProjectEvent = new FloatEvent();
 
         [SerializeField, Outlet]
-        FloatEvent _masterVolume = new FloatEvent();
+        FloatEvent _masterVolumeEvent = new FloatEvent();
 
         [SerializeField, Outlet]
-        FloatEvent _batteryLevel = new FloatEvent();
+        FloatEvent _batteryLevelEvent = new FloatEvent();
 
         #endregion
 
@@ -39,23 +85,23 @@ namespace Klak.Midi
         {
             if (id == MidiSysex.ActiveTrack)
             {
-                _activeTrack.Invoke(value);
+                activeTrack = value;
             }
             else if (id == MidiSysex.ActivePattern)
             {
-                _activePattern.Invoke(value);
+                activePattern = value;
             }
             else if (id == MidiSysex.ActiveProject)
             {
-                _activeProject.Invoke(value);
+                activeProject = value;
             }
             else if (id == MidiSysex.MasterVolume)
             {
-                _masterVolume.Invoke(value);
+                masterVolume = value;
             }
             else if (id == MidiSysex.BatteryLevel)
             {
-                _batteryLevel.Invoke(value);
+                batteryLevel = value;
             }
         }
 
