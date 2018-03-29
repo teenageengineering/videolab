@@ -57,6 +57,16 @@ namespace Klak.Midi
 
         #region Node I/O
 
+        [Inlet]
+        public float channel {
+            set {
+                if (!enabled)
+                    return;
+
+                _channel = (MidiChannel)Mathf.Clamp(value, (float)MidiChannel.Ch1, (float)MidiChannel.All);
+            }
+        }
+
         [SerializeField, Outlet]
         VoidEvent _onEvent = new VoidEvent();
 

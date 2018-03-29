@@ -37,6 +37,16 @@ namespace Klak.Midi
         #region Node I/O
 
         [Inlet]
+        public float channel {
+            set {
+                if (!enabled)
+                    return;
+
+                _channel = (MidiChannel)Mathf.Clamp(value, (float)MidiChannel.Ch1, (float)MidiChannel.All);
+            }
+        }
+
+        [Inlet]
         public float noteNumber {
             set {
                 _noteNumber = (int)value;
