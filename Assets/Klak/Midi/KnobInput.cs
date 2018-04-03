@@ -63,7 +63,11 @@ namespace Klak.Midi
                 if (!enabled)
                     return;
 
-                _channel = (MidiChannel)Mathf.Clamp(value, (float)MidiChannel.Ch1, (float)MidiChannel.All);
+                MidiChannel newChannel = (MidiChannel)Mathf.Clamp(value, (float)MidiChannel.Ch1, (float)MidiChannel.All);
+                if (newChannel != _channel)
+                    ResetValue();
+
+                _channel = newChannel;
             }
         }
 
@@ -122,7 +126,11 @@ namespace Klak.Midi
             _lastInputValue = inputValue;
         }
 
-        #endregion
+        void ResetValue()
+        {
+            _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
+            _floatValue.targetValue = _responseCurve.Evaluate(_lastInputValue);
+        }
 
         MidiSource _prevSource;
 
@@ -136,8 +144,12 @@ namespace Klak.Midi
 
             _source.knobDelegate += OnKnobUpdate;
 
+            ResetValue();
+
             _prevSource = _source;
         }
+
+        #endregion
 
         #region MonoBehaviour functions
 
@@ -149,13 +161,9 @@ namespace Klak.Midi
 
         void Start()
         {
+            _floatValue = new FloatInterpolator(0, _interpolator);
+
             SwitchSource();
-
-            _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
-
-            _floatValue = new FloatInterpolator(
-                _responseCurve.Evaluate(_lastInputValue), _interpolator
-            );
         }
 
         void Update()
