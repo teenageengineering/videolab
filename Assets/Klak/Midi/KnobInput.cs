@@ -64,10 +64,11 @@ namespace Klak.Midi
                     return;
 
                 MidiChannel newChannel = (MidiChannel)Mathf.Clamp(value, (float)MidiChannel.Ch1, (float)MidiChannel.All);
-                if (newChannel != _channel)
-                    ResetValue();
+                if (newChannel == _channel)
+                    return;
 
                 _channel = newChannel;
+                ResetValue();
             }
         }
 
