@@ -59,6 +59,7 @@ namespace Klak.Wiring
 
         void Update()
         {
+            if (_target == null || string.IsNullOrEmpty(_propertyName)) return;
             float value = (float)_propertyInfo.GetValue(_target, null);
             if (value != _value)
                 _valueEvent.Invoke(value);
