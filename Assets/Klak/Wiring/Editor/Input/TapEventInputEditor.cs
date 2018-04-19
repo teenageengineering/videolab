@@ -5,8 +5,8 @@ namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(TapEventInput))]
-    public class TapEventInputEditor : Editor {
-
+    public class TapEventInputEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

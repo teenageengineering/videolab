@@ -5,8 +5,8 @@ namespace Klak.Wiring
 {
 	[CanEditMultipleObjects]
 	[CustomEditor(typeof(ConsoleOut))]
-	public class ConsoleOutEditor : Editor {
-
+	public class ConsoleOutEditor : Editor 
+    {
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();

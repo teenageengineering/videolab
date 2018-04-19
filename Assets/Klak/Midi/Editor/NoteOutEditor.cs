@@ -6,8 +6,8 @@ namespace Klak.Midi
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(NoteOut))]
-    public class NoteOutEditor : Editor {
-
+    public class NoteOutEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

@@ -5,8 +5,8 @@ namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(DragEventInput))]
-    public class DragEventInputEditor : Editor {
-
+    public class DragEventInputEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

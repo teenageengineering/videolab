@@ -6,8 +6,8 @@ namespace Klak.Midi
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(SequencerInput))]
-    public class SequencerInputEditor : Editor {
-
+    public class SequencerInputEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

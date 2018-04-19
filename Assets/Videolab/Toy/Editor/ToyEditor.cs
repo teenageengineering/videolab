@@ -10,8 +10,8 @@ namespace VideoLab
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(Toy))]
-    public class ToyEditor : Editor {
-        
+    public class ToyEditor : Editor 
+    {
         const string kTemplatePath = "Assets/videolab/Toy/Shader/Toy.shader";
 
         SerializedProperty _shadertoyText;
