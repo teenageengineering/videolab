@@ -5,13 +5,8 @@ namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(ComponentVector))]
-    public class ComponentVectorEditor : Editor {
-
-        public override bool RequiresConstantRepaint()
-        {
-            return true;
-        }
-
+    public class ComponentVectorEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

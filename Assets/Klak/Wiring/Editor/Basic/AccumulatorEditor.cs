@@ -5,13 +5,8 @@ namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(Accumulator))]
-    public class AccumulatorEditor : Editor {
-
-        public override bool RequiresConstantRepaint()
-        {
-            return true;
-        }
-
+    public class AccumulatorEditor : Editor 
+    {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

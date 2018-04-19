@@ -28,12 +28,7 @@ namespace Klak.Wiring
     [AddComponentMenu("Klak/Wiring/Convertion/Accumulator")]
     public class Accumulator : NodeBase
     {
-        [SerializeField]
         float _floatValue;
-        public float floatValue {
-            get { return _floatValue; }
-            set { _floatValue = value; }
-        }
 
         #region Node I/O
 
@@ -42,6 +37,7 @@ namespace Klak.Wiring
             set {
                 if (!enabled) return;
                 _floatValue = 0;
+                _valueEvent.Invoke(_floatValue); 
             }
         }
 
@@ -50,26 +46,12 @@ namespace Klak.Wiring
             set {
                 if (!enabled) return;
                 _floatValue += value;
+                _valueEvent.Invoke(_floatValue); 
             }
         }
 
         [SerializeField, Outlet]
         FloatEvent _valueEvent = new FloatEvent();
-
-        #endregion
-
-        float _prevValue;
-
-        #region Monobehaviour
-
-        void Update()
-        {
-            if (floatValue != _prevValue)
-			{
-				_valueEvent.Invoke(_floatValue); 
-                _prevValue = _floatValue;
-            }
-        }
 
         #endregion
     }
