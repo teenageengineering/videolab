@@ -26,7 +26,7 @@ using System.Reflection;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Input/Float Input")]
+    [AddComponentMenu("Klak/Wiring/Input/Generic/Float Input")]
     public class FloatInput : NodeBase
     {
         #region Editable properties
