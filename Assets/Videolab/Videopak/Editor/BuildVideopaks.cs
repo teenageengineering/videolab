@@ -16,13 +16,17 @@ public class BuildVideopaks
             buildInfo.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName);
             AssetBundleBuild[] buildMap = new AssetBundleBuild[] { buildInfo };
 
-            string osxDir = dir + bundleName + "/" + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
-            Directory.CreateDirectory(osxDir);
-            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSXUniversal);
-
             string iosDir = dir + bundleName + "/" + VideopakManager.GetPlatformString(RuntimePlatform.IPhonePlayer);
             Directory.CreateDirectory(iosDir);
             BuildPipeline.BuildAssetBundles(iosDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.iOS);
+
+            string osxDir = dir + bundleName + "/" + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
+            Directory.CreateDirectory(osxDir);
+            #if UNITY_2017_3_OR_NEWER
+            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSX);
+            #else
+            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSXUniversal);
+            #endif
         }
     }
 }
