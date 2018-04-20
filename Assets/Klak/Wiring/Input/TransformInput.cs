@@ -30,19 +30,51 @@ namespace Klak.Wiring
 
         #region MonoBehaviour functions
 
+        Vector3 _prevPosition;
+        Quaternion _prevRotation;
+        Vector3 _prevScale;
+
+        void UpdatePosition(Vector3 position)
+        {
+            if (position != _prevPosition)
+            {
+                _positionEvent.Invoke(position);
+                _prevPosition = position;
+            }
+        }
+
+        void UpdateRotation(Quaternion rotation)
+        {
+            if (rotation != _prevRotation)
+            {
+                _rotationEvent.Invoke(rotation);
+                _prevRotation = rotation;
+            }
+        }
+
+        void UpdateScale()
+        {
+            if (_transform.localScale != _prevScale)
+            {
+                _scaleEvent.Invoke(_transform.localScale);
+                _prevScale = _transform.localScale;
+            }
+        }
+
         void Update()
         {
             if (_useLocalValues)
-                _positionEvent.Invoke(_transform.localPosition);
+            {
+                UpdatePosition(_transform.localPosition);
+                UpdateRotation(_transform.localRotation);
+            }
             else
-                _positionEvent.Invoke(_transform.position);
+            {
+                UpdatePosition(_transform.position);
+                UpdateRotation(_transform.rotation);
+            }
 
-            if (_useLocalValues)
-                _rotationEvent.Invoke(_transform.localRotation);
-            else
-                _rotationEvent.Invoke(_transform.rotation);
-
-            _scaleEvent.Invoke(_transform.localScale);
+            UpdateScale();
         }
 
         #endregion
