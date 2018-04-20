@@ -53,7 +53,7 @@ namespace MidiJack
             if (endpointIndex == -1)
             {
                 endpointIds.Add(endpoint.endpointId);
-                endpointNames.Add(endpoint.endpointName + " *");
+                endpointNames.Add(endpoint.endpointName + " (offline)");
                 endpointIndex = endpointIds.Count - 1;
             }
 
