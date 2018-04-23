@@ -10,7 +10,7 @@ namespace VideoLab
         #region Editable properties
 
         [SerializeField]
-        int _deviceIndex = -1;
+        int _deviceIndex;
 
         public int deviceIndex {
             get { return _deviceIndex; }
@@ -79,16 +79,12 @@ namespace VideoLab
             }
         }
 
-        #endregion
-
-        #region Public members
-
         public bool playing {
-            get { return _camTexture.isPlaying; }
+            get { return _camTexture && _camTexture.isPlaying; }
             set {
-                if (_camTexture == null || value == _camTexture.isPlaying)
+                if (!_camTexture || value == _camTexture.isPlaying)
                     return;
-                
+
                 if (value)
                     _camTexture.Play();
                 else 

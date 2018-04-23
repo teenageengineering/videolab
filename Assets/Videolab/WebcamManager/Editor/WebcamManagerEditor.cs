@@ -31,6 +31,13 @@ namespace VideoLab
 
             manager.rawImage = (RawImage)EditorGUILayout.ObjectField("Raw Image", manager.rawImage, typeof(RawImage), true);
             manager.aspectRatioFitter = (AspectRatioFitter)EditorGUILayout.ObjectField("Aspect Ratio Fitter", manager.aspectRatioFitter, typeof(AspectRatioFitter), true);
+
+            EditorGUILayout.Space();
+
+            if (EditorApplication.isPlaying && !serializedObject.isEditingMultipleObjects)
+            {
+                manager.playing = EditorGUILayout.Toggle("Playing", manager.playing);
+            }
         }
     }
 }
