@@ -79,6 +79,22 @@ namespace VideoLab
             }
         }
 
+        [SerializeField]
+        float _targetFrameRate = 60;
+
+        public float targetFrameRate {
+            get { return _targetFrameRate; }
+            set { _targetFrameRate = value; }
+        }
+
+        [SerializeField]
+        bool _autoPlay;
+
+        public bool autoPlay {
+            get { return _autoPlay; }
+            set { _autoPlay = value; }
+        }
+
         public bool playing {
             get { return _camTexture && _camTexture.isPlaying; }
             set {
@@ -86,7 +102,10 @@ namespace VideoLab
                     return;
 
                 if (value)
+                {
+                    _camTexture.requestedFPS = _targetFrameRate;
                     _camTexture.Play();
+                }
                 else 
                     _camTexture.Stop();
             }
@@ -113,6 +132,7 @@ namespace VideoLab
             {
                 WebCamDevice device = WebCamTexture.devices.ElementAt(_deviceIndex);
                 WebCamTexture texture = new WebCamTexture(device.name);
+                texture.requestedFPS = _targetFrameRate;
                 _camTexture = texture;
 
                 if (_material)
@@ -132,6 +152,9 @@ namespace VideoLab
         void Start()
         {
             ReloadCamTexture();
+
+            if (_autoPlay)
+                playing = true;
         }
 
         ScreenOrientation _screenOrientation = ScreenOrientation.Unknown;

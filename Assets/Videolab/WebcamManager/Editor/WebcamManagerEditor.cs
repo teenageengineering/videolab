@@ -34,9 +34,13 @@ namespace VideoLab
 
             EditorGUILayout.Space();
 
+            manager.targetFrameRate = EditorGUILayout.FloatField("Target Frame Rate", manager.targetFrameRate);
             if (EditorApplication.isPlaying && !serializedObject.isEditingMultipleObjects)
             {
                 manager.playing = EditorGUILayout.Toggle("Playing", manager.playing);
+            }
+            else {
+                manager.autoPlay = EditorGUILayout.Toggle("Auto Play", manager.autoPlay);
             }
         }
     }
