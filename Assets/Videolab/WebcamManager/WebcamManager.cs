@@ -92,11 +92,14 @@ namespace VideoLab
             }
         }
 
+        WebCamTexture _camTexture;
+        public WebCamTexture camTexture {
+            get { return _camTexture; }
+        }
+
         #endregion
 
         #region Private
-
-        WebCamTexture _camTexture;
 
         bool _frameNeedsFixing;
 
@@ -131,10 +134,18 @@ namespace VideoLab
             ReloadCamTexture();
         }
 
+        ScreenOrientation _screenOrientation = ScreenOrientation.Unknown;
+
         void Update()
         {
             if (!_camTexture || _camTexture.width < 100)
                 return;
+
+            if (Screen.orientation != _screenOrientation)
+            {
+                _frameNeedsFixing = true;
+                _screenOrientation = Screen.orientation;
+            }
 
             if (_frameNeedsFixing)
             {
