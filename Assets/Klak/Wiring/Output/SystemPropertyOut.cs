@@ -46,6 +46,13 @@ namespace Klak.Wiring
         }
 
         [Inlet]
+        public Color ambientColor {
+            set {
+                if (enabled) RenderSettings.ambientLight = value;
+            }
+        }
+
+        [Inlet]
         public float ambientIntensity {
             set {
                 if (enabled) RenderSettings.ambientIntensity = value;
