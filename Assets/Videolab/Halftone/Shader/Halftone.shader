@@ -17,12 +17,6 @@
             #pragma fragment frag
             
             #include "UnityCG.cginc"
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 pos : SV_POSITION;
-            };
             
             sampler2D _MainTex;
 
@@ -44,7 +38,7 @@
                 return smoothstep(threshold - gl, threshold + gl, value);
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            fixed4 frag(v2f_img i) : SV_Target
             {
                 float3 src = tex2D(_MainTex, i.uv).rgb;
 
