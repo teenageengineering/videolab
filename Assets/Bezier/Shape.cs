@@ -51,31 +51,10 @@ namespace Bezier
             return handles.ToArray();
         }
 
-        public void UpdateGraphic()
+        bool _needsRebuild;
+        public void SetNeedsRebuild()
         {
-            _needsNewMesh = true;
-        }
-
-        public void UpdateTransform()
-        {
-            if (_verts.Length == 0)
-                EditVertices();
-
-            Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 max = new Vector2(float.MinValue, float.MinValue);
-
-            foreach (Vector2 vert in _verts)
-            {
-                min = Vector2.Min(vert, min);
-                max = Vector2.Max(vert, max);
-            }
-
-            this.rectTransform.sizeDelta = max - min;
-            this.rectTransform.anchoredPosition = (max + min) / 2;
-            foreach (Handle handle in GetHandles())
-                handle.pos -= this.rectTransform.anchoredPosition;
-
-            _prevSize = this.rectTransform.rect.size;
+            _needsRebuild = true;
         }
 
         #endregion
@@ -88,7 +67,6 @@ namespace Bezier
 
         Vector2[] _verts = new Vector2[0];
         int[] _indices = new int[0];
-        bool _needsNewMesh;
 
         IEnumerable<Point> GetAllPoints()
         {
@@ -249,10 +227,12 @@ namespace Bezier
 
         void ScaleHandles()
         {
+            if (_prevSize == Vector2.zero)
+                return;
+            
             Vector2 scale = new Vector2(this.rectTransform.rect.size.x / _prevSize.x, this.rectTransform.rect.size.y / _prevSize.y);
 
             Handle[] handles = GetHandles();
-
             for (int i = 0; i < handles.Length; i++)
             {
                 Handle handle = handles[i];
@@ -260,8 +240,6 @@ namespace Bezier
                 handle.control1 = Vector2.Scale(handle.control1, scale);
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
-
-            UpdateGraphic();
         }
 
         #endregion
@@ -270,23 +248,28 @@ namespace Bezier
 
         void Update()
         {
-            if (this.rectTransform.rect.size != _prevSize && _prevSize != Vector2.zero)
-                ScaleHandles();
-
+            if (this.rectTransform.rect.size != _prevSize)
+            {
+                if (snapToSize)
+                    ScaleHandles();
+                SetNeedsRebuild();
+                _prevSize = this.rectTransform.rect.size;
+            }
+            
             int numHandles = GetHandles().Length;
             if (numHandles != _prevNumHandles)
             {
+                SetNeedsRebuild();
                 _prevNumHandles = numHandles;
-                UpdateGraphic();
             }
 
             if (_lineWidth != _prevLineWidth)
             {
+                SetNeedsRebuild();
                 _prevLineWidth = _lineWidth;
-                UpdateGraphic();
             }
 
-            if (_needsNewMesh)
+            if (_needsRebuild)
             {
                 EditVertices();
                 EditTriangles();
@@ -294,15 +277,13 @@ namespace Bezier
                 Graphic graphic = GetComponent<Graphic>();
                 graphic.SetVerticesDirty();
 
-                _needsNewMesh = false;
+                _needsRebuild = false;
             }
-
-            _prevSize = this.rectTransform.rect.size;
         }
 
         public void OnValidate()
         {
-            UpdateGraphic();
+            SetNeedsRebuild();
         }
 
         #endregion

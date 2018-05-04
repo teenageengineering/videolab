@@ -51,8 +51,6 @@ namespace Bezier
                 ParseElementContent(svgElement, reader, ref maskLayer);
             }
 
-            go.AddComponent<Group>();
-
             return go;
         }
 
@@ -114,7 +112,7 @@ namespace Bezier
                     ParseElementContent(groupElement, innerReader, ref maskLayer);
                 }
 
-                go.AddComponent<Group>().EnvelopeChildren();
+                EnvelopeChildren(go.transform);
             }
         }
 
@@ -140,7 +138,7 @@ namespace Bezier
             AddHandle(shape, new Vector2(x + w, y), rx).gameObject.SetActive(false);
             AddHandle(shape, new Vector2(x + w, y - h)).gameObject.SetActive(false);
             AddHandle(shape, new Vector2(x, y - h), rx).gameObject.SetActive(false);
-            shape.UpdateTransform();
+            EnvelopeChildren(go.transform);
         }
 
         void ParseCircleElement(Transform parentElement, XmlReader reader)
@@ -163,7 +161,7 @@ namespace Bezier
             AddHandle(shape, new Vector2(cx + r, cy - r), r).gameObject.SetActive(false);
             AddHandle(shape, new Vector2(cx + r, cy + r), r).gameObject.SetActive(false);
             AddHandle(shape, new Vector2(cx - r, cy + r), r).gameObject.SetActive(false);
-            shape.UpdateTransform();
+            EnvelopeChildren(go.transform);
         }
 
         void ParsePolygonElement(Transform parentElement, XmlReader reader)
@@ -182,9 +180,8 @@ namespace Bezier
             Graphic graphic = _curSegment.GetComponent<Graphic>();
             graphic.color = ParseFillColor(reader);
 
-            Shape shape = _curSegment.GetComponent<Shape>();
             ParseClose();
-            shape.UpdateTransform();
+            EnvelopeChildren(_curSegment.transform);
         }
 
         void ParsePathElement(Transform parentElement, XmlReader reader, ref int maskLayer)
@@ -207,15 +204,11 @@ namespace Bezier
                 Color fillColor = ParseFillColor(reader);
 
                 foreach (Transform segment in pathElement)
-                {
-                    Shape shape = segment.GetComponent<Shape>();
-                    shape.UpdateTransform();
-                }
+                    EnvelopeChildren(segment);
 
                 if (pathElement.childCount > 1)
                 {
-                    Group group = pathObj.AddComponent<Group>();
-                    group.EnvelopeChildren();
+                    EnvelopeChildren(pathElement);
 
                     if (pathObj.name.StartsWith("Path"))
                         pathObj.name = "Compound " + pathObj.name;
@@ -512,6 +505,25 @@ namespace Bezier
             go.transform.SetParent(shape.transform, false);
 
             return handle;
+        }
+
+        void EnvelopeChildren(Transform transform)
+        {
+            Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 max = new Vector2(float.MinValue, float.MinValue);
+
+            foreach (RectTransform child in transform)
+            {
+                Vector2 pos = child.anchoredPosition;
+                min = Vector2.Min(pos + child.rect.min, min);
+                max = Vector2.Max(pos + child.rect.max, max);
+            }
+
+            RectTransform rt = transform as RectTransform;
+            rt.sizeDelta = max - min;
+            rt.anchoredPosition = (max + min) / 2;
+            foreach (RectTransform child in transform)
+                child.anchoredPosition -= rt.anchoredPosition;
         }
 
         void DestroyObject(GameObject go)

@@ -54,9 +54,10 @@ namespace Bezier
 
         public Point point { 
             get {
+                Vector2 p = transform.localPosition;
                 Vector2 c1 = Vector2.Scale(transform.localRotation * this.control1, transform.localScale);
                 Vector2 c2 = Vector2.Scale(transform.localRotation * this.control2, transform.localScale);
-                return new Point(this.pos, this.pos + c1, this.pos + c2);
+                return new Point(p, p + c1, p + c2);
             }
         }
 
@@ -73,8 +74,6 @@ namespace Bezier
         Vector3 _prevScale;
 
         Mode _prevMode;
-
-        const float kHandleSize = 10f;
 
         void EnforceMode(bool control2Free)
         {
@@ -101,7 +100,7 @@ namespace Bezier
             {
                 Shape parentShape = transform.parent.GetComponent<Shape>();
                 if (parentShape)
-                    parentShape.UpdateGraphic();
+                    parentShape.SetNeedsRebuild();
             }
         }
 
@@ -109,16 +108,9 @@ namespace Bezier
 
         #region MonoBehaviour
 
-        void Start()
+        void Awake()
         {
-            this.rectTransform.sizeDelta = new Vector2(kHandleSize, kHandleSize);
-
-            UpdateParent();
-        }
-
-        void OnDestroy()
-        {
-            UpdateParent();
+            this.rectTransform.sizeDelta = Vector2.zero;
         }
 
         void Update()
