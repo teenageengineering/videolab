@@ -14,10 +14,10 @@ namespace VideoLab
 
         public int deviceIndex {
             get { return _deviceIndex; }
-            set { 
+            set {
                 if (value == _deviceIndex)
                     return;
-                
+
                 _deviceIndex = value;
 
                 ReloadCamTexture();
@@ -32,7 +32,7 @@ namespace VideoLab
             set {
                 if (value == _material)
                     return;
-                
+
                 if (_material)
                     _material.mainTexture = null;
 
@@ -72,7 +72,7 @@ namespace VideoLab
             set {
                 if (value == _aspectRatioFitter)
                     return;
-                
+
                 _aspectRatioFitter = value;
 
                 _frameNeedsFixing = true;
@@ -106,7 +106,7 @@ namespace VideoLab
                     _camTexture.requestedFPS = _targetFrameRate;
                     _camTexture.Play();
                 }
-                else 
+                else
                     _camTexture.Stop();
             }
         }
@@ -126,14 +126,11 @@ namespace VideoLab
         {
             playing = false;
 
-            _camTexture = null;
-
             if (_deviceIndex >= 0 && _deviceIndex < WebCamTexture.devices.Length)
             {
                 WebCamDevice device = WebCamTexture.devices.ElementAt(_deviceIndex);
-                WebCamTexture texture = new WebCamTexture(device.name);
-                texture.requestedFPS = _targetFrameRate;
-                _camTexture = texture;
+                _camTexture = new WebCamTexture(device.name);
+                _camTexture.requestedFPS = _targetFrameRate;
 
                 if (_material)
                     _material.mainTexture = _camTexture;
