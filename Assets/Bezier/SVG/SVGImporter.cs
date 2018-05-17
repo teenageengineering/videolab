@@ -36,7 +36,7 @@ class SVGImporter : AssetPostprocessor
 		if (importedAssets.Length == 0)
 			return;
 
-		if (Path.GetExtension(importedAssets[0]) == ".prefab")
+		if (Path.GetExtension(importedAssets[0]) != ".svg")
 			return;
 
 		string svgStr = null;
