@@ -117,5 +117,28 @@ namespace Bezier
 
             serializedObject.ApplyModifiedProperties();
         }
+
+        public void OnSceneGUI() {
+
+            Shape shape = target as Shape;
+            if (!shape.enabled)
+                return;
+
+            float size = HandleUtility.GetHandleSize(shape.transform.localPosition);
+            Quaternion shapeRotation = Tools.pivotRotation == PivotRotation.Local ? shape.transform.rotation : Quaternion.identity;
+
+            Handles.color = Color.HSVToRGB(0, 0, 0.8f);
+
+            Handle[] handles = shape.GetHandles();
+            foreach (Handle handle in handles)
+            {
+                Vector3 p = shape.transform.TransformPoint(handle.transform.localPosition);
+                if (Handles.Button(p, shapeRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
+                {
+                    Selection.activeTransform = handle.transform;
+                    return;
+                }
+            }
+        }
     }
 }

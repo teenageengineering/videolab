@@ -39,7 +39,6 @@ namespace Bezier
         int selectedHandle = 0;
 
         static Color[] modeColors = {
-            Color.HSVToRGB(0, 0, 0.8f),
             Color.yellow,
             Color.cyan,
             Color.magenta
@@ -102,8 +101,6 @@ namespace Bezier
             Transform handleTransform = handle.transform;
             Quaternion handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
-            Handles.color = modeColors[(int)handle.mode];
-
             Event e = Event.current;
             bool deletePressed = (e.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Backspace));
 
@@ -113,25 +110,27 @@ namespace Bezier
 
             if (handle.mode != Handle.Mode.Rounded)
             {
+                Handles.color = modeColors[(int)handle.mode];
+
                 Handles.DrawLine(p, c1);
                 if (Handles.Button(c1, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
-                {
                     selectedHandle = 1;
-                }
 
                 Handles.DrawLine(p, c2);
                 if (Handles.Button(c2, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
-                {
                     selectedHandle = 2;
-                }
             }
 
             if (selectedHandle == 0)
+            {
+                // use standard editor tools
                 Tools.hidden = false;
+            }
             else
             {
                 Tools.hidden = true;
 
+                Handles.color = Color.HSVToRGB(0, 0, 0.8f);
                 if (Handles.Button(p, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
                     selectedHandle = 0;
 

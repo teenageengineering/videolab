@@ -18,6 +18,8 @@ namespace Bezier
 
         public Mode mode;
 
+		// properties for animation and Klak access
+
         [SerializeField]
         float _cornerRadius;
         public float cornerRadius {
@@ -110,7 +112,7 @@ namespace Bezier
 
         void Awake()
         {
-            this.rectTransform.sizeDelta = Vector2.zero;
+            this.rectTransform.sizeDelta = Vector2.one;
         }
 
         void Update()
