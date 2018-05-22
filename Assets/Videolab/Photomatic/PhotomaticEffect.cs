@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VideoLab
+namespace Videolab
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]

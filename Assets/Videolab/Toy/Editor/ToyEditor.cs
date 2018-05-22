@@ -6,7 +6,7 @@ using UnityEditor;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace VideoLab
+namespace Videolab
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(Toy))]

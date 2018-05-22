@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
 
-namespace VideoLab
+namespace Videolab
 {
     public class WebcamManager : MonoBehaviour
     {

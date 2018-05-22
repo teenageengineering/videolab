@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using VideoLab;
+using Videolab;
 
 namespace Klak.Wiring
 {

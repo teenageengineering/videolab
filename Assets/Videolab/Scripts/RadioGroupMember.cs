@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace VideoLab
+namespace Videolab
 {
     public class RadioGroupMember : MonoBehaviour
     {
