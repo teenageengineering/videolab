@@ -67,6 +67,14 @@ namespace Klak.Wiring
             _isPlaying = !_isPlaying;
         }
 
+        [Inlet]
+        public float normalizedTime {
+            set { 
+                _time = value * _timeScale;
+                _floatEvent.Invoke(_curve.Evaluate(_time));
+            }
+        }
+
         [SerializeField, Outlet]
         FloatEvent _floatEvent = new FloatEvent();
 
