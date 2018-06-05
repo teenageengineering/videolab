@@ -12,13 +12,17 @@ namespace Videolab
     [CustomEditor(typeof(Toy))]
     public class ToyEditor : Editor 
     {
-        const string kTemplatePath = "Assets/videolab/Toy/Shader/Toy.shader";
-
         SerializedProperty _shadertoyText;
         SerializedProperty _shader;
 
+        string _templatePath;
+
         void OnEnable()
         {
+            MonoScript thisScript = MonoScript.FromScriptableObject(this);
+            string thisScriptPath = AssetDatabase.GetAssetPath(thisScript);
+            _templatePath = Path.GetDirectoryName(thisScriptPath) + "/../Shader/Toy.shader";
+
             _shadertoyText  = serializedObject.FindProperty("_shadertoyText");
             _shader         = serializedObject.FindProperty("_shader");
         }
@@ -45,12 +49,12 @@ namespace Videolab
         {
             if (shadertoyText == null)
             {
-                _shader.objectReferenceValue = (Shader)AssetDatabase.LoadAssetAtPath(kTemplatePath, typeof(Shader));
+                _shader.objectReferenceValue = (Shader)AssetDatabase.LoadAssetAtPath(_templatePath, typeof(Shader));
                 return;
             }
 
             string stPath = AssetDatabase.GetAssetPath(shadertoyText);
-            string template = File.ReadAllText(kTemplatePath);
+            string template = File.ReadAllText(_templatePath);
 
             // Rename shader.
             template = template.Replace("Hidden/Toy", "Hidden/" + Path.GetFileNameWithoutExtension(stPath));
