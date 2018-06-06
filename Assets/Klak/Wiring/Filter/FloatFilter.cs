@@ -73,12 +73,7 @@ namespace Klak.Wiring
 
         float EvalResponse()
         {
-            float val = _inputValue;
-
-            if (_inputValue >= _responseCurve.keys[0].time && _inputValue <= _responseCurve.keys[_responseCurve.length - 1].time)
-                val = _responseCurve.Evaluate(_inputValue);
-                    
-            return val * _amplitude + _bias;
+            return _responseCurve.Evaluate(_inputValue) * _amplitude + _bias;
         }
 
         #endregion
