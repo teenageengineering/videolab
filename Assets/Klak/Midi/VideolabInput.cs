@@ -40,7 +40,7 @@ namespace Klak.Midi
             }
         }
 
-        float _masterVolume;
+        float _masterVolume = 1;
         public float masterVolume {
             get { return _masterVolume; }
             set {
@@ -49,12 +49,21 @@ namespace Klak.Midi
             }
         }
 
-        float _batteryLevel;
+        float _batteryLevel = 1;
         public float batteryLevel {
             get { return _batteryLevel; }
             set {
                 _batteryLevel = value;
                 _batteryLevelEvent.Invoke(_batteryLevel);
+            }
+        }
+
+        float _tempo = 120;
+        public float tempo {
+            get { return _tempo; }
+            set {
+                _tempo = value;
+                _tempoEvent.Invoke(_tempo);
             }
         }
 
@@ -76,6 +85,9 @@ namespace Klak.Midi
 
         [SerializeField, Outlet]
         FloatEvent _batteryLevelEvent = new FloatEvent();
+
+        [SerializeField, Outlet]
+        FloatEvent _tempoEvent = new FloatEvent();
 
         #endregion
 
@@ -102,6 +114,10 @@ namespace Klak.Midi
             else if (id == MidiSysex.BatteryLevel)
             {
                 batteryLevel = value;
+            }
+            else if (id == MidiSysex.Tempo)
+            {
+                tempo = value;
             }
         }
 
