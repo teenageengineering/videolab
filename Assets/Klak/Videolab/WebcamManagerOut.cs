@@ -3,7 +3,7 @@ using Videolab;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Output/Component/Webcam Manager Out")]
+    [AddComponentMenu("Klak/Wiring/Output/Videolab/Webcam Manager Out")]
     public class WebcamManagerOut : NodeBase
     {
         #region Editable properties
