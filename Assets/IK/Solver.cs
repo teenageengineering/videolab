@@ -6,8 +6,9 @@ namespace IK
 {
 	public class Solver : MonoBehaviour 
 	{
-        public Transform rootJoint;
-        public Transform endEffector;
+        public Joint rootJoint;
+        public Joint endEffector;
+
         public Transform target;
 
         public float tolerance = 0;
@@ -17,7 +18,7 @@ namespace IK
 
 		void LateUpdate()
 		{
-            if (!endEffector.IsChildOf(rootJoint))
+            if (!endEffector.transform.IsChildOf(rootJoint.transform))
             {
                 Debug.Log("[IK.Solver] End effector is not a child of root joint.");
 
@@ -26,31 +27,31 @@ namespace IK
 
             List<Vector3> solution = new List<Vector3>();
 
-            Vector3 startPos = rootJoint.position;
+            Vector3 startPos = rootJoint.transform.position;
             Vector3 targetPos = target.position;
             
             float chainLen = 0;
             List<float> ds = new List<float>();
-            Transform joint;
+            Joint joint;
 
             joint = rootJoint;
             while (true)
             {
-                solution.Add(joint.position);
+                solution.Add(joint.transform.position);
 
-                float d = Vector3.Magnitude(joint.localPosition);
+                float d = Vector3.Magnitude(joint.transform.localPosition);
                 ds.Add(d);
                 chainLen += d;
 
                 if (joint == endEffector)
                     break;
                 
-                joint = joint.GetChild(0);
+                joint = joint.GetJoints()[0];
             }
 
             // target unreachable
-            if (chainLen < Vector3.Distance(targetPos, rootJoint.position))
-                targetPos = rootJoint.position + chainLen * Vector3.Normalize(targetPos - rootJoint.position);
+            if (chainLen < Vector3.Distance(targetPos, rootJoint.transform.position))
+                targetPos = rootJoint.transform.position + chainLen * Vector3.Normalize(targetPos - rootJoint.transform.position);
 
             for (int k = 0; k < maxIterations; k++)
             {
@@ -77,8 +78,11 @@ namespace IK
             joint = rootJoint;
             for (int i = 1; i < solution.Count; i++)
             {
-                joint = joint.GetChild(0);
-                joint.position = Vector3.Lerp(joint.position, solution[i], blendWeight);
+                Joint nextJoint = joint.GetJoints()[0];
+                joint.transform.rotation = Quaternion.LookRotation(solution[i] - joint.transform.position);
+                nextJoint.transform.position = Vector3.Lerp(nextJoint.transform.position, solution[i], blendWeight);
+
+                joint = nextJoint;
             }
         }
 	}
