@@ -6,17 +6,38 @@ namespace IK
 {
     public class Joint : MonoBehaviour 
     {
-        public Joint[] GetJoints()
+        float _boneLength;
+        public float boneLength {
+            get { 
+                return _boneLength;
+            }
+        }
+
+        Quaternion _refOrientation;
+        public Quaternion refOrientation {
+            get { 
+                return _refOrientation;
+            }
+        }
+        
+        public Joint GetChildJoint()
         {
-            List<Joint> joints = new List<Joint>();
-
             Joint joint;
-
             foreach (Transform child in transform)
                 if (joint = child.GetComponent<Joint>())
-                    joints.Add(joint);
+                    return joint;
 
-            return joints.ToArray();
+            return null;
+        }
+
+        void Awake()
+        {
+            Joint childJoint = GetChildJoint();
+            if (childJoint)
+            {
+                _boneLength = Vector3.Magnitude(childJoint.transform.localPosition);
+                _refOrientation = Quaternion.LookRotation(transform.position - childJoint.transform.position);
+            }
         }
     }
 }

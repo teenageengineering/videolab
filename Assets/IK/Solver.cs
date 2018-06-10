@@ -6,6 +6,8 @@ namespace IK
 {
 	public class Solver : MonoBehaviour 
 	{
+        #region Public
+
         public Joint rootJoint;
         public Joint endEffector;
 
@@ -16,8 +18,18 @@ namespace IK
 
         public float blendWeight = 1;
 
-		void LateUpdate()
-		{
+        #endregion
+
+        #region Private
+
+        Joint[] _joints;
+        float _chainLen;
+        Vector3[] _solution;
+
+        #endregion
+
+        void Start()
+        {
             if (!endEffector.transform.IsChildOf(rootJoint.transform))
             {
                 Debug.Log("[IK.Solver] End effector is not a child of root joint.");
@@ -25,64 +37,70 @@ namespace IK
                 return;
             }
 
-            List<Vector3> solution = new List<Vector3>();
-
-            Vector3 startPos = rootJoint.transform.position;
-            Vector3 targetPos = target.position;
+            List<Joint> joints = new List<Joint>();
             
-            float chainLen = 0;
-            List<float> ds = new List<float>();
-            Joint joint;
-
-            joint = rootJoint;
+            Joint joint = rootJoint;
             while (true)
             {
-                solution.Add(joint.transform.position);
-
-                float d = Vector3.Magnitude(joint.transform.localPosition);
-                ds.Add(d);
-                chainLen += d;
+                joints.Add(joint);
+                _chainLen += joint.boneLength;
 
                 if (joint == endEffector)
                     break;
-                
-                joint = joint.GetJoints()[0];
+
+                joint = joint.GetChildJoint();
             }
+            _joints = joints.ToArray();
+
+            _solution = new Vector3[_joints.Length];
+        }
+
+		void LateUpdate()
+		{
+            if (_joints == null)
+                return;
+            
+            Vector3 startPos = rootJoint.transform.position;
+            Vector3 targetPos = target.position;
+
+            // initialize solution
+            for (int i = 0; i < _solution.Length; i++)
+                _solution[i] = _joints[i].transform.position;
 
             // target unreachable
-            if (chainLen < Vector3.Distance(targetPos, rootJoint.transform.position))
-                targetPos = rootJoint.transform.position + chainLen * Vector3.Normalize(targetPos - rootJoint.transform.position);
+            if (_chainLen < Vector3.Distance(targetPos, rootJoint.transform.position))
+                targetPos = rootJoint.transform.position + _chainLen * Vector3.Normalize(targetPos - rootJoint.transform.position);
 
+            // FABRIK iterations
             for (int k = 0; k < maxIterations; k++)
             {
                 //inward
-                solution[solution.Count - 1] = targetPos;
-                for (int i = solution.Count - 1; i > 0; i--)
+                _solution[_solution.Length - 1] = targetPos;
+                for (int i = _solution.Length - 1; i > 0; i--)
                 {
-                    Vector3 v = Vector3.Normalize(solution[i] - solution[i - 1]);
-                    solution[i - 1] = solution[i] - ds[i] * v;
+                    Vector3 v = Vector3.Normalize(_solution[i] - _solution[i - 1]);
+                    _solution[i - 1] = _solution[i] - _joints[i - 1].boneLength * v;
                 }
 
                 //outward
-                solution[0] = startPos;
-                for (int i = 1; i < solution.Count; i++)
+                _solution[0] = startPos;
+                for (int i = 1; i < _solution.Length; i++)
                 {
-                    Vector3 v = Vector3.Normalize(solution[i] - solution[i - 1]);
-                    solution[i] = solution[i - 1] + ds[i] * v;
+                    Vector3 v = Vector3.Normalize(_solution[i] - _solution[i - 1]);
+                    _solution[i] = _solution[i - 1] + _joints[i - 1].boneLength * v;
                 }
 
-                if (Vector3.Distance(solution[solution.Count - 1], targetPos) < (tolerance + 0.001))
+                if (Vector3.Distance(_solution[_solution.Length - 1], targetPos) < (tolerance + 0.001))
                     break;
             }
 
-            joint = rootJoint;
-            for (int i = 1; i < solution.Count; i++)
+            // update joints
+            for (int i = 1; i < _solution.Length; i++)
             {
-                Joint nextJoint = joint.GetJoints()[0];
-                joint.transform.rotation = Quaternion.LookRotation(solution[i] - joint.transform.position);
-                nextJoint.transform.position = Vector3.Lerp(nextJoint.transform.position, solution[i], blendWeight);
-
-                joint = nextJoint;
+                Joint j0 = _joints[i - 1];
+                Joint j1 = _joints[i];
+                j0.transform.rotation = Quaternion.LookRotation(_solution[i] - j0.transform.position) * j0.refOrientation;
+                j1.transform.position = Vector3.Lerp(j1.transform.position, _solution[i], blendWeight);
             }
         }
 	}
