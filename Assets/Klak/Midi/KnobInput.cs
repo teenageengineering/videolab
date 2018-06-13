@@ -154,16 +154,19 @@ namespace Klak.Midi
 
         #region MonoBehaviour functions
 
+        void Awake()
+        {
+            _floatValue = new FloatInterpolator(0, _interpolator);
+        }
+
         void OnDisable()
         {
             if (_source)
                 _source.knobDelegate -= OnKnobUpdate;
         }
 
-        void Start()
+        void OnEnable()
         {
-            _floatValue = new FloatInterpolator(0, _interpolator);
-
             SwitchSource();
         }
 

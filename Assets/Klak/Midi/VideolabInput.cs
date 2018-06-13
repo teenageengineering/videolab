@@ -146,7 +146,7 @@ namespace Klak.Midi
                 _source.sysexDelegate -= OnSysex;
         }
 
-        void Start()
+        void OnEnable()
         {
             SwitchSource();
         }
