@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
+
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#else
+using UnityEngine.SceneManagement;
+#endif
 
 public class VideopakManager
 {
@@ -28,11 +33,9 @@ public class VideopakManager
         return null;
     }
 
-    public static void LoadPak(string pakName, bool isRom = false)
+    public static void LoadPak(string pakRoot)
     {
         Unload();
-
-        string root = (isRom) ? Application.streamingAssetsPath + "/videopaks/" : Application.persistentDataPath + "/videopaks/";
 
         string platform = GetPlatformString(Application.platform);
         if (platform == null)
@@ -41,7 +44,8 @@ public class VideopakManager
             return;
         }
 
-        string path = root + pakName + "/" + platform + "/" + pakName;
+        string pakName = Path.GetFileName(pakRoot);
+        string path = pakRoot + "/" + platform + "/" + pakName;
 
         AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle == null)
@@ -57,7 +61,11 @@ public class VideopakManager
             return;
         }
 
+        #if UNITY_EDITOR
+        EditorSceneManager.OpenScene(scenePaths[0], OpenSceneMode.Additive);
+        #else
         SceneManager.LoadScene(scenePaths[0], LoadSceneMode.Additive);
+        #endif
 
         Instance._bundle = bundle;
     }
@@ -69,7 +77,12 @@ public class VideopakManager
         if (bundle != null)
         {
             var scenePaths = bundle.GetAllScenePaths();
+
+            #if UNITY_EDITOR
+            EditorSceneManager.UnloadScene(scenePaths[0]);
+            #else
             SceneManager.UnloadScene(scenePaths[0]);
+            #endif
 
             bundle.Unload(true);
         }
