@@ -25,13 +25,19 @@ public class BuildVideopaks
             Directory.CreateDirectory(iosDir);
             BuildPipeline.BuildAssetBundles(iosDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.iOS);
 
-            string osxDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
-            Directory.CreateDirectory(osxDir);
-            #if UNITY_2017_3_OR_NEWER
-            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSX);
-            #else
-            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSXUniversal);
-            #endif
+            string pcDir = pakDir + "PC";
+            Directory.CreateDirectory(pcDir);
+            BuildTarget target = BuildTarget.StandaloneWindows64;
+            if (Application.platform == RuntimePlatform.OSXEditor)
+            {
+                #if UNITY_2017_3_OR_NEWER
+                target =  BuildTarget.StandaloneOSX;
+                #else
+                target =  BuildTarget.StandaloneOSXUniversal;
+                #endif
+            }
+
+            BuildPipeline.BuildAssetBundles(pcDir, buildMap, BuildAssetBundleOptions.None, target);
         }
     }
 

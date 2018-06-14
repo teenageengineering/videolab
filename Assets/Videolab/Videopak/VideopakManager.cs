@@ -27,8 +27,11 @@ public class VideopakManager
         if (platform == RuntimePlatform.IPhonePlayer)
             return "iOS";
 
-        if (platform == RuntimePlatform.OSXEditor || platform == RuntimePlatform.OSXPlayer)
-            return "OSX";
+        if (platform == RuntimePlatform.OSXEditor || 
+            platform == RuntimePlatform.OSXPlayer ||
+            platform == RuntimePlatform.WindowsEditor || 
+            platform == RuntimePlatform.WindowsPlayer)
+            return "PC";
 
         return null;
     }
@@ -79,7 +82,7 @@ public class VideopakManager
             var scenePaths = bundle.GetAllScenePaths();
 
             #if UNITY_EDITOR
-            EditorSceneManager.UnloadScene(scenePaths[0]);
+            EditorSceneManager.CloseScene(EditorSceneManager.GetSceneByName(scenePaths[0]), true);
             #else
             SceneManager.UnloadScene(scenePaths[0]);
             #endif
