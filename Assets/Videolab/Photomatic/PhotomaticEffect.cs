@@ -10,7 +10,7 @@ namespace Videolab
         #region Public Properties
 
         [SerializeField, Range(0, 1)]
-        float _hue = 0;
+        float _hue = 0.5f;
 
         public float hue {
             get { return _hue; }
@@ -62,7 +62,8 @@ namespace Videolab
                 _material.hideFlags = HideFlags.DontSave;
             }
 
-            _material.SetVector("_hsbc", new Vector4(_hue, _saturation, _brightness, _contrast));
+            float hue = Mathf.Repeat(_hue - 0.5f, 1);
+            _material.SetVector("_hsbc", new Vector4(hue, _saturation, _brightness, _contrast));
 
             Graphics.Blit(source, destination, _material);
         }
