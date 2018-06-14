@@ -12,17 +12,17 @@ namespace Videolab
         [SerializeField, Range(1, 8)]
         int _resolutionBits = 8;
 
-        public int resolutionBits {
+        public float resolutionBits {
             get { return _resolutionBits; }
-            set { _resolutionBits = value; }
+            set { _resolutionBits = (int)value; }
         }
 
         [SerializeField, Range(1, 8)]
         int _colorBits = 8;
 
-        public int colorBits {
+        public float colorBits {
             get { return _colorBits; }
-            set { _colorBits = value; }
+            set { _colorBits = (int)value; }
         }
 
         #endregion
