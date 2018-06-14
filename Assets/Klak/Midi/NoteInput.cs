@@ -173,6 +173,11 @@ namespace Klak.Midi
 
         #region MonoBehaviour functions
 
+        void Awake()
+        {
+            _floatValue = new FloatInterpolator(_offValue, _interpolator);
+        }
+
         void OnDisable()
         {
             if (_source)
@@ -182,11 +187,9 @@ namespace Klak.Midi
             }
         }
 
-        void Start()
+        void OnEnable()
         {
             SwitchSource();
-
-            _floatValue = new FloatInterpolator(_offValue, _interpolator);
         }
 
         void Update()

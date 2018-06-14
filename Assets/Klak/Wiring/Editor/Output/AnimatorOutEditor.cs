@@ -28,23 +28,13 @@ namespace Klak.Wiring
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(AnimatorOut))]
-    public class AnimatorEditor : Editor
+    public class AnimatorOutEditor : Editor
     {
-        SerializedProperty _animator;
-        SerializedProperty _changeStateTo;
-
-        void OnEnable()
-        {
-            _animator = serializedObject.FindProperty("_animator");
-            _changeStateTo = serializedObject.FindProperty("_changeStateTo");
-        }
-
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_animator);
-            EditorGUILayout.PropertyField(_changeStateTo);
+            DrawPropertiesExcluding(serializedObject, new string[] {"m_Script"});
 
             serializedObject.ApplyModifiedProperties();
         }

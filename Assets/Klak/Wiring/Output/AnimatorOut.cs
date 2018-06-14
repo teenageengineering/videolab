@@ -36,6 +36,9 @@ namespace Klak.Wiring
         [SerializeField]
         string _changeStateTo;
 
+        [SerializeField]
+        string _parameterName;
+
         #endregion
 
         #region Node I/O
@@ -53,6 +56,14 @@ namespace Klak.Wiring
             set {
                 if (!enabled || _animator == null) return;
                 _animator.Play(0, -1, value % 1);
+            }
+        }
+
+        [Inlet]
+        public float floatParameter {
+            set {
+                if (!enabled || _animator == null) return;
+                _animator.SetFloat(Animator.StringToHash(_parameterName), value);
             }
         }
 
