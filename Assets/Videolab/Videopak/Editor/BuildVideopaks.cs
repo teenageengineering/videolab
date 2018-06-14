@@ -5,9 +5,9 @@ using System.IO;
 public class BuildVideopaks
 {
     [MenuItem ("Assets/Build Videopaks")]
-    static void BuildAllVideopaks()
+    static void BuildAll()
     {
-        string rootDir = EditorUtility.SaveFolderPanel("Output directory", "", "");
+        string rootDir = EditorUtility.SaveFolderPanel("Select output directory", "", "");
 
         if (string.IsNullOrEmpty(rootDir))
             return;
@@ -25,30 +25,13 @@ public class BuildVideopaks
             Directory.CreateDirectory(iosDir);
             BuildPipeline.BuildAssetBundles(iosDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.iOS);
 
-            string pcDir = pakDir + "PC";
-            Directory.CreateDirectory(pcDir);
-            BuildTarget target = BuildTarget.StandaloneWindows64;
-            if (Application.platform == RuntimePlatform.OSXEditor)
-            {
-                #if UNITY_2017_3_OR_NEWER
-                target =  BuildTarget.StandaloneOSX;
-                #else
-                target =  BuildTarget.StandaloneOSXUniversal;
-                #endif
-            }
-
-            BuildPipeline.BuildAssetBundles(pcDir, buildMap, BuildAssetBundleOptions.None, target);
+            string osxDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
+            Directory.CreateDirectory(osxDir);
+            #if UNITY_2017_3_OR_NEWER
+            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSX);
+            #else
+            BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSXUniversal);
+            #endif
         }
-    }
-
-    [MenuItem ("Assets/Load Videopak")]
-    static void LoadVideopak()
-    {
-        string pakDir = EditorUtility.OpenFolderPanel("Select videopak", "", "");
-
-        if (string.IsNullOrEmpty(pakDir))
-            return;
-
-        VideopakManager.LoadPak(pakDir);
     }
 }

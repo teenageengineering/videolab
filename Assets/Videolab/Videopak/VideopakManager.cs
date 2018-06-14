@@ -1,11 +1,6 @@
 ﻿using UnityEngine;
-using System.IO;
-
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-#else
 using UnityEngine.SceneManagement;
-#endif
+using System.IO;
 
 public class VideopakManager
 {
@@ -27,11 +22,8 @@ public class VideopakManager
         if (platform == RuntimePlatform.IPhonePlayer)
             return "iOS";
 
-        if (platform == RuntimePlatform.OSXEditor || 
-            platform == RuntimePlatform.OSXPlayer ||
-            platform == RuntimePlatform.WindowsEditor || 
-            platform == RuntimePlatform.WindowsPlayer)
-            return "PC";
+        if (platform == RuntimePlatform.OSXEditor || platform == RuntimePlatform.OSXPlayer)
+            return "OSX";
 
         return null;
     }
@@ -64,11 +56,7 @@ public class VideopakManager
             return;
         }
 
-        #if UNITY_EDITOR
-        EditorSceneManager.OpenScene(scenePaths[0], OpenSceneMode.Additive);
-        #else
         SceneManager.LoadScene(scenePaths[0], LoadSceneMode.Additive);
-        #endif
 
         Instance._bundle = bundle;
     }
@@ -80,12 +68,7 @@ public class VideopakManager
         if (bundle != null)
         {
             var scenePaths = bundle.GetAllScenePaths();
-
-            #if UNITY_EDITOR
-            EditorSceneManager.CloseScene(EditorSceneManager.GetSceneByName(scenePaths[0]), true);
-            #else
             SceneManager.UnloadScene(scenePaths[0]);
-            #endif
 
             bundle.Unload(true);
         }
