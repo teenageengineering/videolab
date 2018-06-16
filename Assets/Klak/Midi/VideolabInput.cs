@@ -40,7 +40,7 @@ namespace Klak.Midi
             }
         }
 
-        float _masterVolume = 1;
+        float _masterVolume;
         public float masterVolume {
             get { return _masterVolume; }
             set {
@@ -49,7 +49,7 @@ namespace Klak.Midi
             }
         }
 
-        float _batteryLevel = 1;
+        float _batteryLevel;
         public float batteryLevel {
             get { return _batteryLevel; }
             set {
@@ -58,7 +58,7 @@ namespace Klak.Midi
             }
         }
 
-        float _tempo = 120;
+        float _tempo;
         public float tempo {
             get { return _tempo; }
             set {
@@ -155,6 +155,10 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+			// FIXME
+			if (_tempo == 0)
+				tempo = 120;
         }
 
         #endregion
