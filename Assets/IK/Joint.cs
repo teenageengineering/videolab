@@ -36,7 +36,7 @@ namespace IK
             if (childJoint)
             {
                 _boneLength = Vector3.Magnitude(childJoint.transform.localPosition);
-                _refOrientation = Quaternion.LookRotation(transform.position - childJoint.transform.position);
+                _refOrientation = Quaternion.LookRotation(childJoint.transform.localPosition);
             }
         }
     }

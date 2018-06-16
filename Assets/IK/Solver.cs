@@ -74,7 +74,7 @@ namespace IK
             // FABRIK iterations
             for (int k = 0; k < maxIterations; k++)
             {
-                //inward
+                // inward
                 _solution[_solution.Length - 1] = targetPos;
                 for (int i = _solution.Length - 1; i > 0; i--)
                 {
@@ -82,7 +82,7 @@ namespace IK
                     _solution[i - 1] = _solution[i] - _joints[i - 1].boneLength * v;
                 }
 
-                //outward
+                // outward
                 _solution[0] = startPos;
                 for (int i = 1; i < _solution.Length; i++)
                 {
@@ -95,12 +95,10 @@ namespace IK
             }
 
             // update joints
-            for (int i = 1; i < _solution.Length; i++)
+            for (int i = 0; i < _solution.Length - 1; i++)
             {
-                Joint j0 = _joints[i - 1];
-                Joint j1 = _joints[i];
-                j0.transform.rotation = Quaternion.LookRotation(_solution[i] - j0.transform.position) * j0.refOrientation;
-                j1.transform.position = Vector3.Lerp(j1.transform.position, _solution[i], blendWeight);
+                Joint joint = _joints[i];
+                joint.transform.rotation = Quaternion.LookRotation(_solution[i + 1] - joint.transform.position) * Quaternion.Inverse(joint.refOrientation);
             }
         }
 	}
