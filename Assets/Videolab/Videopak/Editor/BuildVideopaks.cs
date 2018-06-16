@@ -19,7 +19,7 @@ public class BuildVideopaks
             buildInfo.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName);
             AssetBundleBuild[] buildMap = new AssetBundleBuild[] { buildInfo };
 
-            string pakDir = rootDir + bundleName + "/";
+            string pakDir = rootDir + "/" + bundleName + "/";
 
             string iosDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.IPhonePlayer);
             Directory.CreateDirectory(iosDir);
