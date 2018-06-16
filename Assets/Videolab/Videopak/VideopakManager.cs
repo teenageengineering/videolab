@@ -28,11 +28,9 @@ public class VideopakManager
         return null;
     }
 
-    public static void LoadPak(string pakName, bool isRom = false)
+    public static void LoadPak(string pakRoot)
     {
         Unload();
-
-        string root = (isRom) ? Application.streamingAssetsPath + "/videopaks/" : Application.persistentDataPath + "/videopaks/";
 
         string platform = GetPlatformString(Application.platform);
         if (platform == null)
@@ -41,7 +39,8 @@ public class VideopakManager
             return;
         }
 
-        string path = root + pakName + "/" + platform + "/" + pakName;
+        string pakName = Path.GetFileName(pakRoot);
+        string path = pakRoot + "/" + platform + "/" + pakName;
 
         AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle == null)
