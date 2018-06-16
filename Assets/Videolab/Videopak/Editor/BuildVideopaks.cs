@@ -11,7 +11,7 @@ public class BuildVideopaks
 
         if (string.IsNullOrEmpty(rootDir))
             return;
-        
+
         foreach (string bundleName in AssetDatabase.GetAllAssetBundleNames())
         {
             AssetBundleBuild buildInfo = new AssetBundleBuild();
@@ -19,7 +19,7 @@ public class BuildVideopaks
             buildInfo.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName);
             AssetBundleBuild[] buildMap = new AssetBundleBuild[] { buildInfo };
 
-            string pakDir = rootDir + "/videopaks/" + bundleName + "/";
+            string pakDir = rootDir + bundleName + "/";
 
             string iosDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.IPhonePlayer);
             Directory.CreateDirectory(iosDir);
