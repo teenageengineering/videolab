@@ -15,6 +15,7 @@ namespace Klak.Wiring
         string _propertyName;
 
         [SerializeField]
+        [Tooltip("Standard numeric format string.")]
         string _format = "0.00";
 
         #endregion
