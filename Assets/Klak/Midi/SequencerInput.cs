@@ -66,6 +66,8 @@ namespace Klak.Midi
 
         MidiSource _prevSource;
 
+        bool _needsReset;
+
         void SwitchSource()
         {
             if (_prevSource)
@@ -76,17 +78,7 @@ namespace Klak.Midi
 
             _source.realtimeDelegate += OnRealtime;
 
-            if (_source.IsPlaying())
-            {
-                _startEvent.Invoke();
-                _continueEvent.Invoke();
-                _playingEvent.Invoke(1);
-            }
-            else
-            {
-                _stopEvent.Invoke();
-                _playingEvent.Invoke(0);
-            }
+            _needsReset = true;
 
             _prevSource = _source;
         }
@@ -110,6 +102,16 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+            if (_needsReset)
+            {
+                if (_source.IsPlaying())
+                    OnRealtime(MidiRealtime.Start);
+                else
+                    OnRealtime(MidiRealtime.Stop);
+
+                _needsReset = false;
+            }
         }
 
         #endregion

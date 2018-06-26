@@ -123,6 +123,8 @@ namespace Klak.Midi
 
         MidiSource _prevSource;
 
+        bool _needsReset;
+
         void SwitchSource()
         {
             if (_prevSource)
@@ -133,12 +135,7 @@ namespace Klak.Midi
 
             _source.sysexDelegate += OnSysex;
 
-            OnSysex(MidiSysex.ActiveTrack, _source.GetSysex(MidiSysex.ActiveTrack));
-            OnSysex(MidiSysex.ActivePattern, _source.GetSysex(MidiSysex.ActivePattern));
-            OnSysex(MidiSysex.ActiveProject, _source.GetSysex(MidiSysex.ActiveProject));
-            OnSysex(MidiSysex.MasterVolume, _source.GetSysex(MidiSysex.MasterVolume));
-            OnSysex(MidiSysex.BatteryLevel, _source.GetSysex(MidiSysex.BatteryLevel));
-            OnSysex(MidiSysex.Tempo, _source.GetSysex(MidiSysex.Tempo));
+            _needsReset = true;
 
             _prevSource = _source;
         }
@@ -162,6 +159,18 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+            if (_needsReset)
+            {
+                OnSysex(MidiSysex.ActiveTrack, _source.GetSysex(MidiSysex.ActiveTrack));
+                OnSysex(MidiSysex.ActivePattern, _source.GetSysex(MidiSysex.ActivePattern));
+                OnSysex(MidiSysex.ActiveProject, _source.GetSysex(MidiSysex.ActiveProject));
+                OnSysex(MidiSysex.MasterVolume, _source.GetSysex(MidiSysex.MasterVolume));
+                OnSysex(MidiSysex.BatteryLevel, _source.GetSysex(MidiSysex.BatteryLevel));
+                OnSysex(MidiSysex.Tempo, _source.GetSysex(MidiSysex.Tempo));
+
+                _needsReset = false;
+            }
         }
 
         #endregion
