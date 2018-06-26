@@ -54,6 +54,8 @@ namespace MidiJack
 
         bool _isPlaying;
 
+        int[] _sysexMem;
+
         protected override void AddEndpoint() 
         {
             MidiDriver.AddSource(this);
@@ -126,6 +128,18 @@ namespace MidiJack
             return _isPlaying;
         }
 
+        public int GetSysex(MidiSysex id)
+        {
+            MidiDriver.Refresh();
+
+            int index = (int)id;
+
+            if (index >= _sysexMem.Length)
+                return 0;
+
+            return _sysexMem[index];
+        }
+
         #endregion
 
         #region Event Delegates
@@ -157,6 +171,8 @@ namespace MidiJack
             _channelArray = new ChannelState[17];
             for (var i = 0; i < 17; i++)
                 _channelArray[i] = new ChannelState();
+
+            _sysexMem = new int[Enum.GetNames(typeof(MidiSysex)).Length];
 
             msgQueue = new Queue<MidiMessage>();
         }
@@ -232,6 +248,11 @@ namespace MidiJack
                 {
                     if (channelNumber == 0)
                     {
+                        if (message.data1 >= _sysexMem.Length)
+                            return;
+
+                        _sysexMem[message.data1] = message.data2;
+
                         if (sysexDelegate != null)
                             sysexDelegate((MidiSysex)message.data1, message.data2);
                     }

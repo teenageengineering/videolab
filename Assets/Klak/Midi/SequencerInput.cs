@@ -76,6 +76,18 @@ namespace Klak.Midi
 
             _source.realtimeDelegate += OnRealtime;
 
+            if (_source.IsPlaying())
+            {
+                _startEvent.Invoke();
+                _continueEvent.Invoke();
+                _playingEvent.Invoke(1);
+            }
+            else
+            {
+                _stopEvent.Invoke();
+                _playingEvent.Invoke(0);
+            }
+
             _prevSource = _source;
         }
 
