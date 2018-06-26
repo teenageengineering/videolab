@@ -41,6 +41,11 @@ public class VideopakManager
 
         string pakName = Path.GetFileName(pakRoot);
         string path = pakRoot + "/" + platform + "/" + pakName;
+        if (!File.Exists(path))
+        {
+            Debug.Log("[VideopakManager] Missing platform payload " + path);
+            return;
+        }
 
         AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle == null)
