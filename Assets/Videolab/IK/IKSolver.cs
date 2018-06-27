@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IK 
+namespace Videolab 
 {
-	public class Solver : MonoBehaviour 
+	public class IKSolver : MonoBehaviour 
 	{
         #region Public
 
-        public Joint rootJoint;
-        public Joint endEffector;
+        public IKJoint rootJoint;
+        public IKJoint endEffector;
 
         public Transform target;
 
@@ -22,7 +22,7 @@ namespace IK
 
         #region Private
 
-        Joint[] _joints;
+        IKJoint[] _joints;
         float _chainLen;
         Vector3[] _solution;
 
@@ -37,9 +37,9 @@ namespace IK
                 return;
             }
 
-            List<Joint> joints = new List<Joint>();
+            List<IKJoint> joints = new List<IKJoint>();
             
-            Joint joint = rootJoint;
+            IKJoint joint = rootJoint;
             while (true)
             {
                 joints.Add(joint);
@@ -97,7 +97,7 @@ namespace IK
             // update joints
             for (int i = 0; i < _solution.Length - 1; i++)
             {
-                Joint joint = _joints[i];
+                IKJoint joint = _joints[i];
                 joint.transform.rotation = Quaternion.LookRotation(_solution[i + 1] - joint.transform.position) * Quaternion.Inverse(joint.refOrientation);
             }
         }

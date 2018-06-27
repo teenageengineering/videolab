@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IK
+namespace Videolab
 {
-    public class Joint : MonoBehaviour 
+    public class IKJoint : MonoBehaviour 
     {
         float _boneLength;
         public float boneLength {
@@ -20,11 +20,11 @@ namespace IK
             }
         }
         
-        public Joint GetChildJoint()
+        public IKJoint GetChildJoint()
         {
-            Joint joint;
+            IKJoint joint;
             foreach (Transform child in transform)
-                if (joint = child.GetComponent<Joint>())
+                if (joint = child.GetComponent<IKJoint>())
                     return joint;
 
             return null;
@@ -32,7 +32,7 @@ namespace IK
 
         void Awake()
         {
-            Joint childJoint = GetChildJoint();
+            IKJoint childJoint = GetChildJoint();
             if (childJoint)
             {
                 _boneLength = Vector3.Magnitude(childJoint.transform.localPosition);
