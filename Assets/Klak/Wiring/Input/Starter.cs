@@ -33,13 +33,36 @@ namespace Klak.Wiring
         [SerializeField, Outlet]
         VoidEvent _onStartEvent = new VoidEvent();
 
+        [SerializeField, Outlet]
+        VoidEvent _onEnabledEvent = new VoidEvent();
+
+        [SerializeField, Outlet]
+        VoidEvent _onDisabledEvent = new VoidEvent();
+
         #endregion
 
         #region MonoBehaviour functions
 
+        bool _hasStarted;
+
         void Start()
         {
             _onStartEvent.Invoke();
+            _onEnabledEvent.Invoke();
+
+            _hasStarted = true;
+        }
+
+        void OnEnable()
+        {
+            // Do not fire during startup.
+            if (_hasStarted)
+                _onEnabledEvent.Invoke();
+        }
+
+        void OnDisable()
+        {
+            _onDisabledEvent.Invoke();
         }
 
         #endregion
