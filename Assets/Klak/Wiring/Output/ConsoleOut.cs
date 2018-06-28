@@ -10,37 +10,44 @@ namespace Klak.Wiring
 
 		[Inlet]
 		public void Bang() {
-			Debug.Log(name + " Bang!");
+            LogInEditor(name + " Bang!");
 		}
 
 		[Inlet]
 		public float number {
 			set {
-				Debug.Log(name + " " + value);
+                LogInEditor(name + " " + value);
 			}
 		}
 
 		[Inlet]
 		public Vector3 vector {
 			set {
-				Debug.Log(name + " Vector3" + value);
+                LogInEditor(name + " Vector3" + value);
 			}
 		}
 
 		[Inlet]
 		public Quaternion rotation {
 			set {
-				Debug.Log(name + " Quaternion" + value);
+                LogInEditor(name + " Quaternion" + value);
 			}
 		}
 
 		[Inlet]
 		public Color color {
 			set {
-				Debug.Log(name + " " + value);
+                LogInEditor(name + " " + value);
 			}
 		}
 
 		#endregion
+
+        void LogInEditor(string msg)
+        {
+            #if UNITY_EDITOR
+            Debug.Log(msg);
+            #endif
+        }
 	}
 }
