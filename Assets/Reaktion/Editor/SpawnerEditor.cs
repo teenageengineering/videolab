@@ -15,7 +15,7 @@ public class SpawnerEditor : Editor
     SerializedProperty _boxSize;
     SerializedProperty _spawnPoints;
     SerializedProperty _randomRotation;
-    SerializedProperty _invertSortOrder;
+    SerializedProperty _parent;
 
     void OnEnable()
     {
@@ -27,7 +27,7 @@ public class SpawnerEditor : Editor
         _boxSize = serializedObject.FindProperty("boxSize");
         _spawnPoints = serializedObject.FindProperty("spawnPoints");
         _randomRotation = serializedObject.FindProperty("randomRotation");
-        _invertSortOrder = serializedObject.FindProperty("invertSortOrder");
+        _parent = serializedObject.FindProperty("parent");
     }
 
     public override void OnInspectorGUI()
@@ -55,7 +55,7 @@ public class SpawnerEditor : Editor
         EditorGUILayout.Space();
 
         EditorGUILayout.PropertyField(_randomRotation);
-        EditorGUILayout.PropertyField(_invertSortOrder);
+        EditorGUILayout.PropertyField(_parent);
 
         serializedObject.ApplyModifiedProperties();
     }
