@@ -36,9 +36,9 @@ namespace Kino
         [SerializeField, Range(16, kMaxSliceCount)]
         int _sliceCount = 128;
 
-        public int sliceCount {
+        public float sliceCount {
             get { return _sliceCount; }
-            set { _sliceCount = value; }
+            set { _sliceCount = (int)value; }
         }
 
         #endregion

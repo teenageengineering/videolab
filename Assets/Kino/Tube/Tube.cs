@@ -10,10 +10,29 @@ namespace Kino
     {
         #region Editable attributes
 
-        [SerializeField, Range(0, 1)] float _bleeding = 0.5f;
-        [SerializeField, Range(0, 1)] float _fringing = 0.5f;
-        [SerializeField, Range(0, 1)] float _scanline = 0.5f;
+        [SerializeField, Range(0, 1)] 
+        float _bleeding = 0.5f;
 
+        public float bleeding {
+            get { return _bleeding; }
+            set { _bleeding = value; }
+        }
+
+        [SerializeField, Range(0, 1)] 
+        float _fringing = 0.5f;
+
+        public float fringing {
+            get { return _fringing; }
+            set { _fringing = value; }
+        }
+
+        [SerializeField, Range(0, 1)] 
+        float _scanline = 0.5f;
+
+        public float scanline {
+            get { return _scanline; }
+            set { _scanline = value; }
+        }
         #endregion
 
         #region Private resources

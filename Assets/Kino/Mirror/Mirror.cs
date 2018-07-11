@@ -34,11 +34,26 @@ namespace Kino
         [SerializeField]
         int _repeat;
 
+        public float repeat  {
+            get { return _repeat; }
+            set { _repeat = (int)value; }
+        }
+
         [SerializeField]
         float _offset;
 
+        public float offset {
+            get { return _offset; }
+            set { _offset = value; }
+        }
+
         [SerializeField]
         float _roll;
+
+        public float roll {
+            get { return _roll; }
+            set { _roll = value; }
+        }
 
         [SerializeField]
         bool _symmetry;
