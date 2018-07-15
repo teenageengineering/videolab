@@ -130,12 +130,11 @@ GameObject:
   - component: {fileID: 268996383}
   - component: {fileID: 268996382}
   - component: {fileID: 268996381}
+  - component: {fileID: 268996375}
   - component: {fileID: 268996380}
-  - component: {fileID: 268996379}
   - component: {fileID: 268996378}
   - component: {fileID: 268996377}
   - component: {fileID: 268996376}
-  - component: {fileID: 268996375}
   - component: {fileID: 268996374}
   - component: {fileID: 268996373}
   - component: {fileID: 268996372}
@@ -295,12 +294,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 268996365}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97ab43805f89702488f7ab1de382cd05, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a3a070408aa941ab83ae10be1708848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sliceCount: 128
-  _mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  _shader: {fileID: 4800000, guid: 8b3f314a534e9b34da06266d263c34e6, type: 3}
+  _intensity: 0
+  _shader: {fileID: 4800000, guid: ba40dc630e1d9417cb9ea22586ece1e1, type: 3}
 --- !u!114 &268996376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -353,19 +351,6 @@ MonoBehaviour:
   _roll: 0
   _symmetry: 0
   _shader: {fileID: 4800000, guid: 46ce67666b84e15478d1b6d6cff3f092, type: 3}
---- !u!114 &268996379
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 268996365}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb9c048da5fbd4bde8a9f986a66de05d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _direction: {x: 0.577, y: 0.577, z: 0.577}
-  _speed: 0.2
 --- !u!114 &268996380
 MonoBehaviour:
   m_ObjectHideFlags: 0
