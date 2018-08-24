@@ -46,7 +46,7 @@ namespace Klak.Wiring
         [Inlet]
         public float speed {
             set {
-                if (!enabled || _animator == null) return;
+                if (!enabled || _animator == null || !_animator.isActiveAndEnabled) return;
                 _animator.speed = value;
             }
         }
@@ -54,7 +54,7 @@ namespace Klak.Wiring
         [Inlet]
         public float normalizedTime {
             set {
-                if (!enabled || _animator == null) return;
+                if (!enabled || _animator == null || !_animator.isActiveAndEnabled) return;
                 _animator.Play(0, -1, value % 1);
             }
         }
@@ -62,7 +62,7 @@ namespace Klak.Wiring
         [Inlet]
         public float floatParameter {
             set {
-                if (!enabled || _animator == null) return;
+                if (!enabled || _animator == null || !_animator.isActiveAndEnabled) return;
                 _animator.SetFloat(Animator.StringToHash(_parameterName), value);
             }
         }
@@ -70,6 +70,7 @@ namespace Klak.Wiring
         [Inlet]
         public void ChangeState()
         {
+            if (!enabled || _animator == null || !_animator.isActiveAndEnabled) return;
             _animator.Play(_changeStateTo);
         }
 
