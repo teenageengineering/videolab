@@ -173,6 +173,7 @@ namespace MidiJack
                 _channelArray[i] = new ChannelState();
 
             _sysexMem = new int[Enum.GetNames(typeof(MidiSysex)).Length];
+			_sysexMem[(int)MidiSysex.Tempo] = 120;
 
             msgQueue = new Queue<MidiMessage>();
         }
