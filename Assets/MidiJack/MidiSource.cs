@@ -56,12 +56,12 @@ namespace MidiJack
 
         int[] _sysexMem;
 
-        protected override void AddEndpoint() 
+        protected override void AddEndpoint()
         {
             MidiDriver.AddSource(this);
         }
 
-        protected override void RemoveEndpoint(uint endpointId) 
+        protected override void RemoveEndpoint(uint endpointId)
         {
             MidiDriver.RemoveSource(endpointId);
         }
@@ -173,7 +173,7 @@ namespace MidiJack
                 _channelArray[i] = new ChannelState();
 
             _sysexMem = new int[Enum.GetNames(typeof(MidiSysex)).Length];
-			_sysexMem[(int)MidiSysex.Tempo] = 120;
+            _sysexMem[(int)MidiSysex.Tempo] = 120;
 
             msgQueue = new Queue<MidiMessage>();
         }
