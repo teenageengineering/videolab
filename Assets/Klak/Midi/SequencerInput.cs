@@ -45,7 +45,7 @@ namespace Klak.Midi
                 _clockEvent.Invoke();
 
                 if (_source.IsPlaying())
-                    _stepEvent.Invoke(1f / 96);
+                    _stepEvent.Invoke(1f / 24);
             }
             else if (realtimeMsg == MidiRealtime.Start)
             {
