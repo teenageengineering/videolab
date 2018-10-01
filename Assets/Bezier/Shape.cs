@@ -227,10 +227,14 @@ namespace Bezier
 
         void ScaleHandles()
         {
-            if (_prevSize == Vector2.zero)
+            Vector2 newSize = this.rectTransform.rect.size;
+            if (newSize.x == 0) newSize.x = _prevSize.x;
+            if (newSize.y == 0) newSize.y = _prevSize.y;
+
+            if (newSize == _prevSize)
                 return;
-            
-            Vector2 scale = new Vector2(this.rectTransform.rect.size.x / _prevSize.x, this.rectTransform.rect.size.y / _prevSize.y);
+
+            Vector2 scale = new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y);
 
             Handle[] handles = GetHandles();
             for (int i = 0; i < handles.Length; i++)
@@ -240,11 +244,20 @@ namespace Bezier
                 handle.control1 = Vector2.Scale(handle.control1, scale);
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
+
+            SetNeedsRebuild();
+
+            _prevSize = newSize;
         }
 
         #endregion
 
         #region MonoBehaviour
+
+        void Start()
+        {
+            _prevSize = this.rectTransform.rect.size;
+        }
 
         void Update()
         {
@@ -252,10 +265,8 @@ namespace Bezier
             {
                 if (snapToSize)
                     ScaleHandles();
-                SetNeedsRebuild();
-                _prevSize = this.rectTransform.rect.size;
             }
-            
+
             int numHandles = GetHandles().Length;
             if (numHandles != _prevNumHandles)
             {
