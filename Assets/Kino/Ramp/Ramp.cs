@@ -80,9 +80,9 @@ namespace Kino
         [SerializeField]
         BlendMode _blendMode = BlendMode.Overlay;
 
-        public BlendMode blendMode {
-            get { return _blendMode; }
-            set { _blendMode = value; }
+        public float blendMode {
+			get { return (float)_blendMode; }
+			set { _blendMode = (BlendMode)value; }
         }
 
         // debug (show ramp)
