@@ -21,6 +21,8 @@
             sampler2D _MainTex;
 
             float4 _hsbc;
+            float4 _fx;
+            float4 _colorMask;
 
             float3 applyHue(float3 aColor, float aHue)
 			{
@@ -33,7 +35,10 @@
 
             fixed4 frag(v2f_img i) : SV_Target
             {
-                float3 src = tex2D(_MainTex, i.uv).rgb;
+            	float2 pivot = float2(0.5f, 0.5f);
+            	float2 uv = (i.uv - pivot) / _fx.w + pivot;
+            	uv = lerp(uv, 1.0 - uv, _fx.xy);
+                float3 src = tex2D(_MainTex, uv).rgb;
 
                 float hue = 360 * _hsbc.x;
 			    float saturation = _hsbc.y * 2;
@@ -45,6 +50,8 @@
 			    src = src + brightness;        
 			    float3 intensity = dot(src, float3(0.299,0.587,0.114));
 			    src = lerp(intensity, src, saturation);
+                src = lerp(src, 1.0 - src, _fx.z);
+                src = src * _colorMask.rgb;
 
                 return fixed4(src, 1.0);
             }
