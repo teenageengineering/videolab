@@ -116,11 +116,14 @@ namespace Videolab
             get { return _camTexture; }
         }
 
+        bool _frameNeedsFixing;
+        public bool isReady {
+            get { return _frameNeedsFixing; }
+        }
+
         #endregion
 
         #region Private
-
-        bool _frameNeedsFixing;
 
         void ReloadCamTexture()
         {
@@ -132,6 +135,8 @@ namespace Videolab
             {
                 WebCamDevice device = WebCamTexture.devices.ElementAt(_deviceIndex);
                 _camTexture = new WebCamTexture(device.name);
+                _camTexture.requestedWidth = 1280;
+                _camTexture.requestedHeight = 720;
                 _camTexture.requestedFPS = _targetFrameRate;
 
                 if (_material)
