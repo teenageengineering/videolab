@@ -50,17 +50,20 @@ namespace Klak.Wiring
             Vector2 position = Vector2.zero;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_triggerRect, pointerData.position, pointerData.pressEventCamera, out position);
 
-            Vector2 prevPos = position - pointerData.delta;
+            Canvas canvas = GetComponentInParent<Canvas>();
+            Vector2 deltaPosition = pointerData.delta / canvas.scaleFactor;
+
+            Vector2 prevPos = position - deltaPosition;
             float delta = 0;
 
             switch (_axis) {
 
             case DragAxis.Horizontal:
-                delta = pointerData.delta.x / _range;
+                delta = deltaPosition.x / _range;
                 break;
 
             case DragAxis.Vertical:
-                delta = pointerData.delta.y / _range;
+                delta = deltaPosition.y / _range;
                 break;
 
             case DragAxis.Radial:
@@ -77,7 +80,6 @@ namespace Klak.Wiring
 
         void DragAbsolute(PointerEventData pointerData)
         {
-
             Vector2 position = Vector2.zero;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_triggerRect, pointerData.position, pointerData.pressEventCamera, out position);
 
