@@ -109,11 +109,11 @@ namespace Klak.Midi
             }
             else if (id == MidiSysex.MasterVolume)
             {
-                masterVolume = value;
+                masterVolume = value / 127f;
             }
             else if (id == MidiSysex.BatteryLevel)
             {
-                batteryLevel = value;
+				batteryLevel = value / 127f;
             }
             else if (id == MidiSysex.Tempo)
             {
