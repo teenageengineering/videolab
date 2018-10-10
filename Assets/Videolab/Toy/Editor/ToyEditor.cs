@@ -21,7 +21,7 @@ namespace Videolab
         {
             MonoScript thisScript = MonoScript.FromScriptableObject(this);
             string thisScriptPath = AssetDatabase.GetAssetPath(thisScript);
-            _templatePath = Path.GetDirectoryName(thisScriptPath) + "/../Shader/Toy.shader";
+            _templatePath = Path.GetDirectoryName(thisScriptPath) + "/../Toy.shader";
 
             _shadertoyText  = serializedObject.FindProperty("_shadertoyText");
             _shader         = serializedObject.FindProperty("_shader");
