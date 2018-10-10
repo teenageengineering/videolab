@@ -30,7 +30,7 @@ namespace Klak.Midi
         #region Private members
 
         int _noteNumber;
-        int _velocity;
+		float _velocity;
 
         #endregion
 
@@ -56,7 +56,7 @@ namespace Klak.Midi
         [Inlet]
         public float velocity {
             set {
-                _velocity = (int)value;
+                _velocity = value;
             }
         }
 

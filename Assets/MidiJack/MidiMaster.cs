@@ -132,7 +132,7 @@ namespace MidiJack
             return Instance._source.GetKnob(MidiChannel.All, knobNumber, defaultValue);
         }
 
-        public static void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+        public static void SendKeyDown(MidiChannel channel, int noteNumber, float velocity)
         {
             Instance._destination.SendKeyDown(channel, noteNumber, velocity);
         }
