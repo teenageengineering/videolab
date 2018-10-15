@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Videolab 
 {
-	public class IKSolver : MonoBehaviour 
-	{
+    public class IKSolver : MonoBehaviour 
+    {
         #region Public
 
         public IKJoint rootJoint;
@@ -38,7 +38,7 @@ namespace Videolab
             }
 
             List<IKJoint> joints = new List<IKJoint>();
-            
+
             IKJoint joint = rootJoint;
             while (true)
             {
@@ -55,11 +55,11 @@ namespace Videolab
             _solution = new Vector3[_joints.Length];
         }
 
-		void LateUpdate()
-		{
+        void LateUpdate()
+        {
             if (_joints == null)
                 return;
-            
+
             Vector3 startPos = rootJoint.transform.position;
             Vector3 targetPos = target.position;
 
@@ -101,5 +101,5 @@ namespace Videolab
                 joint.transform.rotation = Quaternion.LookRotation(_solution[i + 1] - joint.transform.position) * Quaternion.Inverse(joint.refOrientation);
             }
         }
-	}
+    }
 }

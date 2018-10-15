@@ -81,8 +81,8 @@ namespace Kino
         BlendMode _blendMode = BlendMode.Overlay;
 
         public float blendMode {
-			get { return (float)_blendMode; }
-			set { _blendMode = (BlendMode)value; }
+            get { return (float)_blendMode; }
+            set { _blendMode = (BlendMode)value; }
         }
 
         // debug (show ramp)

@@ -132,11 +132,11 @@ namespace Klak.Motion
             _initialRotation = transform.localRotation;
         }
 
-		void OnDisable()
-		{
-			transform.localPosition = _initialPosition;
-			transform.localRotation = _initialRotation;
-		}
+        void OnDisable()
+        {
+            transform.localPosition = _initialPosition;
+            transform.localRotation = _initialRotation;
+        }
 
         void Update()
         {

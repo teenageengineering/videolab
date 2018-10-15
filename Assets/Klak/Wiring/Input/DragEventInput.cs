@@ -50,7 +50,7 @@ namespace Klak.Wiring
             Vector2 position = Vector2.zero;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(_triggerRect, pointerData.position, pointerData.pressEventCamera, out position);
 
-			Canvas canvas = _triggerRect.GetComponentInParent<Canvas>();
+            Canvas canvas = _triggerRect.GetComponentInParent<Canvas>();
             Vector2 deltaPosition = pointerData.delta / canvas.scaleFactor;
 
             Vector2 prevPos = position - deltaPosition;

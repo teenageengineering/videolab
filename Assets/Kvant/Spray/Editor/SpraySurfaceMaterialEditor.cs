@@ -82,7 +82,7 @@ namespace Kvant
             materialEditor.TexturePropertySingleLine(_albedoText, _albedoMap, null);
             materialEditor.TexturePropertySingleLine(_normalMapText, _normalMap, _normalMap.textureValue ? _normalScale : null);
             materialEditor.TexturePropertySingleLine(_occlusionText, _occlusionMap, _occlusionMap.textureValue ? _occlusionStr : null);
-			materialEditor.TextureScaleOffsetProperty(_albedoMap);
+            materialEditor.TextureScaleOffsetProperty(_albedoMap);
 
             EditorGUILayout.Space();
 

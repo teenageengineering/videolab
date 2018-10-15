@@ -40,7 +40,7 @@ namespace Klak.Midi
         MidiChannel _channel = MidiChannel.All;
 
         [SerializeField]
-		[Tooltip("ModWheel is 1, generic knobs are 12 - 31.")]
+        [Tooltip("ModWheel is 1, generic knobs are 12 - 31.")]
         int _knobNumber = 0;
 
         [SerializeField]

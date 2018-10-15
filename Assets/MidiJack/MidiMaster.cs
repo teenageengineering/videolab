@@ -45,7 +45,7 @@ namespace MidiJack
             _destination = destinationGo.AddComponent<MidiDestination>();
             _destination.endpointId = uint.MaxValue;
         }
-        
+
         #region Singleton
 
         static MidiMaster _instance = null;
@@ -60,7 +60,7 @@ namespace MidiJack
         }
 
         #endregion
-        
+
         // MIDI event delegates
         public static MidiSource.NoteOnDelegate noteOnDelegate {
             get { return Instance._source.noteOnDelegate; }
@@ -152,15 +152,15 @@ namespace MidiJack
             Instance._destination.SendRealtime(code);
         }
 
-		// Bad singleton style..
-		public static MidiSource GetSource()
-		{
-			return Instance._source;
-		}
+        // Bad singleton style..
+        public static MidiSource GetSource()
+        {
+            return Instance._source;
+        }
 
-		public static MidiDestination GetDestination()
-		{
-			return Instance._destination;
-		}
+        public static MidiDestination GetDestination()
+        {
+            return Instance._destination;
+        }
     }
 }

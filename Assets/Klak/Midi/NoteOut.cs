@@ -30,7 +30,7 @@ namespace Klak.Midi
         #region Private members
 
         int _noteNumber;
-		float _velocity;
+        float _velocity;
 
         #endregion
 

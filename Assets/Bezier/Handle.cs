@@ -18,7 +18,7 @@ namespace Bezier
 
         public Mode mode;
 
-		// properties for animation and Klak access
+        // properties for animation and Klak access
 
         [SerializeField]
         float _cornerRadius;

@@ -113,7 +113,7 @@ namespace Klak.Midi
             }
             else if (id == MidiSysex.BatteryLevel)
             {
-				batteryLevel = value / 127f;
+                batteryLevel = value / 127f;
             }
             else if (id == MidiSysex.Tempo)
             {
