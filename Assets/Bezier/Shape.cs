@@ -51,6 +51,44 @@ namespace Bezier
             return handles.ToArray();
         }
 
+        public Handle AddHandle(string name, Vector2 pos, float cornerRadius = 0)
+        {
+            GameObject go = new GameObject(name);
+
+            Handle handle = go.AddComponent<Handle>();
+            handle.pos = pos;
+
+            if (cornerRadius > 0)
+            {
+                handle.mode = Handle.Mode.Rounded;
+                handle.cornerRadius = cornerRadius;
+            }
+
+            go.transform.SetParent(transform, false);
+
+            return handle;
+        }
+
+        // TODO http://www.iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
+        public void Envelope()
+        {
+            Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 max = new Vector2(float.MinValue, float.MinValue);
+
+            Handle[] handles = GetHandles();
+            foreach (Handle handle in handles)
+            {
+                min = Vector2.Min(handle.pos, min);
+                max = Vector2.Max(handle.pos, max);
+            }
+
+            RectTransform rt = transform as RectTransform;
+            rt.sizeDelta = max - min;
+            rt.anchoredPosition = (max + min) / 2;
+            foreach (RectTransform child in transform)
+                child.anchoredPosition -= rt.anchoredPosition;
+        }
+
         bool _needsRebuild;
         public void SetNeedsRebuild()
         {
@@ -98,14 +136,14 @@ namespace Bezier
                     else if (h1.control1 != Vector3.zero)
                         r1Max = 0;
 
-                    float r0 = Mathf.Min(handle.cornerRadius, r0Max);
-                    float r1 = Mathf.Min(handle.cornerRadius, r1Max);
+                    float rMax = Mathf.Min(r0Max, r1Max);
+                    float r = Mathf.Min(handle.cornerRadius, rMax);
 
-                    Vector2 p0 = handle.pos - v0.normalized * r0;
-                    Vector2 p1 = handle.pos - v1.normalized * r1;
+                    Vector2 p0 = handle.pos - v0.normalized * r;
+                    Vector2 p1 = handle.pos - v1.normalized * r;
 
-                    Vector2 c0 = p0 + v0.normalized * c * r0;
-                    Vector2 c1 = p1 + v1.normalized * c * r1;
+                    Vector2 c0 = p0 + v0.normalized * c * r;
+                    Vector2 c1 = p1 + v1.normalized * c * r;
 
                     yield return new Point(p0, p0, c0);
                     if (n < handles.Length)
@@ -166,9 +204,7 @@ namespace Bezier
                         verts.Add(vert - d);
                     }
                     else
-                    {
                         verts.Add(prevVert);
-                    }
 
                     prevVert = vert;
                 }
@@ -227,14 +263,10 @@ namespace Bezier
 
         void ScaleHandles()
         {
-            Vector2 newSize = this.rectTransform.rect.size;
-            if (newSize.x == 0) newSize.x = _prevSize.x;
-            if (newSize.y == 0) newSize.y = _prevSize.y;
-
-            if (newSize == _prevSize)
+            if (_prevSize == Vector2.zero)
                 return;
 
-            Vector2 scale = new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y);
+            Vector2 scale = new Vector2(this.rectTransform.rect.size.x / _prevSize.x, this.rectTransform.rect.size.y / _prevSize.y);
 
             Handle[] handles = GetHandles();
             for (int i = 0; i < handles.Length; i++)
@@ -244,20 +276,11 @@ namespace Bezier
                 handle.control1 = Vector2.Scale(handle.control1, scale);
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
-
-            SetNeedsRebuild();
-
-            _prevSize = newSize;
         }
 
         #endregion
 
         #region MonoBehaviour
-
-        void Start()
-        {
-            _prevSize = this.rectTransform.rect.size;
-        }
 
         void Update()
         {
@@ -265,6 +288,8 @@ namespace Bezier
             {
                 if (snapToSize)
                     ScaleHandles();
+                SetNeedsRebuild();
+                _prevSize = this.rectTransform.rect.size;
             }
 
             int numHandles = GetHandles().Length;
