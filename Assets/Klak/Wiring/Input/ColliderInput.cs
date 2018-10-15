@@ -87,6 +87,9 @@ namespace Klak.Wiring
 
         void OnEnable()
         {
+            if (_collider == null)
+                return;
+
             dispatch.CollisionEnterEvent.AddListener(OnCollisionEnter);
             dispatch.CollisionStayEvent.AddListener(OnCollisionStay);
             dispatch.CollisionExitEvent.AddListener(OnCollisionExit);
@@ -97,6 +100,9 @@ namespace Klak.Wiring
 
         void OnDisable()
         {
+            if (_collider == null)
+                return;
+
             dispatch.CollisionEnterEvent.RemoveListener(OnCollisionEnter);
             dispatch.CollisionStayEvent.RemoveListener(OnCollisionStay);
             dispatch.CollisionExitEvent.RemoveListener(OnCollisionExit);
