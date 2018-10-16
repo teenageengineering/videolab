@@ -30,6 +30,7 @@ namespace Klak.Wiring
     [CustomEditor(typeof(FloatFilter))]
     public class FloatFilterEditor : Editor
     {
+        SerializedProperty _useResponseCurve;
         SerializedProperty _responseCurve;
         SerializedProperty _interpolator;
         SerializedProperty _amplitude;
@@ -38,6 +39,7 @@ namespace Klak.Wiring
 
         void OnEnable()
         {
+            _useResponseCurve = serializedObject.FindProperty("_useResponseCurve");
             _responseCurve = serializedObject.FindProperty("_responseCurve");
             _interpolator = serializedObject.FindProperty("_interpolator");
             _amplitude = serializedObject.FindProperty("_amplitude");
@@ -49,7 +51,9 @@ namespace Klak.Wiring
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_responseCurve);
+            EditorGUILayout.PropertyField(_useResponseCurve);
+            if (_useResponseCurve.boolValue)
+                EditorGUILayout.PropertyField(_responseCurve);
 
             EditorGUILayout.Space();
 

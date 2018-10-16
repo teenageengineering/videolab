@@ -32,6 +32,9 @@ namespace Klak.Wiring
         #region Editable properties
 
         [SerializeField]
+        bool _useResponseCurve = false;
+
+        [SerializeField]
         AnimationCurve _responseCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
         [SerializeField]
@@ -73,7 +76,10 @@ namespace Klak.Wiring
 
         float EvalResponse()
         {
-            return _responseCurve.Evaluate(_inputValue) * _amplitude + _bias;
+            if (_useResponseCurve)
+                return _responseCurve.Evaluate(_inputValue) * _amplitude + _bias;
+
+            return _inputValue * _amplitude + _bias;
         }
 
         #endregion
