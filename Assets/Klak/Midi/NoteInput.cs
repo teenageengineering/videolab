@@ -100,6 +100,9 @@ namespace Klak.Midi
         VoidEvent _noteOnEvent = new VoidEvent();
 
         [SerializeField, Outlet]
+        FloatEvent _noteOnNumberEvent = new FloatEvent();
+
+        [SerializeField, Outlet]
         FloatEvent _noteOnVelocityEvent = new FloatEvent();
 
         [SerializeField, Outlet]
@@ -136,6 +139,7 @@ namespace Klak.Midi
             velocity = _velocityCurve.Evaluate(velocity);
 
             _noteOnEvent.Invoke();
+            _noteOnNumberEvent.Invoke(note);
             _noteOnVelocityEvent.Invoke(velocity);
 
             _floatValue.targetValue = _onValue * velocity;
