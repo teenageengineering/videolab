@@ -101,8 +101,9 @@ namespace Bezier
             else
             {
                 string id = reader.GetAttribute("id") ?? "Group";
+                string name = GameObjectUtility.GetUniqueNameForSibling(parentElement, id);
 
-                GameObject go = new GameObject(GameObjectUtility.GetUniqueNameForSibling(parentElement, id));
+                GameObject go = new GameObject(name);
                 RectTransform groupElement = go.AddComponent<RectTransform>();
                 groupElement.SetParent(parentElement, false);
 
@@ -126,19 +127,15 @@ namespace Bezier
             float w = ((s = reader.GetAttribute("width")) != null) ? float.Parse(s) : 0;
             float h = ((s = reader.GetAttribute("height")) != null) ? float.Parse(s) : 0;
             float rx = ((s = reader.GetAttribute("rx")) != null) ? float.Parse(s) : 0;
+            Color color = ParseFillColor(reader);
 
-            GameObject go = new GameObject(GameObjectUtility.GetUniqueNameForSibling(parentElement, id));
-            go.transform.SetParent(parentElement, false);
+            string name = GameObjectUtility.GetUniqueNameForSibling(parentElement, id);
 
-            Image image = go.AddComponent<Image>();
-            image.color = ParseFillColor(reader);
+            Shape shape = Shape.CreateRect(name, new Vector2(w, h), rx);
+            shape.rectTransform.localPosition = new Vector2(x, y);
+            shape.graphic.color = color;
 
-            Shape shape = go.AddComponent<Shape>();
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(x, y), rx).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(x + w, y), rx).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(x + w, y - h)).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(x, y - h), rx).gameObject.SetActive(false);
-            EnvelopeChildren(go.transform);
+            shape.transform.SetParent(parentElement, false);
         }
 
         void ParseCircleElement(Transform parentElement, XmlReader reader)
@@ -149,19 +146,15 @@ namespace Bezier
             float cx = ((s = reader.GetAttribute("cx")) != null) ? _origin.x + float.Parse(s) : _origin.x;
             float cy = ((s = reader.GetAttribute("cy")) != null) ? _origin.y - float.Parse(s) : _origin.y;
             float r = ((s = reader.GetAttribute("r")) != null) ? float.Parse(s) : 0;
+            Color color = ParseFillColor(reader);
 
-            GameObject go = new GameObject(GameObjectUtility.GetUniqueNameForSibling(parentElement, id));
-            go.transform.SetParent(parentElement, false);
+            string name = GameObjectUtility.GetUniqueNameForSibling(parentElement, id);
 
-            Image image = go.AddComponent<Image>();
-            image.color = ParseFillColor(reader);
+            Shape shape = Shape.CreateCircle(name, r);
+            shape.rectTransform.localPosition = new Vector2(cx, cy);
+            shape.graphic.color = color;
 
-            Shape shape = go.AddComponent<Shape>();
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(cx - r, cy - r), r).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(cx + r, cy - r), r).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(cx + r, cy + r), r).gameObject.SetActive(false);
-            shape.AddHandle(GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle"), new Vector2(cx - r, cy + r), r).gameObject.SetActive(false);
-            EnvelopeChildren(go.transform);
+            shape.transform.SetParent(parentElement, false);
         }
 
         void ParsePolygonElement(Transform parentElement, XmlReader reader)
@@ -329,21 +322,16 @@ namespace Bezier
             if (_curSegment)
                 endHandle = _curSegment.GetHandles()[0];
 
-            // start new segment
-            GameObject segmentObj = new GameObject(GameObjectUtility.GetUniqueNameForSibling(parentElement, "Segment"));
-            RectTransform segment = segmentObj.AddComponent<RectTransform>();
-            segment.SetParent(parentElement, false);
-
-            segmentObj.AddComponent<Image>();
-            _curSegment = segmentObj.AddComponent<Shape>();
+            string name = GameObjectUtility.GetUniqueNameForSibling(parentElement, "Segment");
+            _curSegment = Shape.CreateShape(name);
+            _curSegment.transform.SetParent(parentElement, false);
 
             // first handle
             int i = 0;
             Vector2 pos = new Vector2(floatArgs[i++], -floatArgs[i++]);
             pos += (isRel && endHandle) ? endHandle.pos : _origin;
 
-            _curHandle = _curSegment.AddHandle(GameObjectUtility.GetUniqueNameForSibling(_curSegment.transform, "Handle"), pos);
-            _curHandle.gameObject.SetActive(false);
+            _curHandle = AddHandle(_curSegment, pos);
 
             if (i < floatArgs.Length)
                 ParseLine(floatArgs.Skip(i).Take(floatArgs.Length - i).ToArray(), isRel);
@@ -357,8 +345,7 @@ namespace Bezier
                 Vector2 pos = new Vector2(floatArgs[i++], -floatArgs[i++]);
                 pos += (isRel) ? _curHandle.pos : _origin;
 
-                _curHandle = _curSegment.AddHandle(GameObjectUtility.GetUniqueNameForSibling(_curSegment.transform, "Handle"), pos);
-                _curHandle.gameObject.SetActive(false);
+                _curHandle = AddHandle(_curSegment, pos);
             }
         }
 
@@ -374,8 +361,7 @@ namespace Bezier
                 else
                     pos.x = (isRel) ? pos.x + a : _origin.x + a;
 
-                _curHandle = _curSegment.AddHandle(GameObjectUtility.GetUniqueNameForSibling(_curSegment.transform, "Handle"), pos);
-                _curHandle.gameObject.SetActive(false);
+                _curHandle = AddHandle(_curSegment, pos);
             }
         }
 
@@ -398,9 +384,8 @@ namespace Bezier
                 if (isSmooth)
                     _curHandle.mode = Handle.Mode.Mirrored;
 
-                _curHandle = _curSegment.AddHandle(GameObjectUtility.GetUniqueNameForSibling(_curSegment.transform, "Handle"), pos);
+                _curHandle = AddHandle(_curSegment, pos);
                 _curHandle.control1 = c2 - _curHandle.pos;
-                _curHandle.gameObject.SetActive(false);
             }
         }
 
@@ -487,6 +472,16 @@ namespace Bezier
             var splitArgs = Regex.Split(args, argSeparators).Where(t => !string.IsNullOrEmpty(t));
 
             return splitArgs.Select(arg => float.Parse(arg)).ToArray();
+        }
+
+        Handle AddHandle(Shape shape, Vector2 pos)
+        {
+            string name = GameObjectUtility.GetUniqueNameForSibling(shape.transform, "Handle");
+            Handle handle = Handle.CreateHandle(name, pos);
+            handle.transform.SetParent(shape.transform, false);
+            handle.gameObject.SetActive(false);
+
+            return handle;
         }
 
         void EnvelopeChildren(Transform transform)

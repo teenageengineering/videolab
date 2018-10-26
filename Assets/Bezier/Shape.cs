@@ -7,6 +7,7 @@ using System.Linq;
 namespace Bezier
 {
     [ExecuteInEditMode]
+    [RequireComponent(typeof(RectTransform))]
     [RequireComponent(typeof(Graphic))]
     public class Shape : MonoBehaviour, IMeshModifier
     {
@@ -38,6 +39,10 @@ namespace Bezier
             get { return transform as RectTransform; }
         }
 
+        public Graphic graphic {
+            get { return GetComponent<Graphic>(); }
+        }
+
         public Handle[] GetHandles()
         {
             List<Handle> handles = new List<Handle>();
@@ -49,24 +54,6 @@ namespace Bezier
                     handles.Add(handle);
 
             return handles.ToArray();
-        }
-
-        public Handle AddHandle(string name, Vector2 pos, float cornerRadius = 0)
-        {
-            GameObject go = new GameObject(name);
-
-            Handle handle = go.AddComponent<Handle>();
-            handle.pos = pos;
-
-            if (cornerRadius > 0)
-            {
-                handle.mode = Handle.Mode.Rounded;
-                handle.cornerRadius = cornerRadius;
-            }
-
-            go.transform.SetParent(transform, false);
-
-            return handle;
         }
 
         // TODO http://www.iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
@@ -93,6 +80,13 @@ namespace Bezier
         public void SetNeedsRebuild()
         {
             _needsRebuild = true;
+        }
+
+        public void SetHandlesActive(bool active)
+        {
+            Handle[] handles = GetHandles();
+            foreach (Handle handle in handles)
+                handle.gameObject.SetActive(active);
         }
 
         #endregion
@@ -344,6 +338,41 @@ namespace Bezier
                 EditMesh(vh);
                 vh.FillMesh(mesh);
             }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public static Shape CreateShape(string name)
+        {
+            GameObject go = new GameObject(name);
+            go.AddComponent<Image>();
+            Shape shape = go.AddComponent<Shape>();
+
+            return shape;
+        }
+
+        public static Shape CreateRect(string name, Vector2 size, float cornerRadius = 0)
+        {
+            Shape shape = CreateShape(name);
+
+            shape.rectTransform.sizeDelta = size;
+
+            Vector3[] localCorners = new Vector3[4];
+            shape.rectTransform.GetLocalCorners(localCorners);
+            foreach (Vector3 corner in localCorners)
+            {
+                Handle handleObj = Handle.CreateHandle("Handle", corner, cornerRadius);
+                handleObj.transform.SetParent(shape.transform, false);
+            }
+
+            return shape;
+        }
+
+        public static Shape CreateCircle(string name, float radius)
+        {
+            return CreateRect(name, new Vector2(radius * 2, radius * 2), radius);
         }
 
         #endregion

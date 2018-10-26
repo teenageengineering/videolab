@@ -16,22 +16,21 @@ namespace Bezier
             if (parentGo && parentGo.GetComponent<Shape>())
                 return parentGo;
             
-            GameObject shapeGo = ShapeEditor.CreateShape();
-            GameObjectUtility.SetParentAndAlign(shapeGo, ShapeEditor.GetCanvas(menuContext));
+            Shape shape = Shape.CreateShape("Bezier Shape");
+            GameObjectUtility.SetParentAndAlign(shape.gameObject, ShapeEditor.GetCanvas(menuContext));
 
-            return shapeGo;
+            return shape.gameObject;
         }
 
         [MenuItem("GameObject/UI/Bezier/Handle")]
         static void CreateBezierHandle(MenuCommand menuCommand)
         {
-            GameObject go = new GameObject("Handle");
-            go.AddComponent<Handle>();
+            Handle handle = Handle.CreateHandle("Handle", Vector2.zero);
 
-            GameObjectUtility.SetParentAndAlign(go, GetShape(menuCommand.context));
+            GameObjectUtility.SetParentAndAlign(handle.gameObject, GetShape(menuCommand.context));
 
-            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-            Selection.activeObject = go;
+            Undo.RegisterCreatedObjectUndo(handle.gameObject, "Create " + handle.name);
+            Selection.activeObject = handle.gameObject;
         }
 
         #endregion

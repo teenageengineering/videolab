@@ -172,5 +172,25 @@ namespace Bezier
         }
 
         #endregion
+
+        #region Helpers
+
+        public static Handle CreateHandle(string name, Vector2 pos, float cornerRadius = 0)
+        {
+            GameObject go = new GameObject(name);
+
+            Handle handle = go.AddComponent<Handle>();
+            handle.pos = pos;
+
+            if (cornerRadius > 0)
+            {
+                handle.mode = Handle.Mode.Rounded;
+                handle.cornerRadius = cornerRadius;
+            }
+
+            return handle;
+        }
+
+        #endregion
     }
 }
