@@ -103,8 +103,7 @@ namespace Bezier
         IEnumerable<Point> GetAllPoints()
         {
             Handle[] handles = GetHandles();
-            int N = (this.outline && !this.closedPath) ? handles.Length : handles.Length + 1;
-            for (int n = 0; n < N; n++)
+            for (int n = 0; n <= handles.Length; n++)
             {
                 Handle handle = handles[n % handles.Length];
 
@@ -186,24 +185,32 @@ namespace Bezier
                     if ((vert - prevVert).magnitude < Curve.precision)
                         continue;
 
-                    if (this.outline)
-                    {
-                        Vector2 d = (vert - prevVert).normalized;
-                        d = new Vector2(-d.y, d.x) * this.lineWidth / 2;
-
-                        verts.Add(prevVert + d);
-                        verts.Add(prevVert - d);
-
-                        verts.Add(vert + d);
-                        verts.Add(vert - d);
-                    }
-                    else
-                        verts.Add(prevVert);
+                    verts.Add(prevVert);
 
                     prevVert = vert;
                 }
 
                 prevPt = pt;
+            }
+
+            if (this.outline)
+            {
+                List<Vector2> lineVerts = new List<Vector2>();
+
+                for (int i = 0; i < verts.Count; i++)
+                {
+                    Vector2 v0 = verts[(i + verts.Count - 1) % verts.Count];
+                    Vector2 v = verts[i];
+                    Vector2 v2 = verts[(i + 1) % verts.Count];
+                    
+                    Vector2 d = (v2 - v0).normalized;
+                    d = new Vector2(-d.y, d.x) * this.lineWidth / 2;
+
+                    lineVerts.Add(v + d);
+                    lineVerts.Add(v - d);
+                }
+
+                verts = lineVerts;
             }
 
             _verts = verts.ToArray();
@@ -243,7 +250,6 @@ namespace Bezier
         {
             vh.Clear();
 
-            Graphic graphic = GetComponent<Graphic>();
             for (int i = 0; i < _verts.Length; i++)
             {
                 Vector2 v = _verts[i];
@@ -304,7 +310,6 @@ namespace Bezier
                 EditVertices();
                 EditTriangles();
 
-                Graphic graphic = GetComponent<Graphic>();
                 graphic.SetVerticesDirty();
 
                 _needsRebuild = false;
