@@ -103,30 +103,31 @@ namespace Bezier
         IEnumerable<Point> GetAllPoints()
         {
             Handle[] handles = GetHandles();
+            Handle prevHandle = handles[handles.Length - 1];
+
             for (int n = 0; n <= handles.Length; n++)
             {
                 Handle handle = handles[n % handles.Length];
 
                 if (handle.mode == Handle.Mode.Rounded)
                 {
-                    float c = 4f * (Mathf.Sqrt(2f) - 1f) / 3f;
+                    float c = 4 * (Mathf.Sqrt(2) - 1) / 3;
 
-                    Handle h0 = handles[(n + handles.Length - 1) % handles.Length];
-                    Handle h1 = handles[(n + 1) % handles.Length];
+                    Handle nextHandle = handles[(n + 1) % handles.Length];
 
-                    Vector2 v0 = handle.pos - h0.pos;
-                    Vector2 v1 = handle.pos - h1.pos;
+                    Vector2 v0 = handle.pos - prevHandle.pos;
+                    Vector2 v1 = handle.pos - nextHandle.pos;
 
                     float r0Max = v0.magnitude;
-                    if (h0.mode == Handle.Mode.Rounded)
+                    if (prevHandle.mode == Handle.Mode.Rounded)
                         r0Max = v0.magnitude / 2;
-                    else if (h0.control2 != Vector3.zero)
+                    else if (prevHandle.control2 != Vector3.zero)
                         r0Max = 0;
 
                     float r1Max = v1.magnitude;
-                    if (h1.mode == Handle.Mode.Rounded)
+                    if (nextHandle.mode == Handle.Mode.Rounded)
                         r1Max = v1.magnitude / 2;
-                    else if (h1.control1 != Vector3.zero)
+                    else if (nextHandle.control1 != Vector3.zero)
                         r1Max = 0;
 
                     float rMax = Mathf.Min(r0Max, r1Max);
@@ -144,7 +145,22 @@ namespace Bezier
                 }
                 else
                     yield return handle.point;
+
+                prevHandle = handle;
             }
+        }
+
+        Vector2 InterSection(Vector2 p1, Vector2 v1, Vector2 p2, Vector2 v2)
+        {
+            if (Vector2.Angle(v1, v2) < 5)
+                return p1;
+                    
+            float t = ((p2.x - p1.x) * v2.y + (p1.y * v2.x - p2.y * v2.x)) / (v1.x * v2.y - v1.y * v2.x);
+
+            if (t < -v2.magnitude / v1.magnitude)
+                return p1;
+
+            return p1 + t * v1;
         }
 
         void EditVertices()
@@ -152,12 +168,10 @@ namespace Bezier
             Handle[] handles = GetHandles();
 
             if (handles.Length < 2)
-            {
-                if (this.outline && handles.Length > 0)
-                    this.closedPath = false;
-                else
-                    return;
-            }
+                return;
+
+            if (handles.Length < 3 && this.outline)
+                this.closedPath = false;
 
             var pointsEnum = GetAllPoints().GetEnumerator();
             pointsEnum.MoveNext();
@@ -197,17 +211,35 @@ namespace Bezier
             {
                 List<Vector2> lineVerts = new List<Vector2>();
 
+                prevVert = verts[verts.Count - 1];
+
                 for (int i = 0; i < verts.Count; i++)
                 {
-                    Vector2 v0 = verts[(i + verts.Count - 1) % verts.Count];
-                    Vector2 v = verts[i];
-                    Vector2 v2 = verts[(i + 1) % verts.Count];
-                    
-                    Vector2 d = (v2 - v0).normalized;
-                    d = new Vector2(-d.y, d.x) * this.lineWidth / 2;
+                    Vector2 vert = verts[i];
+                    Vector2 nextVert = verts[(i + 1) % verts.Count];
 
-                    lineVerts.Add(v + d);
-                    lineVerts.Add(v - d);
+                    Vector2 v0 = vert - prevVert;
+                    Vector2 d0 = Vector2.Perpendicular(v0).normalized * this.lineWidth / 2;
+                    Vector2 v1 = nextVert - vert;
+                    Vector2 d1 = Vector2.Perpendicular(v1).normalized * this.lineWidth / 2;
+
+                    if (!this.closedPath && i == 0)
+                    {
+                        lineVerts.Add(vert + d1);
+                        lineVerts.Add(vert - d1);
+                    }
+                    else if (!this.closedPath && i == verts.Count - 1)
+                    {
+                        lineVerts.Add(vert + d0);
+                        lineVerts.Add(vert - d0);
+                    }
+                    else
+                    {
+                        lineVerts.Add(InterSection(vert + d0, v0, vert + d1, v1));
+                        lineVerts.Add(InterSection(vert - d0, v0, vert - d1, v1));
+                    }
+
+                    prevVert = vert;
                 }
 
                 verts = lineVerts;
