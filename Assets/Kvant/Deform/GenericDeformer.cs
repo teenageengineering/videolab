@@ -34,9 +34,28 @@ namespace Kvant
         public bool smooth = true;
         public bool surfaceSpace = false;
         public int octave = 3;
-        public Vector3 noiseVelocity1 = Vector3.right;
-        public Vector3 noiseVelocity2 = Vector3.up;
-        public Vector3 noiseVelocity3 = Vector3.forward;
+
+        [SerializeField]
+        Vector3 _noiseVelocity1 = Vector3.right;
+        public Vector3 noiseVelocity1 {
+            get { return _noiseVelocity1; }
+            set { _noiseVelocity1 = value; }
+        }
+
+        [SerializeField]
+        Vector3 _noiseVelocity2 = Vector3.up;
+        public Vector3 noiseVelocity2 {
+            get { return _noiseVelocity2; }
+            set { _noiseVelocity2 = value; }
+        }
+
+        [SerializeField]
+        Vector3 _noiseVelocity3 = Vector3.forward;
+        public Vector3 noiseVelocity3 {
+            get { return _noiseVelocity3; }
+            set { _noiseVelocity3 = value; }
+        }
+
         public Vector3 noiseOffset1 = Vector3.right;
         public Vector3 noiseOffset2 = Vector3.up;
         public Vector3 noiseOffset3 = Vector3.forward;
