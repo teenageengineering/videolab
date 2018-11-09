@@ -9,10 +9,12 @@ namespace Klak.Wiring
         #region Node I/O
 
         [Inlet]
-		public void Vibrate()
-		{
-			Handheld.Vibrate();
-		}
+        public void Vibrate()
+        {
+            #if UNITY_IOS
+            Handheld.Vibrate();
+            #endif
+        }
 
         #endregion
 	}
