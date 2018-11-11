@@ -77,6 +77,16 @@ namespace MidiJack
             set { Instance._source.knobDelegate = value; }
         }
 
+        public static MidiSource.RealtimeDelegate realtimeDelegate {
+            get { return Instance._source.realtimeDelegate; }
+            set { Instance._source.realtimeDelegate = value; }
+        }
+
+        public static MidiSource.SysexDelegate sysexDelegate {
+            get { return Instance._source.sysexDelegate; }
+            set { Instance._source.sysexDelegate = value; }
+        }
+
         // Returns the key state (on: velocity, off: zero).
         public static float GetKey(MidiChannel channel, int noteNumber)
         {
