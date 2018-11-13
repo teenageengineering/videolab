@@ -100,9 +100,30 @@ namespace Bezier
         Vector2[] _verts = new Vector2[0];
         int[] _indices = new int[0];
 
+        float MaxRadius(Handle h0, Vector2 v0, Handle h1, Vector2 v1)
+        {
+            float r0Max = v0.magnitude;
+            if (h0.mode == Handle.Mode.Rounded)
+                r0Max = v0.magnitude / 2;
+            else if (h0.control2 != Vector3.zero)
+                r0Max = 0;
+
+            float r1Max = v1.magnitude;
+            if (h1.mode == Handle.Mode.Rounded)
+                r1Max = v1.magnitude / 2;
+            else if (h1.control1 != Vector3.zero)
+                r1Max = 0;
+
+            return Mathf.Min(r0Max, r1Max);
+        }
+
+        // 1 - 4 * (sqrt(2) - 1) / 3
+        const float c = 0.4477f;
+
         IEnumerable<Point> GetAllPoints()
         {
             Handle[] handles = GetHandles();
+            Handle prevHandle = handles[handles.Length - 1];
             int N = (this.outline && !this.closedPath) ? handles.Length : handles.Length + 1;
             for (int n = 0; n < N; n++)
             {
@@ -110,41 +131,31 @@ namespace Bezier
 
                 if (handle.mode == Handle.Mode.Rounded)
                 {
-                    float c = 4f * (Mathf.Sqrt(2f) - 1f) / 3f;
+                    Handle nextHandle = handles[(n + 1) % handles.Length];
 
-                    Handle h0 = handles[(n + handles.Length - 1) % handles.Length];
-                    Handle h1 = handles[(n + 1) % handles.Length];
+                    Vector2 v0 = handle.pos - prevHandle.pos;
+                    Vector2 v1 = handle.pos - nextHandle.pos;
 
-                    Vector2 v0 = handle.pos - h0.pos;
-                    Vector2 v1 = handle.pos - h1.pos;
+                    float maxRadius = MaxRadius(prevHandle, v0, nextHandle, v1);
+                    float r = Mathf.Min(handle.cornerRadius, maxRadius);
 
-                    float r0Max = v0.magnitude;
-                    if (h0.mode == Handle.Mode.Rounded)
-                        r0Max = v0.magnitude / 2;
-                    else if (h0.control2 != Vector3.zero)
-                        r0Max = 0;
-
-                    float r1Max = v1.magnitude;
-                    if (h1.mode == Handle.Mode.Rounded)
-                        r1Max = v1.magnitude / 2;
-                    else if (h1.control1 != Vector3.zero)
-                        r1Max = 0;
-
-                    float rMax = Mathf.Min(r0Max, r1Max);
-                    float r = Mathf.Min(handle.cornerRadius, rMax);
-
-                    Vector2 p0 = handle.pos - v0.normalized * r;
-                    Vector2 p1 = handle.pos - v1.normalized * r;
-
-                    Vector2 c0 = p0 + v0.normalized * c * r;
-                    Vector2 c1 = p1 + v1.normalized * c * r;
-
+                    v0 = v0.normalized * r;
+                    Vector2 p0 = handle.pos - v0;
+                    Vector2 c0 = handle.pos - v0 * c;
                     yield return new Point(p0, p0, c0);
+
                     if (n < handles.Length)
+                    {
+                        v1 = v1.normalized * r;
+                        Vector2 p1 = handle.pos - v1;
+                        Vector2 c1 = handle.pos - v1 * c;
                         yield return new Point(p1, c1, p1);
+                    }
                 }
                 else
                     yield return handle.point;
+
+                prevHandle = handle;
             }
         }
 
@@ -256,10 +267,14 @@ namespace Bezier
 
         void ScaleHandles()
         {
-            if (_prevSize == Vector2.zero)
+            Vector2 newSize = this.rectTransform.rect.size;
+            if (newSize.x == 0) newSize.x = _prevSize.x;
+            if (newSize.y == 0) newSize.y = _prevSize.y;
+
+            if (newSize == _prevSize)
                 return;
 
-            Vector2 scale = new Vector2(this.rectTransform.rect.size.x / _prevSize.x, this.rectTransform.rect.size.y / _prevSize.y);
+            Vector2 scale = new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y);
 
             Handle[] handles = GetHandles();
             for (int i = 0; i < handles.Length; i++)
@@ -269,11 +284,20 @@ namespace Bezier
                 handle.control1 = Vector2.Scale(handle.control1, scale);
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
+
+            SetNeedsRebuild();
+
+            _prevSize = newSize;
         }
 
         #endregion
 
         #region MonoBehaviour
+
+        void Start()
+        {
+            _prevSize = this.rectTransform.rect.size;
+        }
 
         void Update()
         {
@@ -281,8 +305,6 @@ namespace Bezier
             {
                 if (snapToSize)
                     ScaleHandles();
-                SetNeedsRebuild();
-                _prevSize = this.rectTransform.rect.size;
             }
 
             int numHandles = GetHandles().Length;
