@@ -4,10 +4,5 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/App/Main.unity
-    guid: 7700a0fc0bc41462fa3442c1996388fa
-  - enabled: 1
-    path: Assets/Scenes/VideolabRefs.unity
-    guid: 00000000000000000000000000000000
+  m_Scenes: []
+  m_configObjects: {}
