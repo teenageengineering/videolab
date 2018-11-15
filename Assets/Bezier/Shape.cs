@@ -93,10 +93,6 @@ namespace Bezier
 
         #region Private
 
-        Vector2 _prevSize;
-        int _prevNumHandles;
-        float _prevLineWidth;
-
         Vector2[] _verts = new Vector2[0];
         int[] _indices = new int[0];
 
@@ -265,17 +261,8 @@ namespace Bezier
                 vh.AddTriangle(_indices[i], _indices[i + 1], _indices[i + 2]);
         }
 
-        void ScaleHandles()
+        void ScaleHandles(Vector2 scale)
         {
-            Vector2 newSize = this.rectTransform.rect.size;
-            if (newSize.x == 0) newSize.x = _prevSize.x;
-            if (newSize.y == 0) newSize.y = _prevSize.y;
-
-            if (newSize == _prevSize)
-                return;
-
-            Vector2 scale = new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y);
-
             Handle[] handles = GetHandles();
             for (int i = 0; i < handles.Length; i++)
             {
@@ -286,13 +273,15 @@ namespace Bezier
             }
 
             SetNeedsRebuild();
-
-            _prevSize = newSize;
         }
 
         #endregion
 
         #region MonoBehaviour
+
+        Vector2 _prevSize;
+        int _prevNumHandles;
+        float _prevLineWidth;
 
         void Start()
         {
@@ -301,10 +290,17 @@ namespace Bezier
 
         void Update()
         {
-            if (this.rectTransform.rect.size != _prevSize)
+            // avoid zero size
+            Vector2 newSize = this.rectTransform.rect.size;
+            if (newSize.x == 0) newSize.x = _prevSize.x;
+            if (newSize.y == 0) newSize.y = _prevSize.y;
+
+            if (newSize != _prevSize)
             {
                 if (snapToSize)
-                    ScaleHandles();
+                    ScaleHandles(new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y));
+    
+                _prevSize = newSize;
             }
 
             int numHandles = GetHandles().Length;
