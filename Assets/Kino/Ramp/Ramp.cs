@@ -74,15 +74,15 @@ namespace Kino
         // blend mode
 
         public enum BlendMode {
-            Multiply, Screen, Overlay, HardLight, SoftLight
+            Multiply, Screen, Overlay, HardLight, SoftLight, NumValues
         }
 
         [SerializeField]
         BlendMode _blendMode = BlendMode.Overlay;
 
-        public float blendMode {
-            get { return (float)_blendMode; }
-            set { _blendMode = (BlendMode)value; }
+        public int blendMode {
+            get { return (int)_blendMode; }
+            set { _blendMode = (BlendMode)(value % (int)BlendMode.NumValues); }
         }
 
         // debug (show ramp)

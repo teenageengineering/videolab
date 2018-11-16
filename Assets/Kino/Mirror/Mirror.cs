@@ -34,9 +34,9 @@ namespace Kino
         [SerializeField]
         int _repeat;
 
-        public float repeat  {
+        public int repeat  {
             get { return _repeat; }
-            set { _repeat = (int)value; }
+            set { _repeat = value; }
         }
 
         [SerializeField]
