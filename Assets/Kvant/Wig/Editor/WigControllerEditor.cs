@@ -6,6 +6,14 @@ namespace Kvant
     [CustomEditor(typeof(WigController))]
     public class WigControllerEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Wig Controller", false, 10)]
+        static void CreateWigController()
+        {
+            var go = new GameObject("Wig Controller");
+            go.AddComponent<WigController>();
+            Selection.activeGameObject = go;
+        }
+
         #region Editor functions
 
         SerializedProperty _target;
