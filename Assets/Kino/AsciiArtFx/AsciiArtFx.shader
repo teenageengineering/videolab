@@ -18,12 +18,6 @@ float4 _Color;
 float _Scale;
 float _Alpha;
 
-struct v2f
-{
-    float4 position : SV_POSITION;
-    float2 texcoord : TEXCOORD0;
-};   
-
 float character(float n, float2 p) 
 {
 #ifdef UNITY_HALF_TEXEL_OFFSET
@@ -40,10 +34,10 @@ float character(float n, float2 p)
     return 0;
 }
 
-float4 frag(v2f i) : SV_Target
+float4 frag(v2f_img i) : SV_Target
 {
     float2 texel = _MainTex_TexelSize.xy * _Scale;
-    float2 uv = i.texcoord.xy / texel;
+    float2 uv = i.uv / texel;
     float3 c = tex2D(_MainTex, floor(uv / 8) * 8 * texel).rgb;
 
     float gray = (c.r + c.g + c.b) / 3;
@@ -61,7 +55,7 @@ float4 frag(v2f i) : SV_Target
     float2 p = fmod(uv / 4, 2) - 1;
     c *= character(n, p);
 
-    float4 src = tex2D(_MainTex, i.texcoord.xy);
+    float4 src = tex2D(_MainTex, i.uv);
     return lerp(src, float4(c * _Color.rgb, _Color.a), _Alpha);
 }
 
