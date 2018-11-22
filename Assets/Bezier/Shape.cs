@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
+using UnityEngine.Serialization;
 
 namespace Bezier
 {
@@ -13,10 +12,19 @@ namespace Bezier
     {
         #region Editor
 
-        [Range(0, 7)]
-        public int subdivisions = 4;
+        [SerializeField, FormerlySerializedAs("subdivisions"), Range(0, 7)]
+        int _subdivisions = 4;
+        public int subdivisions {
+            get { return _subdivisions; }
+            set { _subdivisions = value; }
+        }
 
-        public bool outline;
+        [SerializeField, FormerlySerializedAs("outline")]
+        bool _outline;
+        public bool outline {
+            get { return _outline; }
+            set { _outline = value; }
+        }
 
         [SerializeField]
         float _lineWidth = 1;
@@ -25,9 +33,19 @@ namespace Bezier
             set { _lineWidth = value; }
         }
 
-        public bool closedPath = true;
+        [SerializeField, FormerlySerializedAs("closedPath")]
+        bool _closedPath = true;
+        public bool closedPath {
+            get { return _closedPath; }
+            set { _closedPath = value; }
+        }
 
-        public bool snapToSize = true;
+        [SerializeField, FormerlySerializedAs("snapToSize")]
+        bool _snapToSize = true;
+        public bool snapToSize {
+            get { return _snapToSize; }
+            set { _snapToSize = value; }
+        }
 
         #endregion
 
@@ -272,6 +290,7 @@ namespace Bezier
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
 
+            // TODO: would be enough to scale verts
             SetNeedsRebuild();
         }
 
@@ -279,18 +298,19 @@ namespace Bezier
 
         #region MonoBehaviour
 
+        int _prevSubdivisions;
+        bool _prevOutline;
+        float _prevLineWidth;
+        bool _prevClosedPath;
+
         Vector2 _prevSize;
         int _prevNumHandles;
-        float _prevLineWidth;
-
-        void Start()
-        {
-            _prevSize = this.rectTransform.rect.size;
-        }
 
         void Update()
         {
-            // avoid zero size
+            if (_prevSize == Vector2.zero)
+                _prevSize = this.rectTransform.rect.size;
+
             Vector2 newSize = this.rectTransform.rect.size;
             if (newSize.x == 0) newSize.x = _prevSize.x;
             if (newSize.y == 0) newSize.y = _prevSize.y;
@@ -310,10 +330,28 @@ namespace Bezier
                 _prevNumHandles = numHandles;
             }
 
+            if (_subdivisions != _prevSubdivisions)
+            {
+                SetNeedsRebuild();
+                _prevSubdivisions = _subdivisions;
+            }
+
+            if (_outline != _prevOutline)
+            {
+                SetNeedsRebuild();
+                _prevOutline = _outline;
+            }
+
             if (_lineWidth != _prevLineWidth)
             {
                 SetNeedsRebuild();
                 _prevLineWidth = _lineWidth;
+            }
+
+            if (_closedPath != _prevClosedPath)
+            {
+                SetNeedsRebuild();
+                _prevClosedPath = _closedPath;
             }
 
             if (_needsRebuild)
@@ -329,7 +367,7 @@ namespace Bezier
 
         public void OnValidate()
         {
-            SetNeedsRebuild();
+            Update();
         }
 
         #endregion

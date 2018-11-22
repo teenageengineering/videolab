@@ -1,5 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Bezier
 {
@@ -16,9 +16,12 @@ namespace Bezier
             Rounded
         }
 
-        public Mode mode;
-
-        // properties for animation and Klak access
+        [SerializeField, FormerlySerializedAs("mode")]
+        Mode _mode;
+        public Mode mode {
+            get { return _mode; }
+            set { _mode = value; }
+        }
 
         [SerializeField]
         float _cornerRadius;
@@ -100,6 +103,7 @@ namespace Bezier
 
         #region MonoBehaviour
 
+        Mode _prevMode;
         float _prevCornerRadius;
         Vector3 _prevControl1;
         Vector3 _prevControl2;
@@ -108,7 +112,6 @@ namespace Bezier
         Quaternion _prevRotation;
         Vector3 _prevScale;
 
-        Mode _prevMode;
 
         void Awake()
         {
@@ -117,6 +120,14 @@ namespace Bezier
 
         void Update()
         {
+            if (this.mode != _prevMode)
+            {
+                EnforceMode(false);
+                UpdateParent();
+
+                _prevMode = this.mode;
+            }
+
             if (this.cornerRadius != _prevCornerRadius)
             {
                 if (this.cornerRadius < 0)
@@ -162,14 +173,6 @@ namespace Bezier
                 UpdateParent();
 
                 _prevScale = transform.localScale;
-            }
-
-            if (this.mode != _prevMode)
-            {
-                EnforceMode(false);
-                UpdateParent();
-
-                _prevMode = this.mode;
             }
         }
 

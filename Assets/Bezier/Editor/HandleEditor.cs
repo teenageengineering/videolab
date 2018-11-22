@@ -50,7 +50,7 @@ namespace Bezier
 
         void OnEnable()
         {
-            mode            = serializedObject.FindProperty("mode");
+            mode            = serializedObject.FindProperty("_mode");
             cornerRadius    = serializedObject.FindProperty("_cornerRadius");
             control1        = serializedObject.FindProperty("_control1");
             control2        = serializedObject.FindProperty("_control2");

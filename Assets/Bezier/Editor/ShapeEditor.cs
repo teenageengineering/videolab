@@ -60,11 +60,11 @@ namespace Bezier
 
         void OnEnable()
         {
-            subdivisions    = serializedObject.FindProperty("subdivisions");
-            outline         = serializedObject.FindProperty("outline");
+            subdivisions    = serializedObject.FindProperty("_subdivisions");
+            outline         = serializedObject.FindProperty("_outline");
             lineWidth       = serializedObject.FindProperty("_lineWidth");
-            closedPath      = serializedObject.FindProperty("closedPath");
-            snapToSize      = serializedObject.FindProperty("snapToSize");
+            closedPath      = serializedObject.FindProperty("_closedPath");
+            snapToSize      = serializedObject.FindProperty("_snapToSize");
         }
 
         public override void OnInspectorGUI()
