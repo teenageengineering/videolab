@@ -178,7 +178,8 @@ namespace Bezier
 
         public void OnValidate()
         {
-            Update();
+            if (!Application.isPlaying)
+                Update();
         }
 
         #endregion
