@@ -107,6 +107,11 @@ namespace Bezier
                 handle.gameObject.SetActive(active);
         }
 
+        public void SetReferenceSize()
+        {
+            _prevSize = rectTransform.rect.size;
+        }
+
         #endregion
 
         #region Private
@@ -309,7 +314,7 @@ namespace Bezier
         void Update()
         {
             if (_prevSize == Vector2.zero)
-                _prevSize = this.rectTransform.rect.size;
+                SetReferenceSize();
 
             Vector2 newSize = this.rectTransform.rect.size;
             if (newSize.x == 0) newSize.x = _prevSize.x;
@@ -367,7 +372,8 @@ namespace Bezier
 
         public void OnValidate()
         {
-            Update();
+            if (!Application.isPlaying)
+                Update();
         }
 
         #endregion
@@ -412,6 +418,7 @@ namespace Bezier
             Shape shape = CreateShape(name);
 
             shape.rectTransform.sizeDelta = size;
+            shape.SetReferenceSize();
 
             Vector3[] localCorners = new Vector3[4];
             shape.rectTransform.GetLocalCorners(localCorners);
@@ -427,6 +434,24 @@ namespace Bezier
         public static Shape CreateCircle(string name, float radius)
         {
             return CreateRect(name, new Vector2(radius * 2, radius * 2), float.MaxValue);
+        }
+
+        public static Shape CreatePolygon(string name, float radius, int numSides)
+        {
+            Shape shape = CreateShape(name);
+
+            shape.rectTransform.sizeDelta = new Vector2(radius * 2, radius * 2);
+            shape.SetReferenceSize();
+
+            for (int i = 0; i < numSides; i++)
+            {
+                float phase = 2 * Mathf.PI * i / numSides;
+                Vector2 pos = new Vector2(Mathf.Cos(phase), Mathf.Sin(phase));
+                Handle handleObj = Handle.CreateHandle("Handle", pos * radius);
+                handleObj.transform.SetParent(shape.transform, false);
+            }
+
+            return shape;
         }
 
         #endregion
