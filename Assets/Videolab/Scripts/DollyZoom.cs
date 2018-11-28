@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace VideoLab
+namespace Videolab
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]

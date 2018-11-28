@@ -9,7 +9,11 @@ namespace Klak.Motion
     {
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+
             DrawPropertiesExcluding(serializedObject, new string[] {"m_Script"});
+
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

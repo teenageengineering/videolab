@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-namespace VideoLab
+namespace Videolab
 {
     [RequireComponent(typeof(Camera))]
     [AddComponentMenu("Image Effects/Toy")]

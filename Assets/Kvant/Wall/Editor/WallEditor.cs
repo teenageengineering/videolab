@@ -9,6 +9,14 @@ namespace Kvant
     [CustomEditor(typeof(Wall)), CanEditMultipleObjects]
     public class WallEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Wall", false, 10)]
+        static void CreateWall()
+        {
+            var go = new GameObject("Wall");
+            go.AddComponent<Wall>();
+            Selection.activeGameObject = go;
+        }
+
         SerializedProperty _columns;
         SerializedProperty _rows;
         SerializedProperty _extent;

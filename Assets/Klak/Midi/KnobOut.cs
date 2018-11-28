@@ -26,6 +26,10 @@ namespace Klak.Midi
 
         [SerializeField]
         int _knobNumber;
+        public int knobNumber {
+            get { return _knobNumber; }
+            set { _knobNumber = value; }
+        }
 
         #endregion
 

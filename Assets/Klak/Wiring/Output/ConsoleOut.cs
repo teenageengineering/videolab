@@ -3,44 +3,51 @@ using System.Reflection;
 
 namespace Klak.Wiring
 {
-	[AddComponentMenu("Klak/Wiring/Output/Generic/Console Out")]
-	public class ConsoleOut : NodeBase
-	{
-		#region Node I/O
+    [AddComponentMenu("Klak/Wiring/Output/Generic/Console Out")]
+    public class ConsoleOut : NodeBase
+    {
+        #region Node I/O
 
-		[Inlet]
-		public void Bang() {
-			Debug.Log(name + " Bang!");
-		}
+        [Inlet]
+        public void Bang() {
+            LogInEditor(name + " Bang!");
+        }
 
-		[Inlet]
-		public float number {
-			set {
-				Debug.Log(name + " " + value);
-			}
-		}
+        [Inlet]
+        public float number {
+            set {
+                LogInEditor(name + " " + value);
+            }
+        }
 
-		[Inlet]
-		public Vector3 vector {
-			set {
-				Debug.Log(name + " Vector3" + value);
-			}
-		}
+        [Inlet]
+        public Vector3 vector {
+            set {
+                LogInEditor(name + " Vector3" + value);
+            }
+        }
 
-		[Inlet]
-		public Quaternion rotation {
-			set {
-				Debug.Log(name + " Quaternion" + value);
-			}
-		}
+        [Inlet]
+        public Quaternion rotation {
+            set {
+                LogInEditor(name + " Quaternion" + value);
+            }
+        }
 
-		[Inlet]
-		public Color color {
-			set {
-				Debug.Log(name + " " + value);
-			}
-		}
+        [Inlet]
+        public Color color {
+            set {
+                LogInEditor(name + " " + value);
+            }
+        }
 
-		#endregion
-	}
+        #endregion
+
+        void LogInEditor(string msg)
+        {
+            #if UNITY_EDITOR
+            Debug.Log(msg);
+            #endif
+        }
+    }
 }

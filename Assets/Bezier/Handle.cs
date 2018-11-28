@@ -1,5 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Bezier
 {
@@ -16,7 +16,12 @@ namespace Bezier
             Rounded
         }
 
-        public Mode mode;
+        [SerializeField, FormerlySerializedAs("mode")]
+        Mode _mode;
+        public Mode mode {
+            get { return _mode; }
+            set { _mode = value; }
+        }
 
         [SerializeField]
         float _cornerRadius;
@@ -54,27 +59,16 @@ namespace Bezier
 
         public Point point { 
             get {
+                Vector2 p = transform.localPosition;
                 Vector2 c1 = Vector2.Scale(transform.localRotation * this.control1, transform.localScale);
                 Vector2 c2 = Vector2.Scale(transform.localRotation * this.control2, transform.localScale);
-                return new Point(this.pos, this.pos + c1, this.pos + c2);
+                return new Point(p, p + c1, p + c2);
             }
         }
 
         #endregion
 
         #region Private
-
-        float _prevCornerRadius;
-        Vector3 _prevControl1;
-        Vector3 _prevControl2;
-
-        Vector2 _prevPos;
-        Quaternion _prevRotation;
-        Vector3 _prevScale;
-
-        Mode _prevMode;
-
-        const float kHandleSize = 10f;
 
         void EnforceMode(bool control2Free)
         {
@@ -101,7 +95,7 @@ namespace Bezier
             {
                 Shape parentShape = transform.parent.GetComponent<Shape>();
                 if (parentShape)
-                    parentShape.UpdateGraphic();
+                    parentShape.SetNeedsRebuild();
             }
         }
 
@@ -109,72 +103,103 @@ namespace Bezier
 
         #region MonoBehaviour
 
-        void Start()
-        {
-            this.rectTransform.sizeDelta = new Vector2(kHandleSize, kHandleSize);
+        Mode _prevMode;
+        float _prevCornerRadius;
+        Vector3 _prevControl1;
+        Vector3 _prevControl2;
 
-            UpdateParent();
-        }
+        Vector2 _prevPos;
+        Quaternion _prevRotation;
+        Vector3 _prevScale;
 
-        void OnDestroy()
+
+        void Awake()
         {
-            UpdateParent();
+            this.rectTransform.sizeDelta = Vector2.one;
         }
 
         void Update()
         {
+            if (this.mode != _prevMode)
+            {
+                EnforceMode(false);
+                UpdateParent();
+
+                _prevMode = this.mode;
+            }
+
             if (this.cornerRadius != _prevCornerRadius)
             {
                 if (this.cornerRadius < 0)
                     this.cornerRadius = 0;
 
-                _prevCornerRadius = this.cornerRadius;
                 UpdateParent();
+
+                _prevCornerRadius = this.cornerRadius;
             }
 
             if (this.control1 != _prevControl1)
             {
-                _prevControl1 = this.control1;
                 EnforceMode(false);
                 UpdateParent();
+
+                _prevControl1 = this.control1;
             }
 
             if (this.control2 != _prevControl2)
             {
-                _prevControl2 = this.control2;
                 EnforceMode(true);
                 UpdateParent();
+
+                _prevControl2 = this.control2;
             }
 
             if (this.pos != _prevPos)
             {
-                _prevPos = this.pos;
                 UpdateParent();
+
+                _prevPos = this.pos;
             }
 
             if (transform.localRotation != _prevRotation)
             {
-                _prevRotation = transform.localRotation;
                 UpdateParent();
+
+                _prevRotation = transform.localRotation;
             }
 
             if (transform.localScale != _prevScale)
             {
-                _prevScale = transform.localScale;
                 UpdateParent();
-            }
 
-            if (this.mode != _prevMode)
-            {
-                _prevMode = this.mode;
-                EnforceMode(false);
-                UpdateParent();
+                _prevScale = transform.localScale;
             }
         }
 
         public void OnValidate()
         {
-            Update();
+            if (!Application.isPlaying)
+                Update();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public static Handle CreateHandle(string name, Vector2 pos, float cornerRadius = 0)
+        {
+            GameObject go = new GameObject(name);
+
+            Handle handle = go.AddComponent<Handle>();
+            handle.pos = pos;
+
+            if (cornerRadius > 0)
+            {
+                handle.mode = Handle.Mode.Rounded;
+                handle.cornerRadius = cornerRadius;
+            }
+
+            return handle;
         }
 
         #endregion

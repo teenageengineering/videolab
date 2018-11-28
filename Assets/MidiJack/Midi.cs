@@ -92,5 +92,6 @@ namespace MidiJack
         ActiveProject,
         MasterVolume,
         BatteryLevel,
+        Tempo
     }
 }

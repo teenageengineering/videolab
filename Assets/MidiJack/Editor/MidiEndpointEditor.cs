@@ -9,6 +9,26 @@ namespace MidiJack
     [CustomEditor(typeof(MidiEndpoint), true)]
     public class MidiEndpointEditor : Editor 
     {
+        #region Menu
+
+        [MenuItem("GameObject/MIDI Jack/MIDI Source", false, 10)]
+        static void CreateMIDISource()
+        {
+            GameObject go = new GameObject("MIDI Source");
+            go.AddComponent<MidiSource>();
+            Selection.activeGameObject = go;
+        }
+
+        [MenuItem("GameObject/MIDI Jack/MIDI Destination", false, 10)]
+        static void CreateMIDIDestination()
+        {
+            GameObject go = new GameObject("MIDI Destination");
+            go.AddComponent<MidiDestination>();
+            Selection.activeGameObject = go;
+        }
+
+        #endregion
+
         SerializedProperty _autoConnect;
         SerializedProperty _preferredName;
         SerializedProperty _midiMap;

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace VideoLab
+namespace Videolab
 {
     public class RadioGroupMember : MonoBehaviour
     {
@@ -36,10 +36,9 @@ namespace VideoLab
 
         void Update()
         {
-            if (groupIndex != _prevGroupIndex) {
-                
-                if (gameObject.activeSelf)
-                    OnMemberEnabled(this);
+            if (groupIndex != _prevGroupIndex) 
+            {
+                OnMemberEnabled(this);
 
                 _prevGroupIndex = groupIndex;
             }
@@ -47,7 +46,7 @@ namespace VideoLab
 
         void onMemberEnabled(RadioGroupMember member)
         {
-            if (member != this && member.groupIndex != this.groupIndex)
+            if (member != this && member.groupIndex == this.groupIndex)
                 gameObject.SetActive(false);
         }
     }

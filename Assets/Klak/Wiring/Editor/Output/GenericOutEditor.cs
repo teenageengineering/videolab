@@ -43,7 +43,7 @@ namespace Klak.Wiring
         string[] _propertyList;
         Type _cachedType;
 
-        void OnEnable()
+        public virtual void OnEnable()
         {
             _target = serializedObject.FindProperty("_target");
             _propertyName = serializedObject.FindProperty("_propertyName");

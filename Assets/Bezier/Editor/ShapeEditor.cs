@@ -28,47 +28,26 @@ namespace Bezier
             return canvasGo;
         }
 
-        public static GameObject CreateShape()
-        {
-            GameObject go = new GameObject("Bezier Shape");
-            go.AddComponent<Image>();
-            go.AddComponent<Shape>();
-
-            return go;
-        }
-
         [MenuItem("GameObject/UI/Bezier/Shape")]
         static void CreateBezierShape(MenuCommand menuCommand)
         {
-            GameObject go = CreateShape();
+            Shape shape = Shape.CreateShape("Shape");
 
-            GameObjectUtility.SetParentAndAlign(go, GetCanvas(menuCommand.context));
+            GameObjectUtility.SetParentAndAlign(shape.gameObject, GetCanvas(menuCommand.context));
 
-            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-            Selection.activeObject = go;
+            Undo.RegisterCreatedObjectUndo(shape.gameObject, "Create " + shape.name);
+            Selection.activeObject = shape.gameObject;
         }
-
 
         [MenuItem("GameObject/UI/Bezier/Rect")]
         static void CreateBezierRect(MenuCommand menuCommand)
         {
-            GameObject go = CreateShape();
+            Shape rect = Shape.CreateRect("Rect", new Vector2(100, 100), 0);
 
-            Shape shape = go.GetComponent<Shape>();
-            Vector3[] localCorners = new Vector3[4];
-            shape.rectTransform.GetLocalCorners(localCorners);
-            foreach (Vector3 corner in localCorners)
-            {
-                GameObject handleObj = new GameObject("Handle");
-                Handle handle = handleObj.AddComponent<Handle>();
-                handle.pos = corner;
-                handleObj.transform.SetParent(go.transform, false);
-            }
+            GameObjectUtility.SetParentAndAlign(rect.gameObject, GetCanvas(menuCommand.context));
 
-            GameObjectUtility.SetParentAndAlign(go, GetCanvas(menuCommand.context));
-
-            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-            Selection.activeObject = go;
+            Undo.RegisterCreatedObjectUndo(rect.gameObject, "Create " + rect.name);
+            Selection.activeObject = rect.gameObject;
         }
 
         #endregion
@@ -81,11 +60,11 @@ namespace Bezier
 
         void OnEnable()
         {
-            subdivisions    = serializedObject.FindProperty("subdivisions");
-            outline         = serializedObject.FindProperty("outline");
+            subdivisions    = serializedObject.FindProperty("_subdivisions");
+            outline         = serializedObject.FindProperty("_outline");
             lineWidth       = serializedObject.FindProperty("_lineWidth");
-            closedPath      = serializedObject.FindProperty("closedPath");
-            snapToSize      = serializedObject.FindProperty("snapToSize");
+            closedPath      = serializedObject.FindProperty("_closedPath");
+            snapToSize      = serializedObject.FindProperty("_snapToSize");
         }
 
         public override void OnInspectorGUI()
@@ -116,6 +95,29 @@ namespace Bezier
             EditorGUILayout.PropertyField(snapToSize);
 
             serializedObject.ApplyModifiedProperties();
+        }
+
+        public void OnSceneGUI() {
+
+            Shape shape = target as Shape;
+            if (!shape.enabled)
+                return;
+
+            float size = HandleUtility.GetHandleSize(shape.transform.localPosition);
+            Quaternion shapeRotation = Tools.pivotRotation == PivotRotation.Local ? shape.transform.rotation : Quaternion.identity;
+
+            Handles.color = Color.HSVToRGB(0, 0, 0.8f);
+
+            Handle[] handles = shape.GetHandles();
+            foreach (Handle handle in handles)
+            {
+                Vector3 p = shape.transform.TransformPoint(handle.transform.localPosition);
+                if (Handles.Button(p, shapeRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
+                {
+                    Selection.activeTransform = handle.transform;
+                    return;
+                }
+            }
         }
     }
 }

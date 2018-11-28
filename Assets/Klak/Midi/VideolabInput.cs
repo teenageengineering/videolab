@@ -58,6 +58,15 @@ namespace Klak.Midi
             }
         }
 
+        float _tempo;
+        public float tempo {
+            get { return _tempo; }
+            set {
+                _tempo = value;
+                _tempoEvent.Invoke(_tempo);
+            }
+        }
+
         #endregion
 
         #region Node I/O
@@ -76,6 +85,9 @@ namespace Klak.Midi
 
         [SerializeField, Outlet]
         FloatEvent _batteryLevelEvent = new FloatEvent();
+
+        [SerializeField, Outlet]
+        FloatEvent _tempoEvent = new FloatEvent();
 
         #endregion
 
@@ -97,15 +109,21 @@ namespace Klak.Midi
             }
             else if (id == MidiSysex.MasterVolume)
             {
-                masterVolume = value;
+                masterVolume = value / 127f;
             }
             else if (id == MidiSysex.BatteryLevel)
             {
-                batteryLevel = value;
+                batteryLevel = value / 127f;
+            }
+            else if (id == MidiSysex.Tempo)
+            {
+                tempo = value;
             }
         }
 
         MidiSource _prevSource;
+
+        bool _needsReset;
 
         void SwitchSource()
         {
@@ -116,6 +134,8 @@ namespace Klak.Midi
                 _source = MidiMaster.GetSource();
 
             _source.sysexDelegate += OnSysex;
+
+            _needsReset = true;
 
             _prevSource = _source;
         }
@@ -130,7 +150,7 @@ namespace Klak.Midi
                 _source.sysexDelegate -= OnSysex;
         }
 
-        void Start()
+        void OnEnable()
         {
             SwitchSource();
         }
@@ -139,6 +159,18 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+            if (_needsReset)
+            {
+                OnSysex(MidiSysex.ActiveTrack, _source.GetSysex(MidiSysex.ActiveTrack));
+                OnSysex(MidiSysex.ActivePattern, _source.GetSysex(MidiSysex.ActivePattern));
+                OnSysex(MidiSysex.ActiveProject, _source.GetSysex(MidiSysex.ActiveProject));
+                OnSysex(MidiSysex.MasterVolume, _source.GetSysex(MidiSysex.MasterVolume));
+                OnSysex(MidiSysex.BatteryLevel, _source.GetSysex(MidiSysex.BatteryLevel));
+                OnSysex(MidiSysex.Tempo, _source.GetSysex(MidiSysex.Tempo));
+
+                _needsReset = false;
+            }
         }
 
         #endregion

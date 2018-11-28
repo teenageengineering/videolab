@@ -5,10 +5,13 @@ using System.IO;
 public class BuildVideopaks
 {
     [MenuItem ("Assets/Build Videopaks")]
-    static void BuildAllAssetBundles()
+    static void BuildAll()
     {
-        string dir = "videopaks/";
-        
+        string rootDir = EditorUtility.SaveFolderPanel("Select output directory", "", "");
+
+        if (string.IsNullOrEmpty(rootDir))
+            return;
+
         foreach (string bundleName in AssetDatabase.GetAllAssetBundleNames())
         {
             AssetBundleBuild buildInfo = new AssetBundleBuild();
@@ -16,11 +19,13 @@ public class BuildVideopaks
             buildInfo.assetNames = AssetDatabase.GetAssetPathsFromAssetBundle(bundleName);
             AssetBundleBuild[] buildMap = new AssetBundleBuild[] { buildInfo };
 
-            string iosDir = dir + bundleName + "/" + VideopakManager.GetPlatformString(RuntimePlatform.IPhonePlayer);
+            string pakDir = rootDir + "/" + bundleName + "/";
+
+            string iosDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.IPhonePlayer);
             Directory.CreateDirectory(iosDir);
             BuildPipeline.BuildAssetBundles(iosDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.iOS);
 
-            string osxDir = dir + bundleName + "/" + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
+            string osxDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
             Directory.CreateDirectory(osxDir);
             #if UNITY_2017_3_OR_NEWER
             BuildPipeline.BuildAssetBundles(osxDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSX);

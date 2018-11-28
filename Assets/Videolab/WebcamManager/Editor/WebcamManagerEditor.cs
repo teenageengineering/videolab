@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
-namespace VideoLab
+namespace Videolab
 {
     [CustomEditor(typeof(WebcamManager), true)]
     public class WebcamManagerEditor : Editor 

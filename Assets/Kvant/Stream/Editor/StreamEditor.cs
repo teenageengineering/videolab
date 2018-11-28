@@ -9,6 +9,14 @@ namespace Kvant
     [CustomEditor(typeof(Stream)), CanEditMultipleObjects]
     public class StreamEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Stream", false, 10)]
+        static void CreateStream()
+        {
+            var go = new GameObject("Stream");
+            go.AddComponent<Stream>();
+            Selection.activeGameObject = go;
+        }
+
         SerializedProperty _maxParticles;
         SerializedProperty _emitterPosition;
         SerializedProperty _emitterSize;

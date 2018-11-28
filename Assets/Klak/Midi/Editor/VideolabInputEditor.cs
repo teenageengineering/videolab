@@ -22,6 +22,7 @@ namespace Klak.Midi
                 instance.activeProject = EditorGUILayout.FloatField("Debug Active Bank", instance.activeProject);
                 instance.masterVolume = EditorGUILayout.Slider("Debug Master Volume", instance.masterVolume, 0, 1);
                 instance.batteryLevel = EditorGUILayout.Slider("Debug Battery Level", instance.batteryLevel, 0, 1);
+                instance.tempo = EditorGUILayout.IntSlider("Debug Tempo", (int)instance.tempo, 40, 200);
 
                 EditorUtility.SetDirty(target); // request repaint
             }

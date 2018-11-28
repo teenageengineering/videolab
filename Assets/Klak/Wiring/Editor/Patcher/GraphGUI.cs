@@ -214,11 +214,11 @@ namespace Klak.Wiring.Patcher
             edgeGUI.DoDraggedEdge();
 
             // Mouse drag
-        #if UNITY_2017_3_OR_NEWER
+            #if UNITY_2017_3_OR_NEWER
             DragSelection();
-        #else
+            #else
             DragSelection(new Rect(-5000, -5000, 10000, 10000));
-        #endif
+            #endif
 
             // Context menu
             ShowCustomContextMenu();
@@ -229,32 +229,32 @@ namespace Klak.Wiring.Patcher
 
         #region Customized context menu
 
-		void ShowCustomContextMenu()
-		{
+        void ShowCustomContextMenu()
+        {
             // Only cares about single right click.
-			if (Event.current.type != EventType.MouseDown) return;
+            if (Event.current.type != EventType.MouseDown) return;
             if (Event.current.button != 1) return;
             if (Event.current.clickCount != 1) return;
 
             // Consume this mouse event.
-			Event.current.Use();
+            Event.current.Use();
 
             // Record the current mouse position
-			m_contextMenuMouseDownPosition = Event.current.mousePosition;
+            m_contextMenuMouseDownPosition = Event.current.mousePosition;
 
             // Build a context menu.
             var menu = new GenericMenu();
 
-			if (selection.Count != 0)
-			{
+            if (selection.Count != 0)
+            {
                 // Node operations
                 menu.AddItem(new GUIContent("Cut"), false, ContextMenuCallback, "Cut");
                 menu.AddItem(new GUIContent("Copy"), false, ContextMenuCallback, "Copy");
                 menu.AddItem(new GUIContent("Duplicate"), false, ContextMenuCallback, "Duplicate");
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("Delete"), false, ContextMenuCallback, "Delete");
-			}
-			else if (edgeGUI.edgeSelection.Count != 0)
+            }
+            else if (edgeGUI.edgeSelection.Count != 0)
             {
                 // Edge operations
                 menu.AddItem(new GUIContent("Delete"), false, ContextMenuCallback, "Delete");
@@ -270,7 +270,7 @@ namespace Klak.Wiring.Patcher
             NodeFactory.AddNodeItemsToMenu(menu, CreateMenuItemCallback);
 
             menu.ShowAsContext();
-		}
+        }
 
         void ContextMenuCallback(object data)
         {

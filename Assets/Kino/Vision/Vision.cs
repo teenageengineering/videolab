@@ -33,11 +33,15 @@ namespace Kino
         #region Common property
 
         public enum Source {
-            Depth, Normals, MotionVectors
+            Depth, Normals, MotionVectors, NumValues
         }
 
         [SerializeField]
         Source _source;
+        public int source {
+            get { return (int)_source; }
+            set { _source = (Source)(value % (int)Source.NumValues); }
+        }
 
         [SerializeField, Range(0, 1)]
         float _blendRatio = 0.5f;

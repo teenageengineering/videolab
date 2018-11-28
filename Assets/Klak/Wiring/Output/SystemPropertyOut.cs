@@ -29,6 +29,13 @@ namespace Klak.Wiring
     [AddComponentMenu("Klak/Wiring/Output/System Property Out")]
     public class SystemPropertyOut : NodeBase
     {
+        #region Editable properties
+
+        [SerializeField]
+        Material _skyboxMaterial;
+
+        #endregion
+
         #region Node I/O
 
         [Inlet]
@@ -92,6 +99,12 @@ namespace Klak.Wiring
             set {
                 if (enabled) RenderSettings.fogEndDistance = value;
             }
+        }
+
+        [Inlet]
+        public void SetSkybox() 
+        {
+            if (enabled) RenderSettings.skybox = _skyboxMaterial;
         }
 
         #endregion

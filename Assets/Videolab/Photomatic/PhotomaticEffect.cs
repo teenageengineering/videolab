@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VideoLab
+namespace Videolab
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
@@ -10,7 +10,7 @@ namespace VideoLab
         #region Public Properties
 
         [SerializeField, Range(0, 1)]
-        float _hue = 0;
+        float _hue = 0.5f;
 
         public float hue {
             get { return _hue; }
@@ -41,6 +41,46 @@ namespace VideoLab
             set { _contrast = value; }
         }
 
+        [SerializeField]
+        bool _invert;
+
+        public bool invert {
+            get { return _invert; }
+            set { _invert = value; }
+        }
+
+        [SerializeField]
+        bool _mirrorX;
+
+        public bool mirrorX {
+            get { return _mirrorX; }
+            set { _mirrorX = value; }
+        }
+
+        [SerializeField]
+        bool _mirrorY;
+
+        public bool mirrorY {
+            get { return _mirrorY; }
+            set { _mirrorY = value; }
+        }
+
+        [SerializeField, Range(1, 4)]
+        float _zoom = 1;
+
+        public float zoom {
+            get { return _zoom; }
+            set { _zoom = value; }
+        }
+
+        [SerializeField]
+        Color _colorMask = Color.white;
+
+        public Color colorMask {
+            get { return _colorMask; }
+            set { _colorMask = value; }
+        }
+
         #endregion
 
         #region Private Properties
@@ -62,7 +102,10 @@ namespace VideoLab
                 _material.hideFlags = HideFlags.DontSave;
             }
 
-            _material.SetVector("_hsbc", new Vector4(_hue, _saturation, _brightness, _contrast));
+            float hue = Mathf.Repeat(_hue - 0.5f, 1);
+            _material.SetVector("_hsbc", new Vector4(hue, _saturation, _brightness, _contrast));
+            _material.SetVector("_fx", new Vector4(_mirrorX ? 1 : 0, _mirrorY ? 1 : 0, _invert ? 1 : 0, _zoom));
+            _material.SetColor("_colorMask", _colorMask);
 
             Graphics.Blit(source, destination, _material);
         }

@@ -16,22 +16,21 @@ namespace Bezier
             if (parentGo && parentGo.GetComponent<Shape>())
                 return parentGo;
             
-            GameObject shapeGo = ShapeEditor.CreateShape();
-            GameObjectUtility.SetParentAndAlign(shapeGo, ShapeEditor.GetCanvas(menuContext));
+            Shape shape = Shape.CreateShape("Bezier Shape");
+            GameObjectUtility.SetParentAndAlign(shape.gameObject, ShapeEditor.GetCanvas(menuContext));
 
-            return shapeGo;
+            return shape.gameObject;
         }
 
         [MenuItem("GameObject/UI/Bezier/Handle")]
         static void CreateBezierHandle(MenuCommand menuCommand)
         {
-            GameObject go = new GameObject("Handle");
-            go.AddComponent<Handle>();
+            Handle handle = Handle.CreateHandle("Handle", Vector2.zero);
 
-            GameObjectUtility.SetParentAndAlign(go, GetShape(menuCommand.context));
+            GameObjectUtility.SetParentAndAlign(handle.gameObject, GetShape(menuCommand.context));
 
-            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-            Selection.activeObject = go;
+            Undo.RegisterCreatedObjectUndo(handle.gameObject, "Create " + handle.name);
+            Selection.activeObject = handle.gameObject;
         }
 
         #endregion
@@ -39,7 +38,6 @@ namespace Bezier
         int selectedHandle = 0;
 
         static Color[] modeColors = {
-            Color.HSVToRGB(0, 0, 0.8f),
             Color.yellow,
             Color.cyan,
             Color.magenta
@@ -52,7 +50,7 @@ namespace Bezier
 
         void OnEnable()
         {
-            mode            = serializedObject.FindProperty("mode");
+            mode            = serializedObject.FindProperty("_mode");
             cornerRadius    = serializedObject.FindProperty("_cornerRadius");
             control1        = serializedObject.FindProperty("_control1");
             control2        = serializedObject.FindProperty("_control2");
@@ -102,8 +100,6 @@ namespace Bezier
             Transform handleTransform = handle.transform;
             Quaternion handleRotation = Tools.pivotRotation == PivotRotation.Local ? handleTransform.rotation : Quaternion.identity;
 
-            Handles.color = modeColors[(int)handle.mode];
-
             Event e = Event.current;
             bool deletePressed = (e.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Backspace));
 
@@ -113,25 +109,27 @@ namespace Bezier
 
             if (handle.mode != Handle.Mode.Rounded)
             {
+                Handles.color = modeColors[(int)handle.mode];
+
                 Handles.DrawLine(p, c1);
                 if (Handles.Button(c1, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
-                {
                     selectedHandle = 1;
-                }
 
                 Handles.DrawLine(p, c2);
                 if (Handles.Button(c2, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
-                {
                     selectedHandle = 2;
-                }
             }
 
             if (selectedHandle == 0)
+            {
+                // use standard editor tools
                 Tools.hidden = false;
+            }
             else
             {
                 Tools.hidden = true;
 
+                Handles.color = Color.HSVToRGB(0, 0, 0.8f);
                 if (Handles.Button(p, handleRotation, size * 0.05f, size * 0.05f, Handles.DotHandleCap))
                     selectedHandle = 0;
 

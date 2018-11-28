@@ -63,7 +63,6 @@ namespace Klak.Midi
 
             EditorGUILayout.PropertyField(_channel);
 
-            EditorGUILayout.HelpBox("ModWheel is 1, generic knobs are 12 - 31.", MessageType.Info);
             EditorGUILayout.PropertyField(_knobNumber);
 
             EditorGUILayout.Space();

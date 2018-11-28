@@ -152,10 +152,10 @@ namespace MidiJack
 
         #region Native Plugin Interface
 
-        #if (!UNITY_IOS && !UNITY_TVOS)
-        const string _libName = "MidiJackPlugin";
-        #else
+        #if UNITY_IOS
         const string _libName = "__Internal";
+        #else
+        const string _libName = "MidiJackPlugin";
         #endif
 
         [DllImport(_libName, EntryPoint="MidiJackCountSources")]

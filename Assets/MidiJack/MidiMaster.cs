@@ -34,16 +34,18 @@ namespace MidiJack
         MidiMaster()
         {
             GameObject sourceGo = new GameObject("Midi Master Source");
+            GameObject.DontDestroyOnLoad(sourceGo);
             sourceGo.hideFlags = HideFlags.HideInHierarchy;
             _source = sourceGo.AddComponent<MidiSource>();
             _source.endpointId = uint.MaxValue;
 
             GameObject destinationGo = new GameObject("Midi Master Destination");
+            GameObject.DontDestroyOnLoad(destinationGo);
             destinationGo.hideFlags = HideFlags.HideInHierarchy;
             _destination = destinationGo.AddComponent<MidiDestination>();
             _destination.endpointId = uint.MaxValue;
         }
-        
+
         #region Singleton
 
         static MidiMaster _instance = null;
@@ -58,7 +60,7 @@ namespace MidiJack
         }
 
         #endregion
-        
+
         // MIDI event delegates
         public static MidiSource.NoteOnDelegate noteOnDelegate {
             get { return Instance._source.noteOnDelegate; }
@@ -73,6 +75,16 @@ namespace MidiJack
         public static MidiSource.KnobDelegate knobDelegate {
             get { return Instance._source.knobDelegate; }
             set { Instance._source.knobDelegate = value; }
+        }
+
+        public static MidiSource.RealtimeDelegate realtimeDelegate {
+            get { return Instance._source.realtimeDelegate; }
+            set { Instance._source.realtimeDelegate = value; }
+        }
+
+        public static MidiSource.SysexDelegate sysexDelegate {
+            get { return Instance._source.sysexDelegate; }
+            set { Instance._source.sysexDelegate = value; }
         }
 
         // Returns the key state (on: velocity, off: zero).
@@ -130,7 +142,7 @@ namespace MidiJack
             return Instance._source.GetKnob(MidiChannel.All, knobNumber, defaultValue);
         }
 
-        public static void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+        public static void SendKeyDown(MidiChannel channel, int noteNumber, float velocity)
         {
             Instance._destination.SendKeyDown(channel, noteNumber, velocity);
         }
@@ -150,15 +162,15 @@ namespace MidiJack
             Instance._destination.SendRealtime(code);
         }
 
-		// Bad singleton style..
-		public static MidiSource GetSource()
-		{
-			return Instance._source;
-		}
+        // Bad singleton style..
+        public static MidiSource GetSource()
+        {
+            return Instance._source;
+        }
 
-		public static MidiDestination GetDestination()
-		{
-			return Instance._destination;
-		}
+        public static MidiDestination GetDestination()
+        {
+            return Instance._destination;
+        }
     }
 }

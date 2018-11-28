@@ -61,12 +61,12 @@ namespace MidiJack
             }
         }
 
-        public void SendKeyDown(MidiChannel channel, int noteNumber, int velocity)
+        public void SendKeyDown(MidiChannel channel, int noteNumber, float velocity)
         {
             MidiMessage msg = new MidiMessage();
             msg.status = (byte)(0x90 | ((int)channel & 0x0f));
             msg.data1 = (byte)noteNumber;
-            msg.data2 = (byte)velocity;
+            msg.data2 = (byte)System.Convert.ToByte(velocity * 127);
 
             SendMessage(msg);
         }
@@ -86,7 +86,7 @@ namespace MidiJack
             msg.status = (byte)(0xb0 | ((int)channel & 0x0f));
             if (_midiMap) knobNumber = _midiMap.DeviceValue(knobNumber);
             msg.data1 = (byte)knobNumber;
-            msg.data2 = (byte)(value * 127);
+            msg.data2 = (byte)System.Convert.ToByte(value * 127);
 
             SendMessage(msg);
         }

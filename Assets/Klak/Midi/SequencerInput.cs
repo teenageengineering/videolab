@@ -38,44 +38,35 @@ namespace Klak.Midi
 
         #region Private members
 
-        bool _playing;
-        bool playing {
-            set {
-                _playing = value;
-                _playingEvent.Invoke(value ? 1 : 0);
-            }
-        }
-
         void OnRealtime(MidiRealtime realtimeMsg)
         {
             if (realtimeMsg == MidiRealtime.Clock)
             {
                 _clockEvent.Invoke();
 
-                if (_playing)
-                    _stepEvent.Invoke(1f / 96);
+                if (_source.IsPlaying())
+                    _stepEvent.Invoke(1f / 24);
             }
             else if (realtimeMsg == MidiRealtime.Start)
             {
                 _startEvent.Invoke();
-
-                playing = true;
+                _playingEvent.Invoke(1);
             }
             else if (realtimeMsg == MidiRealtime.Continue)
             {
                 _continueEvent.Invoke();
-
-                playing = true;
+                _playingEvent.Invoke(1);
             }
             else if (realtimeMsg == MidiRealtime.Stop)
             {
                 _stopEvent.Invoke();
-
-                playing = false;
+                _playingEvent.Invoke(0);
             }
         }
 
         MidiSource _prevSource;
+
+        bool _needsReset;
 
         void SwitchSource()
         {
@@ -87,7 +78,7 @@ namespace Klak.Midi
 
             _source.realtimeDelegate += OnRealtime;
 
-            _playingEvent.Invoke(0);
+            _needsReset = true;
 
             _prevSource = _source;
         }
@@ -102,7 +93,7 @@ namespace Klak.Midi
                 _source.realtimeDelegate -= OnRealtime;
         }
 
-        void Start()
+        void OnEnable()
         {
             SwitchSource();
         }
@@ -111,6 +102,16 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+            if (_needsReset)
+            {
+                if (_source.IsPlaying())
+                    OnRealtime(MidiRealtime.Start);
+                else
+                    OnRealtime(MidiRealtime.Stop);
+
+                _needsReset = false;
+            }
         }
 
         #endregion

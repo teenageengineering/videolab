@@ -9,6 +9,14 @@ namespace Kvant
     [CanEditMultipleObjects, CustomEditor(typeof(Swarm))]
     public class SwarmEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Swarm", false, 10)]
+        static void CreateSwarm()
+        {
+            var go = new GameObject("Swarm");
+            go.AddComponent<Swarm>();
+            Selection.activeGameObject = go;
+        }
+
         SerializedProperty _lineCount;
         SerializedProperty _historyLength;
         SerializedProperty _throttle;

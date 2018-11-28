@@ -67,7 +67,7 @@ namespace Klak.Wiring
         #region Private members
 
         float _inputValue;
-        float _modulationValue;
+        float _modulationValue = 1;
 
         float MixValues()
         {

@@ -30,6 +30,14 @@ namespace Kvant
     [CustomEditor(typeof(Warp))]
     public class WarpEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Warp", false, 10)]
+        static void CreateWarp()
+        {
+            var go = new GameObject("Warp");
+            go.AddComponent<Warp>();
+            Selection.activeGameObject = go;
+        }
+
         SerializedProperty _template;
         SerializedProperty _randomSeed;
 

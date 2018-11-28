@@ -25,12 +25,15 @@ namespace Klak.Midi
         [SerializeField]
         MidiChannel _channel = MidiChannel.All;
 
+        [SerializeField]
+        int _noteNumber = 60;
+
+        [SerializeField]
+        float _velocity = 0.8f;
+
         #endregion
 
         #region Private members
-
-        int _noteNumber;
-        int _velocity;
 
         #endregion
 
@@ -56,7 +59,7 @@ namespace Klak.Midi
         [Inlet]
         public float velocity {
             set {
-                _velocity = (int)value;
+                _velocity = value;
             }
         }
 

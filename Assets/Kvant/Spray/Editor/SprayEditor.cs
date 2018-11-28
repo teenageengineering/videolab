@@ -10,6 +10,14 @@ namespace Kvant
     [CustomEditor(typeof(Spray))]
     public class SprayEditor : Editor
     {
+        [MenuItem("GameObject/Kvant/Spray", false, 10)]
+        static void CreateSpray()
+        {
+            var go = new GameObject("Spray");
+            go.AddComponent<Spray>();
+            Selection.activeGameObject = go;
+        }
+
         SerializedProperty _maxParticles;
         SerializedProperty _emitterCenter;
         SerializedProperty _emitterSize;

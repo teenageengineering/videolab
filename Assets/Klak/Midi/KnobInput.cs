@@ -40,6 +40,7 @@ namespace Klak.Midi
         MidiChannel _channel = MidiChannel.All;
 
         [SerializeField]
+        [Tooltip("ModWheel is 1, generic knobs are 12 - 31.")]
         int _knobNumber = 0;
 
         [SerializeField]
@@ -68,7 +69,8 @@ namespace Klak.Midi
                     return;
 
                 _channel = newChannel;
-                ResetValue();
+
+                _needsReset = true;
             }
         }
 
@@ -127,13 +129,9 @@ namespace Klak.Midi
             _lastInputValue = inputValue;
         }
 
-        void ResetValue()
-        {
-            _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
-            _floatValue.targetValue = _responseCurve.Evaluate(_lastInputValue);
-        }
-
         MidiSource _prevSource;
+
+        bool _needsReset;
 
         void SwitchSource()
         {
@@ -145,7 +143,7 @@ namespace Klak.Midi
 
             _source.knobDelegate += OnKnobUpdate;
 
-            ResetValue();
+            _needsReset = true;
 
             _prevSource = _source;
         }
@@ -154,16 +152,19 @@ namespace Klak.Midi
 
         #region MonoBehaviour functions
 
+        void Awake()
+        {
+            _floatValue = new FloatInterpolator(0, _interpolator);
+        }
+
         void OnDisable()
         {
             if (_source)
                 _source.knobDelegate -= OnKnobUpdate;
         }
 
-        void Start()
+        void OnEnable()
         {
-            _floatValue = new FloatInterpolator(0, _interpolator);
-
             SwitchSource();
         }
 
@@ -171,6 +172,14 @@ namespace Klak.Midi
         {
             if (_source != _prevSource)
                 SwitchSource();
+
+            if (_needsReset)
+            {
+                _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
+                DoKnobUpdate(_lastInputValue);
+
+                _needsReset = false;
+            }
 
             if (!_isRelative && _interpolator.enabled)
                 _valueEvent.Invoke(_floatValue.Step());

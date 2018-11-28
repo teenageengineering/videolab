@@ -1,21 +1,30 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
+using UnityEngine.Serialization;
 
 namespace Bezier
 {
     [ExecuteInEditMode]
+    [RequireComponent(typeof(RectTransform))]
     [RequireComponent(typeof(Graphic))]
     public class Shape : MonoBehaviour, IMeshModifier
     {
         #region Editor
 
-        [Range(0, 7)]
-        public int subdivisions = 4;
+        [SerializeField, FormerlySerializedAs("subdivisions"), Range(0, 7)]
+        int _subdivisions = 4;
+        public int subdivisions {
+            get { return _subdivisions; }
+            set { _subdivisions = value; }
+        }
 
-        public bool outline;
+        [SerializeField, FormerlySerializedAs("outline")]
+        bool _outline;
+        public bool outline {
+            get { return _outline; }
+            set { _outline = value; }
+        }
 
         [SerializeField]
         float _lineWidth = 1;
@@ -24,9 +33,19 @@ namespace Bezier
             set { _lineWidth = value; }
         }
 
-        public bool closedPath = true;
+        [SerializeField, FormerlySerializedAs("closedPath")]
+        bool _closedPath = true;
+        public bool closedPath {
+            get { return _closedPath; }
+            set { _closedPath = value; }
+        }
 
-        public bool snapToSize = true;
+        [SerializeField, FormerlySerializedAs("snapToSize")]
+        bool _snapToSize = true;
+        public bool snapToSize {
+            get { return _snapToSize; }
+            set { _snapToSize = value; }
+        }
 
         #endregion
 
@@ -36,6 +55,10 @@ namespace Bezier
 
         public RectTransform rectTransform {
             get { return transform as RectTransform; }
+        }
+
+        public Graphic graphic {
+            get { return GetComponent<Graphic>(); }
         }
 
         public Handle[] GetHandles()
@@ -51,48 +74,75 @@ namespace Bezier
             return handles.ToArray();
         }
 
-        public void UpdateGraphic()
+        // TODO http://www.iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
+        public void Envelope()
         {
-            _needsNewMesh = true;
-        }
-
-        public void UpdateTransform()
-        {
-            if (_verts.Length == 0)
-                EditVertices();
-
             Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
             Vector2 max = new Vector2(float.MinValue, float.MinValue);
 
-            foreach (Vector2 vert in _verts)
+            Handle[] handles = GetHandles();
+            foreach (Handle handle in handles)
             {
-                min = Vector2.Min(vert, min);
-                max = Vector2.Max(vert, max);
+                min = Vector2.Min(handle.pos, min);
+                max = Vector2.Max(handle.pos, max);
             }
 
-            this.rectTransform.sizeDelta = max - min;
-            this.rectTransform.anchoredPosition = (max + min) / 2;
-            foreach (Handle handle in GetHandles())
-                handle.pos -= this.rectTransform.anchoredPosition;
+            RectTransform rt = transform as RectTransform;
+            rt.sizeDelta = max - min;
+            rt.anchoredPosition = (max + min) / 2;
+            foreach (RectTransform child in transform)
+                child.anchoredPosition -= rt.anchoredPosition;
+        }
 
-            _prevSize = this.rectTransform.rect.size;
+        bool _needsRebuild;
+        public void SetNeedsRebuild()
+        {
+            _needsRebuild = true;
+        }
+
+        public void SetHandlesActive(bool active)
+        {
+            Handle[] handles = GetHandles();
+            foreach (Handle handle in handles)
+                handle.gameObject.SetActive(active);
+        }
+
+        public void SetReferenceSize()
+        {
+            _prevSize = rectTransform.rect.size;
         }
 
         #endregion
 
         #region Private
 
-        Vector2 _prevSize;
-        int _prevNumHandles;
-        float _prevLineWidth;
-
         Vector2[] _verts = new Vector2[0];
         int[] _indices = new int[0];
-        bool _needsNewMesh;
+
+        float MaxRadius(Handle h0, Vector2 v0, Handle h1, Vector2 v1)
+        {
+            float r0Max = v0.magnitude;
+            if (h0.mode == Handle.Mode.Rounded)
+                r0Max = v0.magnitude / 2;
+            else if (h0.control2 != Vector3.zero)
+                r0Max = 0;
+
+            float r1Max = v1.magnitude;
+            if (h1.mode == Handle.Mode.Rounded)
+                r1Max = v1.magnitude / 2;
+            else if (h1.control1 != Vector3.zero)
+                r1Max = 0;
+
+            return Mathf.Min(r0Max, r1Max);
+        }
+
+        // 1 - 4 * (sqrt(2) - 1) / 3
+        const float c = 0.4477f;
 
         IEnumerable<Point> GetAllPoints()
         {
             Handle[] handles = GetHandles();
+            Handle prevHandle = handles[handles.Length - 1];
             int N = (this.outline && !this.closedPath) ? handles.Length : handles.Length + 1;
             for (int n = 0; n < N; n++)
             {
@@ -100,41 +150,31 @@ namespace Bezier
 
                 if (handle.mode == Handle.Mode.Rounded)
                 {
-                    float c = 4f * (Mathf.Sqrt(2f) - 1f) / 3f;
+                    Handle nextHandle = handles[(n + 1) % handles.Length];
 
-                    Handle h0 = handles[(n + handles.Length - 1) % handles.Length];
-                    Handle h1 = handles[(n + 1) % handles.Length];
+                    Vector2 v0 = handle.pos - prevHandle.pos;
+                    Vector2 v1 = handle.pos - nextHandle.pos;
 
-                    Vector2 v0 = handle.pos - h0.pos;
-                    Vector2 v1 = handle.pos - h1.pos;
+                    float maxRadius = MaxRadius(prevHandle, v0, nextHandle, v1);
+                    float r = Mathf.Min(handle.cornerRadius, maxRadius);
 
-                    float r0Max = v0.magnitude;
-                    if (h0.mode == Handle.Mode.Rounded)
-                        r0Max = v0.magnitude / 2;
-                    else if (h0.control2 != Vector3.zero)
-                        r0Max = 0;
-
-                    float r1Max = v1.magnitude;
-                    if (h1.mode == Handle.Mode.Rounded)
-                        r1Max = v1.magnitude / 2;
-                    else if (h1.control1 != Vector3.zero)
-                        r1Max = 0;
-
-                    float r0 = Mathf.Min(handle.cornerRadius, r0Max);
-                    float r1 = Mathf.Min(handle.cornerRadius, r1Max);
-
-                    Vector2 p0 = handle.pos - v0.normalized * r0;
-                    Vector2 p1 = handle.pos - v1.normalized * r1;
-
-                    Vector2 c0 = p0 + v0.normalized * c * r0;
-                    Vector2 c1 = p1 + v1.normalized * c * r1;
-
+                    v0 = v0.normalized * r;
+                    Vector2 p0 = handle.pos - v0;
+                    Vector2 c0 = handle.pos - v0 * c;
                     yield return new Point(p0, p0, c0);
+
                     if (n < handles.Length)
+                    {
+                        v1 = v1.normalized * r;
+                        Vector2 p1 = handle.pos - v1;
+                        Vector2 c1 = handle.pos - v1 * c;
                         yield return new Point(p1, c1, p1);
+                    }
                 }
                 else
                     yield return handle.point;
+
+                prevHandle = handle;
             }
         }
 
@@ -188,9 +228,7 @@ namespace Bezier
                         verts.Add(vert - d);
                     }
                     else
-                    {
                         verts.Add(prevVert);
-                    }
 
                     prevVert = vert;
                 }
@@ -235,7 +273,6 @@ namespace Bezier
         {
             vh.Clear();
 
-            Graphic graphic = GetComponent<Graphic>();
             for (int i = 0; i < _verts.Length; i++)
             {
                 Vector2 v = _verts[i];
@@ -247,12 +284,9 @@ namespace Bezier
                 vh.AddTriangle(_indices[i], _indices[i + 1], _indices[i + 2]);
         }
 
-        void ScaleHandles()
+        void ScaleHandles(Vector2 scale)
         {
-            Vector2 scale = new Vector2(this.rectTransform.rect.size.x / _prevSize.x, this.rectTransform.rect.size.y / _prevSize.y);
-
             Handle[] handles = GetHandles();
-
             for (int i = 0; i < handles.Length; i++)
             {
                 Handle handle = handles[i];
@@ -261,48 +295,85 @@ namespace Bezier
                 handle.control2 = Vector2.Scale(handle.control2, scale);
             }
 
-            UpdateGraphic();
+            // TODO: would be enough to scale verts
+            SetNeedsRebuild();
         }
 
         #endregion
 
         #region MonoBehaviour
 
+        int _prevSubdivisions;
+        bool _prevOutline;
+        float _prevLineWidth;
+        bool _prevClosedPath;
+
+        Vector2 _prevSize;
+        int _prevNumHandles;
+
         void Update()
         {
-            if (this.rectTransform.rect.size != _prevSize && _prevSize != Vector2.zero)
-                ScaleHandles();
+            if (_prevSize == Vector2.zero)
+                SetReferenceSize();
+
+            Vector2 newSize = this.rectTransform.rect.size;
+            if (newSize.x == 0) newSize.x = _prevSize.x;
+            if (newSize.y == 0) newSize.y = _prevSize.y;
+
+            if (newSize != _prevSize)
+            {
+                if (snapToSize)
+                    ScaleHandles(new Vector2(newSize.x / _prevSize.x, newSize.y / _prevSize.y));
+    
+                _prevSize = newSize;
+            }
 
             int numHandles = GetHandles().Length;
             if (numHandles != _prevNumHandles)
             {
+                SetNeedsRebuild();
                 _prevNumHandles = numHandles;
-                UpdateGraphic();
+            }
+
+            if (_subdivisions != _prevSubdivisions)
+            {
+                SetNeedsRebuild();
+                _prevSubdivisions = _subdivisions;
+            }
+
+            if (_outline != _prevOutline)
+            {
+                SetNeedsRebuild();
+                _prevOutline = _outline;
             }
 
             if (_lineWidth != _prevLineWidth)
             {
+                SetNeedsRebuild();
                 _prevLineWidth = _lineWidth;
-                UpdateGraphic();
             }
 
-            if (_needsNewMesh)
+            if (_closedPath != _prevClosedPath)
+            {
+                SetNeedsRebuild();
+                _prevClosedPath = _closedPath;
+            }
+
+            if (_needsRebuild)
             {
                 EditVertices();
                 EditTriangles();
 
-                Graphic graphic = GetComponent<Graphic>();
                 graphic.SetVerticesDirty();
 
-                _needsNewMesh = false;
+                _needsRebuild = false;
             }
-
-            _prevSize = this.rectTransform.rect.size;
         }
 
         public void OnValidate()
         {
-            UpdateGraphic();
+            if (!Application.isPlaying)
+                Update();
         }
 
         #endregion
@@ -327,6 +398,60 @@ namespace Bezier
                 EditMesh(vh);
                 vh.FillMesh(mesh);
             }
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public static Shape CreateShape(string name)
+        {
+            GameObject go = new GameObject(name);
+            go.AddComponent<Image>();
+            Shape shape = go.AddComponent<Shape>();
+
+            return shape;
+        }
+
+        public static Shape CreateRect(string name, Vector2 size, float cornerRadius = 0)
+        {
+            Shape shape = CreateShape(name);
+
+            shape.rectTransform.sizeDelta = size;
+            shape.SetReferenceSize();
+
+            Vector3[] localCorners = new Vector3[4];
+            shape.rectTransform.GetLocalCorners(localCorners);
+            foreach (Vector3 corner in localCorners)
+            {
+                Handle handleObj = Handle.CreateHandle("Handle", corner, cornerRadius);
+                handleObj.transform.SetParent(shape.transform, false);
+            }
+
+            return shape;
+        }
+
+        public static Shape CreateCircle(string name, float radius)
+        {
+            return CreateRect(name, new Vector2(radius * 2, radius * 2), float.MaxValue);
+        }
+
+        public static Shape CreatePolygon(string name, float radius, int numSides)
+        {
+            Shape shape = CreateShape(name);
+
+            shape.rectTransform.sizeDelta = new Vector2(radius * 2, radius * 2);
+            shape.SetReferenceSize();
+
+            for (int i = 0; i < numSides; i++)
+            {
+                float phase = 2 * Mathf.PI * i / numSides;
+                Vector2 pos = new Vector2(Mathf.Cos(phase), Mathf.Sin(phase));
+                Handle handleObj = Handle.CreateHandle("Handle", pos * radius);
+                handleObj.transform.SetParent(shape.transform, false);
+            }
+
+            return shape;
         }
 
         #endregion
