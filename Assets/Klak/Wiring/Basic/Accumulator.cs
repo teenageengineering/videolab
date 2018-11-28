@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Convertion/Accumulator")]
+    [AddComponentMenu("Klak/Wiring/Conversion/Accumulator")]
     public class Accumulator : NodeBase
     {
         float _floatValue;

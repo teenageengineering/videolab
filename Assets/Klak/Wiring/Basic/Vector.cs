@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Convertion/Vector")]
+    [AddComponentMenu("Klak/Wiring/Conversion/Vector")]
     public class Vector : NodeBase
     {
         #region Editable properties

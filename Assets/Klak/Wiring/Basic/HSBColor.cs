@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Convertion/HSB Color")]
+    [AddComponentMenu("Klak/Wiring/Conversion/HSB Color")]
     public class HSBColor : NodeBase
     {
         #region Editable properties

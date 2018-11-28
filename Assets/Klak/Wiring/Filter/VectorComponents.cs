@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Convertion/Vector Components")]
+    [AddComponentMenu("Klak/Wiring/Conversion/Vector Components")]
     public class VectorComponents : NodeBase
     {
         #region Node I/O
