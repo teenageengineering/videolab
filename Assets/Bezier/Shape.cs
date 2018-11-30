@@ -182,7 +182,7 @@ namespace Bezier
         {
             Handle[] handles = GetHandles();
 
-            if (handles.Length < 2)
+            if (handles.Length < 3)
             {
                 if (this.outline && handles.Length > 0)
                     this.closedPath = false;
@@ -252,7 +252,7 @@ namespace Bezier
                 }
 
                 // closing joint
-                if (this.closedPath)
+                if (this.closedPath && _verts.Length > 2)
                 {
                     indices.Add(_verts.Length - 2); indices.Add(_verts.Length - 1); indices.Add(0);
                     indices.Add(_verts.Length - 1); indices.Add(0); indices.Add(1);
