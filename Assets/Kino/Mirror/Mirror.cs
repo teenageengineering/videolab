@@ -58,13 +58,10 @@ namespace Kino
         [SerializeField]
         bool _symmetry;
 
-        public bool symmetry
-        {
+        public bool symmetry {
             get { return _symmetry; }
             set { _symmetry = value; }
         }
-
-
 
         #endregion
 
