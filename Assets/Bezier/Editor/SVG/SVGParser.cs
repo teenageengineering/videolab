@@ -184,7 +184,7 @@ namespace Bezier
 
             if (dStr != null)
             {
-                string separators = @"(?=[A-Za-z])";
+                string separators = @"(?=[MLHVCSQTAZmlhvcsqtaz])";
                 var tokens = Regex.Split(dStr, separators).Where(t => !string.IsNullOrEmpty(t));
 
                 GameObject pathObj = new GameObject(GameObjectUtility.GetUniqueNameForSibling(parentElement, id));
@@ -468,10 +468,10 @@ namespace Bezier
             // fix for adobe terseness
             args = Regex.Replace(args, @"(\.\d+)\.", "$1 .");
 
-            string argSeparators = @"[\s,]|(?=-)";
+            string argSeparators = @"[\s,]|(?=[^e]-)";
             var splitArgs = Regex.Split(args, argSeparators).Where(t => !string.IsNullOrEmpty(t));
 
-            return splitArgs.Select(arg => float.Parse(arg)).ToArray();
+            return splitArgs.Select(arg => float.Parse(arg, System.Globalization.NumberStyles.Float)).ToArray();
         }
 
         Handle AddHandle(Shape shape, Vector2 pos)
