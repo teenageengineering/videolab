@@ -33,7 +33,7 @@ namespace Kino
         #region Public Properties
 
         // Line color
-        [SerializeField, ColorUsage(true, true, 0, 8, 0.125f, 3)]
+        [SerializeField, ColorUsage(true, true)]
         Color _lineColor = Color.white;
 
         public Color lineColor {

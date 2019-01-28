@@ -1,0 +1,3 @@
+﻿
+% Silence warning about serialized fields not being assigned
+-nowarn:0649

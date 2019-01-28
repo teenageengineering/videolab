@@ -161,7 +161,7 @@ namespace Videolab
                 playing = true;
         }
 
-        ScreenOrientation _screenOrientation = ScreenOrientation.Unknown;
+        ScreenOrientation _screenOrientation;
 
         void Update()
         {
