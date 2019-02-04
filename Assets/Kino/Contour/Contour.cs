@@ -32,8 +32,7 @@ namespace Kino
         #region Public Properties
 
         // Line color
-        [SerializeField]
-        Color _lineColor = Color.black;
+        [SerializeField] Color _lineColor = Color.black;
 
         public Color lineColor {
             get { return _lineColor; }
@@ -41,35 +40,39 @@ namespace Kino
         }
 
         // Background color
-        [SerializeField]
-        Color _backgroundColor = new Color(1, 1, 1, 0);
+        [SerializeField] Color _backgroundColor = new Color(1, 1, 1, 0);
 
         public Color backgroundColor {
             get { return _backgroundColor; }
             set { _backgroundColor = value; }
         }
 
-        // Low threshold
-        [SerializeField, Range(0, 1)]
-        float _lowThreshold = 0.05f;
+        // Lower threshold
+        [SerializeField, Range(0, 1)] float _lowerThreshold = 0.05f;
 
-        public float lowThreshold {
-            get { return _lowThreshold; }
-            set { _lowThreshold = value; }
+        public float lowerThreshold {
+            get { return _lowerThreshold; }
+            set { _lowerThreshold = value; }
         }
 
-        // High threshold
-        [SerializeField, Range(0, 1)]
-        float _highThreshold = 0.5f;
+        // Upper threshold
+        [SerializeField, Range(0, 1)] float _upperThreshold = 0.5f;
 
-        public float highThreshold {
-            get { return _highThreshold; }
-            set { _highThreshold = value; }
+        public float upperThreshold {
+            get { return _upperThreshold; }
+            set { _upperThreshold = value; }
+        }
+
+        // Color sensitivity
+        [SerializeField, Range(0, 1)] float _colorSensitivity = 0;
+
+        public float colorSensitivity {
+            get { return _colorSensitivity; }
+            set { _colorSensitivity = value; }
         }
 
         // Depth sensitivity
-        [SerializeField, Range(0, 2)]
-        float _depthSensitivity = 1;
+        [SerializeField, Range(0, 1)] float _depthSensitivity = 0.5f;
 
         public float depthSensitivity {
             get { return _depthSensitivity; }
@@ -77,8 +80,7 @@ namespace Kino
         }
 
         // Normal sensitivity
-        [SerializeField, Range(0, 1)]
-        float _normalSensitivity = 0;
+        [SerializeField, Range(0, 1)] float _normalSensitivity = 0;
 
         public float normalSensitivity {
             get { return _normalSensitivity; }
@@ -86,8 +88,7 @@ namespace Kino
         }
 
         // Depth fall-off
-        [SerializeField]
-        float _fallOffDepth = 40;
+        [SerializeField] float _fallOffDepth = 40;
 
         public float fallOffDepth {
             get { return _fallOffDepth; }
@@ -98,17 +99,33 @@ namespace Kino
 
         #region Private Properties
 
-        [SerializeField] Shader _shader;
-
+        [SerializeField, HideInInspector] Shader _shader;
         Material _material;
 
         #endregion
 
         #region MonoBehaviour Functions
 
-        void OnEnable()
+        void OnValidate()
         {
-            GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
+            _lowerThreshold = Mathf.Min(_lowerThreshold, _upperThreshold);
+        }
+
+        void OnDestroy()
+        {
+            if (_material != null)
+            {
+                if (Application.isPlaying)
+                    Destroy(_material);
+                else
+                    DestroyImmediate(_material);
+            }
+        }
+
+        void Update()
+        {
+            if (_depthSensitivity > 0)
+                GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
         }
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -120,26 +137,28 @@ namespace Kino
             }
 
             _material.SetColor("_Color", _lineColor);
-            _material.SetColor("_BgColor", _backgroundColor);
-
-            var hi = Mathf.Max(_lowThreshold, _highThreshold);
-            _material.SetFloat("_LowThreshold", _lowThreshold);
-            _material.SetFloat("_HighThreshold", hi);
-
-            _material.SetFloat("_DepthSensitivity", _depthSensitivity);
+            _material.SetColor("_Background", _backgroundColor);
+            _material.SetFloat("_Threshold", _lowerThreshold);
+            _material.SetFloat("_InvRange", 1 / (_upperThreshold - _lowerThreshold));
+            _material.SetFloat("_ColorSensitivity", _colorSensitivity);
+            _material.SetFloat("_DepthSensitivity", _depthSensitivity * 2);
             _material.SetFloat("_NormalSensitivity", _normalSensitivity);
+            _material.SetFloat("_InvFallOff", 1 / _fallOffDepth);
 
-            _material.SetFloat("_FallOffDepth", _fallOffDepth);
+            if (_colorSensitivity > 0)
+                _material.EnableKeyword("_CONTOUR_COLOR");
+            else
+                _material.DisableKeyword("_CONTOUR_COLOR");
 
             if (_depthSensitivity > 0)
-                _material.EnableKeyword("USE_DEPTH");
+                _material.EnableKeyword("_CONTOUR_DEPTH");
             else
-                _material.DisableKeyword("USE_DEPTH");
+                _material.DisableKeyword("_CONTOUR_DEPTH");
 
             if (_normalSensitivity > 0)
-                _material.EnableKeyword("USE_NORMAL");
+                _material.EnableKeyword("_CONTOUR_NORMAL");
             else
-                _material.DisableKeyword("USE_NORMAL");
+                _material.DisableKeyword("_CONTOUR_NORMAL");
 
             Graphics.Blit(source, destination, _material);
         }

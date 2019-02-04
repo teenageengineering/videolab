@@ -31,11 +31,21 @@ namespace Kino
     {
         SerializedProperty _lineColor;
         SerializedProperty _backgroundColor;
-        SerializedProperty _lowThreshold;
-        SerializedProperty _highThreshold;
+        SerializedProperty _lowerThreshold;
+        SerializedProperty _upperThreshold;
+        SerializedProperty _colorSensitivity;
         SerializedProperty _depthSensitivity;
         SerializedProperty _normalSensitivity;
         SerializedProperty _fallOffDepth;
+
+        static class Styles
+        {
+            static public readonly GUIContent lowerBound = new GUIContent("Lower Bound");
+            static public readonly GUIContent upperBound = new GUIContent("Upper Bound");
+            static public readonly GUIContent color = new GUIContent("Color");
+            static public readonly GUIContent depth = new GUIContent("Depth");
+            static public readonly GUIContent normal = new GUIContent("Normal");
+        }
 
         static string useDeferredWarning =
             "G-buffer is required for normal edge detection. " +
@@ -51,8 +61,9 @@ namespace Kino
         {
             _lineColor = serializedObject.FindProperty("_lineColor");
             _backgroundColor = serializedObject.FindProperty("_backgroundColor");
-            _lowThreshold = serializedObject.FindProperty("_lowThreshold");
-            _highThreshold = serializedObject.FindProperty("_highThreshold");
+            _lowerThreshold = serializedObject.FindProperty("_lowerThreshold");
+            _upperThreshold = serializedObject.FindProperty("_upperThreshold");
+            _colorSensitivity = serializedObject.FindProperty("_colorSensitivity");
             _depthSensitivity = serializedObject.FindProperty("_depthSensitivity");
             _normalSensitivity = serializedObject.FindProperty("_normalSensitivity");
             _fallOffDepth = serializedObject.FindProperty("_fallOffDepth");
@@ -65,24 +76,25 @@ namespace Kino
             EditorGUILayout.PropertyField(_lineColor);
             EditorGUILayout.PropertyField(_backgroundColor);
 
-            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Threshold");
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_lowerThreshold, Styles.lowerBound);
+            EditorGUILayout.PropertyField(_upperThreshold, Styles.upperBound);
+            EditorGUI.indentLevel--;
 
-            EditorGUILayout.PropertyField(_lowThreshold);
-            EditorGUILayout.PropertyField(_highThreshold);
-
-            EditorGUILayout.Space();
-
-            EditorGUILayout.PropertyField(_depthSensitivity);
-            EditorGUILayout.PropertyField(_normalSensitivity);
-
-            if (_normalSensitivity.floatValue > 0 && !CheckDeferred())
-                EditorGUILayout.HelpBox(useDeferredWarning, MessageType.Warning);
-
-            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Sensitivity");
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_colorSensitivity, Styles.color);
+            EditorGUILayout.PropertyField(_depthSensitivity, Styles.depth);
+            EditorGUILayout.PropertyField(_normalSensitivity, Styles.normal);
+            EditorGUI.indentLevel--;
 
             if (_depthSensitivity.hasMultipleDifferentValues ||
                 _depthSensitivity.floatValue > 0)
                 EditorGUILayout.PropertyField(_fallOffDepth);
+
+            if (_normalSensitivity.floatValue > 0 && !CheckDeferred())
+                EditorGUILayout.HelpBox(useDeferredWarning, MessageType.Warning);
 
             serializedObject.ApplyModifiedProperties();
         }
