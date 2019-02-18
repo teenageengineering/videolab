@@ -3,111 +3,11 @@
 // By Keijiro Takahashi, 2013
 //
 
-#if (UNITY_STANDALONE_OSX || UNITY_IOS)
-#define KVANT_ENABLE_PLUGIN
-#endif
-
 using UnityEngine;
 using System.Runtime.InteropServices;
 
 public static class Math
 {
-#if KVANT_ENABLE_PLUGIN
-
-    //
-    // The implementation with native code.
-    //
-
-    #region Noise functions
-
-    public static float Noise (float x)
-    {
-        return KvantNoise1D (x);
-    }
-
-    public static float Noise (float x, float y)
-    {
-        return KvantNoise2D (x, y);
-    }
-
-    public static float Noise (Vector2 coord)
-    {
-        return KvantNoise2D (coord.x, coord.y);
-    }
-
-    public static float Noise (float x, float y, float z)
-    {
-        return KvantNoise3D (x, y, z);
-    }
-
-    public static float Noise (Vector3 coord)
-    {
-        return KvantNoise3D (coord.x, coord.y, coord.z);
-    }
-
-    #endregion
-
-    #region Fractal functions
-
-    public static float Fractal (float x, int octave)
-    {
-        return KvantFBM1D (x, octave);
-    }
-
-    public static float Fractal (Vector2 coord, int octave)
-    {
-        return KvantFBM2D (coord.x, coord.y, octave);
-    }
-
-    public static float Fractal (Vector3 coord, int octave)
-    {
-        return KvantFBM3D (coord.x, coord.y, coord.z, octave);
-    }
-
-    public static float Fractal4Coeffs (Vector3 coord, float w0, float w1, float w2, float w3)
-    {
-        return KvantFractal4Coeffs (coord.x, coord.y, coord.z, w0, w1, w2, w3);
-    }
-
-    #endregion
-
-    #region Native plug-in interface
-
-    #if UNITY_IOS
-    const string _libName = "__Internal";
-    #else
-    const string _libName = "Kvant";
-    #endif
-
-    [DllImport(_libName)]
-    private static extern float KvantNoise1D (float x);
-
-    [DllImport(_libName)]
-    private static extern float KvantNoise2D (float x, float y);
-
-    [DllImport(_libName)]
-    private static extern float KvantNoise3D (float x, float y, float z);
-
-    [DllImport(_libName)]
-    private static extern float KvantFBM1D (float x, int octave);
-
-    [DllImport(_libName)]
-    private static extern float KvantFBM2D (float x, float y, int octave);
-
-    [DllImport(_libName)]
-    private static extern float KvantFBM3D (float x, float y, float z, int octave);
-
-    [DllImport(_libName)]
-    private static extern float KvantFractal4Coeffs (float x, float y, float z, float w0, float w1, float w2, float w3);
-
-    #endregion
-
-#else
-
-    //
-    // The implementation without native code.
-    //
-
     #region Noise functions
 
     public static float Noise (float x)
@@ -266,6 +166,4 @@ public static class Math
     };
 
     #endregion
-
-#endif
 }
