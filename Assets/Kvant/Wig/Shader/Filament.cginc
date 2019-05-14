@@ -26,7 +26,7 @@ void vert(inout appdata_full v, out Input data)
     float3x3 basis = DecodeBasis(SampleBasis(uv));
 
     // Apply the local transformation and move to the sampled position.
-    v.vertex.xyz = SamplePosition(uv) + mul(v.vertex, basis) * Thickness(uv);
+    v.vertex.xyz = SamplePosition(uv) + mul(v.vertex.xyz, basis) * Thickness(uv);
     v.normal = mul(v.normal, basis);
 
     // Parameters for the pixel shader
