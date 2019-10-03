@@ -1,23 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
-using System.Collections;
 
-public class VideopakManager : MonoBehaviour
+public class VideopakManager
 {
     AssetBundle _bundle;
-    string _path;
 
     static VideopakManager _instance;
 
     public static VideopakManager Instance {
         get {
             if (_instance == null)
-            {
-                GameObject go = new GameObject("Videopak Manager");
-                DontDestroyOnLoad(go);
-                _instance = go.AddComponent<VideopakManager>();
-            }
+                _instance = new VideopakManager();
 
             return _instance;
         }
@@ -28,74 +22,65 @@ public class VideopakManager : MonoBehaviour
         if (platform == RuntimePlatform.IPhonePlayer)
             return "iOS";
 
+        if (platform == RuntimePlatform.Android)
+            return "Android";
+
         if (platform == RuntimePlatform.OSXEditor || platform == RuntimePlatform.OSXPlayer)
             return "OSX";
 
         return null;
     }
 
-    public static IEnumerator LoadPak(string pakRoot)
+    public static void LoadPak(string pakRoot)
     {
-        if (pakRoot == Instance._path)
-            yield break;
-        
-        yield return Instance.StartCoroutine(Unload());
+        Unload();
 
         string platform = GetPlatformString(Application.platform);
         if (platform == null)
         {
             Debug.Log("[VideopakManager] Unsupported platform");
-            yield break;
+            return;
         }
 
         string pakName = Path.GetFileName(pakRoot);
         string path = pakRoot + "/" + platform + "/" + pakName;
+#if !UNITY_ANDROID
         if (!File.Exists(path))
         {
             Debug.Log("[VideopakManager] Missing platform payload " + path);
-            yield break;
+            return;
         }
+#endif
 
         AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle == null)
         {
             Debug.Log("[VideopakManager] Failed to load videopak " + path);
-            yield break;
+            return;
         }
 
         var scenePaths = bundle.GetAllScenePaths();
         if (scenePaths.Length == 0)
         {
             Debug.Log("[VideopakManager] No scene to load");
-            yield break;
+            return;
         }
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(scenePaths[0], LoadSceneMode.Additive);
-        while (!asyncLoad.isDone)
-            yield return null;
+        SceneManager.LoadScene(scenePaths[0], LoadSceneMode.Additive);
 
         Instance._bundle = bundle;
-        Instance._path = pakRoot;
     }
 
-    public static IEnumerator Unload()
+    public static void Unload()
     {
         AssetBundle bundle = Instance._bundle;
 
         if (bundle != null)
         {
             var scenePaths = bundle.GetAllScenePaths();
-            yield return SceneManager.UnloadSceneAsync(scenePaths[0]);
+            SceneManager.UnloadScene(scenePaths[0]);
 
             bundle.Unload(true);
-
-            Instance._bundle = null;
-            Instance._path = null;
         }
-    }
-
-    public static bool IsLoaded()
-    {
-        return Instance._bundle;
     }
 }

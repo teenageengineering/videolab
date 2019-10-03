@@ -25,6 +25,10 @@ public class BuildVideopaks
             Directory.CreateDirectory(iosDir);
             BuildPipeline.BuildAssetBundles(iosDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.iOS);
 
+            string androidDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.Android);
+            Directory.CreateDirectory(androidDir);
+            BuildPipeline.BuildAssetBundles(androidDir, buildMap, BuildAssetBundleOptions.None, BuildTarget.Android);
+
             string osxDir = pakDir + VideopakManager.GetPlatformString(RuntimePlatform.OSXPlayer);
             Directory.CreateDirectory(osxDir);
             #if UNITY_2017_3_OR_NEWER
