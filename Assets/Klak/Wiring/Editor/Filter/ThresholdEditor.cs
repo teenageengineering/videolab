@@ -31,16 +31,16 @@ namespace Klak.Wiring
     public class ThresholdEditor : Editor
     {
         SerializedProperty _threshold;
-        SerializedProperty _delayToOff;
         SerializedProperty _onEvent;
         SerializedProperty _offEvent;
+        SerializedProperty _discrete;
 
         void OnEnable()
         {
             _threshold = serializedObject.FindProperty("_threshold");
-            _delayToOff = serializedObject.FindProperty("_delayToOff");
             _onEvent = serializedObject.FindProperty("_onEvent");
             _offEvent = serializedObject.FindProperty("_offEvent");
+            _discrete = serializedObject.FindProperty("_discrete");
         }
 
         public override void OnInspectorGUI()
@@ -48,7 +48,7 @@ namespace Klak.Wiring
             serializedObject.Update();
 
             EditorGUILayout.PropertyField(_threshold);
-            EditorGUILayout.PropertyField(_delayToOff);
+            EditorGUILayout.PropertyField(_discrete);
 
             EditorGUILayout.Space();
 
