@@ -34,7 +34,7 @@ namespace Klak.Wiring
         float _threshold = 0.01f;
 
         [SerializeField]
-        float _delayToOff = 0.0f;
+        bool _discrete = false;
 
         #endregion
 
@@ -47,11 +47,33 @@ namespace Klak.Wiring
 
                 _currentValue = value;
 
+                if (_discrete)
+                {
+                    _currentState = State.Dormant;
+                }
+
                 if (_currentValue >= _threshold &&
                     _currentState != State.Enabled)
                 {
                     _onEvent.Invoke();
-                    _currentState = State.Enabled;
+                    
+                    if (!_discrete)         //Makes sure _currentState stays Dormant in discrete mode so that
+                                            //consecutive input values >= _threshold keep invoking _onEvent
+                    {
+                        _currentState = State.Enabled;
+                    }
+                }
+
+                else if (_currentValue < _threshold &&
+                     _currentState != State.Disabled)
+                {
+                    _offEvent.Invoke();
+
+                    if (!_discrete)         //Same but for consecutive input values < _threshold to keep invoking _offEvent
+                    {      
+                        _currentState = State.Disabled;
+                    }
+                    
                 }
             }
         }
@@ -70,29 +92,6 @@ namespace Klak.Wiring
 
         State _currentState;
         float _currentValue;
-        float _delayTimer;
-
-        #endregion
-
-        #region MonoBehaviour functions
-
-        void Update()
-        {
-            if (_currentValue >= _threshold)
-            {
-                _delayTimer = 0;
-            }
-            else if (_currentValue < _threshold &&
-                     _currentState != State.Disabled)
-            {
-                _delayTimer += Time.deltaTime;
-                if (_delayTimer >= _delayToOff)
-                {
-                    _offEvent.Invoke();
-                    _currentState = State.Disabled;
-                }
-            }
-        }
 
         #endregion
     }
