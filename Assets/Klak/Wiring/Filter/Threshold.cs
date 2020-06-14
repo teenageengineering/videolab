@@ -34,6 +34,9 @@ namespace Klak.Wiring
         float _threshold = 0.01f;
 
         [SerializeField]
+        float _delayToOff = 0.0f;
+
+        [SerializeField]
         bool _discrete = false;
 
         #endregion
@@ -45,35 +48,20 @@ namespace Klak.Wiring
             set {
                 if (!enabled) return;
 
+                if (_discrete) _currentState = State.Dormant;
+
                 _currentValue = value;
 
-                if (_discrete)
-                {
-                    _currentState = State.Dormant;
-                }
+                _invokeValue = _currentValue + 1;                               //Makes sure _invokeValue != _currentValue as soon as new input comes in
+                                                                                //so that two equal consecutive input values < _threshold both invoke _offEvent in "discrete mode"
 
                 if (_currentValue >= _threshold &&
                     _currentState != State.Enabled)
                 {
                     _onEvent.Invoke();
-                    
-                    if (!_discrete)         //Makes sure _currentState stays Dormant in discrete mode so that
-                                            //consecutive input values >= _threshold keep invoking _onEvent
-                    {
-                        _currentState = State.Enabled;
-                    }
-                }
 
-                else if (_currentValue < _threshold &&
-                     _currentState != State.Disabled)
-                {
-                    _offEvent.Invoke();
-
-                    if (!_discrete)         //Same but for consecutive input values < _threshold to keep invoking _offEvent
-                    {      
-                        _currentState = State.Disabled;
-                    }
-                    
+                    if (!_discrete) _currentState = State.Enabled;              //Makes sure state stays Dormant in "discrete mode" so that 
+                                                                                //consecutive inputs >= _threshold keep invoking _onEvent
                 }
             }
         }
@@ -92,7 +80,35 @@ namespace Klak.Wiring
 
         State _currentState;
         float _currentValue;
+        float _delayTimer;
+        float _invokeValue;
 
+        #endregion
+
+        #region MonoBehaviour functions
+
+        void Update()
+        {
+            if (_currentValue >= _threshold)
+            {
+                _delayTimer = 0;
+            }
+            else if (_currentValue < _threshold &&
+                     _invokeValue != _currentValue &&                 
+                     _currentState != State.Disabled)
+            {
+                _delayTimer += Time.deltaTime;
+                if (_delayTimer >= _delayToOff)
+                {
+                    _offEvent.Invoke();
+                    _invokeValue = _currentValue;                               //Makes sure that in "discrete mode" the offEvent does not keep 
+                                                                                //getting invoked every frame by single input < _threshold
+
+                    if (!_discrete) _currentState = State.Disabled;             //Makes sure state stays Dormant in "discrete mode" so that 
+                                                                                //consecutive inputs < _threshold keep invoking _onEvent                    
+                }
+            }
+        }
         #endregion
     }
 }
