@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 
 namespace Klak.Motion
@@ -7,11 +7,18 @@ namespace Klak.Motion
     [CustomEditor(typeof(ParticleCollisionDispatch))]
     public class ParticleCollisionDispatchEditor : Editor
     {
+        SerializedProperty _particleCollisionEvent;
+
+        private void OnEnable()
+        {
+            _particleCollisionEvent = serializedObject.FindProperty("ParticleCollisionEvent");
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            DrawPropertiesExcluding(serializedObject, new string[] { "m_Script" });
+            EditorGUILayout.PropertyField(_particleCollisionEvent);
 
             serializedObject.ApplyModifiedProperties();
         }
