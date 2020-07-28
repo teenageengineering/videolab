@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Klak.Motion;
 
 namespace Klak.Wiring
@@ -25,6 +25,15 @@ namespace Klak.Wiring
         VoidEvent _particleCollisionEvent = new VoidEvent();
 
         [SerializeField, Outlet]
+        Vector3Event _particleCollisionPosition = new Vector3Event();
+
+        [SerializeField, Outlet]
+        QuaternionEvent _particleCollisionRotation = new QuaternionEvent();
+
+        [SerializeField, Outlet]
+        Vector3Event _particleCollisionVelocity = new Vector3Event();
+
+        [SerializeField, Outlet]
         VoidEvent _particleEnterTriggerEvent = new VoidEvent();
 
         [SerializeField, Outlet]
@@ -45,6 +54,19 @@ namespace Klak.Wiring
 
         {
             _particleCollisionEvent.Invoke();
+            if (_basedOn == Mode.Collider)
+            {
+                _particleCollisionPosition.Invoke(_dispatch._position);
+                _particleCollisionRotation.Invoke(_dispatch._rotation);
+                _particleCollisionVelocity.Invoke(_dispatch._velocity);
+            }
+            else
+            {
+                _particleCollisionPosition.Invoke(_psdispatch._position);
+                _particleCollisionRotation.Invoke(_psdispatch._rotation);
+                _particleCollisionVelocity.Invoke(_psdispatch._velocity);
+            }
+           
         }
 
         void OnParticleEnterTrigger()
@@ -122,7 +144,6 @@ namespace Klak.Wiring
                 psdispatch.ParticleOutsideTriggerEvent.AddListener(OnParticleOutsideTrigger);
                 _switcher = false;
             }
-  
         }
 
         void OnDisable()
@@ -139,7 +160,6 @@ namespace Klak.Wiring
                 psdispatch.ParticleInsideTriggerEvent.RemoveListener(OnParticleInsideTrigger);
                 psdispatch.ParticleOutsideTriggerEvent.RemoveListener(OnParticleOutsideTrigger);
             }
-
         }
 
         void Update()

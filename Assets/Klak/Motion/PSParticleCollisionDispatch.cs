@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,19 +8,32 @@ namespace Klak.Motion
     public class PSParticleCollisionDispatch : MonoBehaviour
     {
         public UnityEvent ParticleCollisionEvent = new UnityEvent();
- 
         public UnityEvent ParticleEnterTriggerEvent = new UnityEvent();
         public UnityEvent ParticleExitTriggerEvent = new UnityEvent();
         public UnityEvent ParticleInsideTriggerEvent = new UnityEvent();
         public UnityEvent ParticleOutsideTriggerEvent = new UnityEvent();
 
+        private List<ParticleCollisionEvent> _collisionEvents = new List<ParticleCollisionEvent>();
+        private GameObject _gameObject;
+        public Vector3 _position;
+        public Quaternion _rotation;
+        public Vector3 _velocity;
 
         #region Particle System events
 
         void OnParticleCollision(GameObject other)
         {
-            if (ParticleCollisionEvent != null)
-                ParticleCollisionEvent.Invoke();
+            _gameObject = gameObject;
+            ParticlePhysicsExtensions.GetCollisionEvents(_gameObject.GetComponent<ParticleSystem>(), other, _collisionEvents);
+
+            for (int i = 0; i < _collisionEvents.Count; i++)
+            {
+                _position = _collisionEvents[i].intersection;
+                _rotation = Quaternion.LookRotation(_collisionEvents[i].normal);
+                _velocity = _collisionEvents[i].velocity;
+                if (ParticleCollisionEvent != null)
+                    ParticleCollisionEvent.Invoke();
+            }
         }
 
         void OnParticleTrigger()
@@ -32,7 +45,7 @@ namespace Klak.Motion
             List<ParticleSystem.Particle> inside = new List<ParticleSystem.Particle>();
             List<ParticleSystem.Particle> outside = new List<ParticleSystem.Particle>();
 
-           
+
             int numEnter = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Enter, enter);
             int numExit = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Exit, exit);
             int numInside = ps.GetTriggerParticles(ParticleSystemTriggerEventType.Inside, inside);
