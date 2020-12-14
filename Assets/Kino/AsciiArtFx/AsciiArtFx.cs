@@ -7,11 +7,19 @@ public class AsciiArtFx : MonoBehaviour
 {
     public Color colorTint = Color.white;
 
-    [Range(0, 1)]
-    public float blendRatio = 1.0f;
+    [SerializeField, Range(0, 1)]
+    float _blendRatio = 1.0f;
+    public float blendRatio {
+        get { return _blendRatio; }
+        set { _blendRatio = value; }
+    }
 
-    [Range(0.5f, 10.0f)]
-    public float scaleFactor = 1.0f;
+    [SerializeField, Range(0.5f, 10.0f)]
+    float _scaleFactor = 1.0f;
+    public float scaleFactor {
+        get { return _scaleFactor; }
+        set { _scaleFactor = value; }
+    }
 
     [SerializeField] Shader shader;
 
