@@ -55,7 +55,7 @@ namespace Klak.Wiring
         public float normalizedTime {
             set {
                 if (!enabled || _animator == null || !_animator.isActiveAndEnabled) return;
-                _animator.Play(0, -1, value % 1);
+                _animator.Play(_changeStateTo, -1, value % 1);
             }
         }
 
