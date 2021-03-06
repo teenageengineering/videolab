@@ -37,6 +37,9 @@ namespace Klak.Wiring
         [SerializeField]
         string _propertyName;
 
+        [SerializeField]
+        bool _useSharedMaterial;
+
         #endregion
 
         #region Node I/O
@@ -45,7 +48,10 @@ namespace Klak.Wiring
         public float floatInput {
             set {
                 if (!enabled || _target == null || _propertyID < 0) return;
-                _target.material.SetFloat(_propertyID, value);
+                if (_useSharedMaterial)
+                    _target.sharedMaterial.SetFloat(_propertyID, value);
+                else
+                    _target.material.SetFloat(_propertyID, value);
             }
         }
 
