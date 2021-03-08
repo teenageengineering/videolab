@@ -33,6 +33,7 @@ namespace Klak.Wiring
     {
         SerializedProperty _target;
         SerializedProperty _propertyName;
+        SerializedProperty _useSharedMaterial;
 
         string[] _propertyList; // cached property list
         Shader _cachedShader;   // shader used to cache the list
@@ -41,6 +42,7 @@ namespace Klak.Wiring
         {
             _target = serializedObject.FindProperty("_target");
             _propertyName = serializedObject.FindProperty("_propertyName");
+            _useSharedMaterial = serializedObject.FindProperty("_useSharedMaterial");
         }
 
         void OnDisable()
@@ -114,6 +116,8 @@ namespace Klak.Wiring
             }
             else
                 _propertyName.stringValue = ""; // reset on failure
+
+            EditorGUILayout.PropertyField(_useSharedMaterial);
 
             serializedObject.ApplyModifiedProperties();
         }
