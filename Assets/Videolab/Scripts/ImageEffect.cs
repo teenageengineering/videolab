@@ -10,7 +10,8 @@ namespace Videolab
 
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            Graphics.Blit(source, destination, material);
+            if (material != null)
+                Graphics.Blit(source, destination, material);
         }
     }
 }
