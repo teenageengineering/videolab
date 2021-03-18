@@ -36,7 +36,7 @@ float character(float n, float2 p)
 
 float4 frag(v2f_img i) : SV_Target
 {
-    float2 texel = _MainTex_TexelSize.xy * _Scale;
+    float2 texel = _MainTex_TexelSize.xy * _Scale / (1024 * _MainTex_TexelSize.y);
     float2 uv = i.uv / texel;
     float3 c = tex2D(_MainTex, floor(uv / 8) * 8 * texel).rgb;
 

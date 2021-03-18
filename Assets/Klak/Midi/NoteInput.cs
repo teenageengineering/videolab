@@ -142,7 +142,7 @@ namespace Klak.Midi
             _noteOnNumberEvent.Invoke(note);
             _noteOnVelocityEvent.Invoke(velocity);
 
-            _floatValue.targetValue = _onValue * velocity;
+            _floatValue.targetValue = _onValue;
         }
 
         void NoteOff(MidiChannel channel, int note)
