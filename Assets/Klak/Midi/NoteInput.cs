@@ -82,6 +82,9 @@ namespace Klak.Midi
             FloatInterpolator.Config.InterpolationType.DampedSpring, 30
         );
 
+        [SerializeField]
+        bool _premultipliedVelocity = true;
+
         #endregion
 
         #region Node I/O
@@ -142,7 +145,7 @@ namespace Klak.Midi
             _noteOnNumberEvent.Invoke(note);
             _noteOnVelocityEvent.Invoke(velocity);
 
-            _floatValue.targetValue = _onValue;
+            _floatValue.targetValue = _premultipliedVelocity ? _onValue * velocity : _onValue;
         }
 
         void NoteOff(MidiChannel channel, int note)

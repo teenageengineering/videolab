@@ -42,6 +42,7 @@ namespace Klak.Midi
         SerializedProperty _offValue;
         SerializedProperty _onValue;
         SerializedProperty _interpolator;
+        SerializedProperty _premultipliedVelocity;
 
         SerializedProperty _noteOnEvent;
         SerializedProperty _noteOnVelocityEvent;
@@ -62,6 +63,7 @@ namespace Klak.Midi
             _offValue = serializedObject.FindProperty("_offValue");
             _onValue = serializedObject.FindProperty("_onValue");
             _interpolator = serializedObject.FindProperty("_interpolator");
+            _premultipliedVelocity = serializedObject.FindProperty("_premultipliedVelocity");
 
             _noteOnEvent = serializedObject.FindProperty("_noteOnEvent");
             _noteOnVelocityEvent = serializedObject.FindProperty("_noteOnVelocityEvent");
@@ -96,6 +98,7 @@ namespace Klak.Midi
             EditorGUILayout.PropertyField(_offValue);
             EditorGUILayout.PropertyField(_onValue);
             EditorGUILayout.PropertyField(_interpolator);
+            EditorGUILayout.PropertyField(_premultipliedVelocity);
 
             EditorGUILayout.Space();
 
