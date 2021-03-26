@@ -141,6 +141,12 @@ namespace Klak.Wiring.Patcher
         {
             // If the outlet is bang, any inlet can be connected.
             if (fromSlot.dataType == null) return true;
+
+            // TE: workaround for not being able to use System.Single as inlets with scripting runtime 4.0
+            // System.Single is replaced with UnityEngine.WrapMode, check Node.cs:138
+            if ((fromSlot.dataType == typeof(System.Single)) && toSlot.dataType == typeof(UnityEngine.WrapMode))
+                return true;
+
             // Apply simple type matching.
             return fromSlot.dataType == toSlot.dataType;
         }

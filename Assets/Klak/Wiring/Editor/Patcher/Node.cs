@@ -131,8 +131,16 @@ namespace Klak.Wiring.Patcher
                 var attrs = prop.GetCustomAttributes(typeof(Wiring.InletAttribute), true);
                 if (attrs.Length == 0) continue;
 
+                var propType = prop.PropertyType;
+
+                // TE: workaround for not being able to use System.Single as inlets with scripting runtime 4.0
+                // System.Single is replaced with UnityEngine.WrapMode. Using WrapMode is arbitrary, just something
+                // that doesn't cause an assert deep in the graph system.
+                if (prop.PropertyType == typeof(System.Single))
+                    propType = typeof(UnityEngine.WrapMode);
+
                 // Register the setter method as an input slot.
-                var slot = AddInputSlot("set_" + prop.Name, prop.PropertyType);
+                var slot = AddInputSlot("set_" + prop.Name, propType);
 
                 // Apply the standard nicifying rule.
                 slot.title = ObjectNames.NicifyVariableName(prop.Name);
