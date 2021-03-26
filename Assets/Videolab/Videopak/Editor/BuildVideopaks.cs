@@ -44,7 +44,7 @@ public class BuildVideopakWindow : EditorWindow
 
     void BuildAssetBundle(string bundleName)
     {
-        string targetFile = EditorUtility.SaveFilePanel("Select output directory", _lastOutputPath, bundleName + ".zpak", "zpak");
+        string targetFile = EditorUtility.SaveFilePanel("Select output file", _lastOutputPath, bundleName + ".zpak", "zpak");
 
         if (string.IsNullOrEmpty(targetFile))
             return;
@@ -92,6 +92,24 @@ public class BuildVideopakWindow : EditorWindow
         _outputLog += string.Format("build succeeded\n\n");
     }
 
+    private bool ValidatePakName(string pakName)
+    {
+        if (string.IsNullOrEmpty(pakName))
+            return false;
+
+        return true;
+    }
+
+    private bool ValidateIcon(Texture2D icon)
+    {
+        if (icon == null)
+            return true;
+
+        string ext = Path.GetExtension(AssetDatabase.GetAssetPath(_settings.icon));
+
+        return (ext.ToLower() == ".png");
+    }
+
     void OnGUI()
     {
         if (_settings == null)
@@ -119,9 +137,20 @@ public class BuildVideopakWindow : EditorWindow
 
         if (GUILayout.Button("Build"))
         {
-            AssetDatabase.SaveAssets();
 
-            if (_selectedAssetBundle < bundleNames.Length)
+            if (_selectedAssetBundle >= bundleNames.Length)
+            {
+                _outputLog = "No AssetBundle selected. Aborting..";
+            }
+            else if (!ValidatePakName(_settings.pakName))
+            {
+                _outputLog = "Invalid pak name. Aborting..";
+            }
+            else if (!ValidateIcon(_settings.icon))
+            {
+                _outputLog = "Icon is not a png file. Aborting..";
+            }
+            else
             {
                 BuildAssetBundle(bundleNames[_selectedAssetBundle]);
                 GUIUtility.ExitGUI();
