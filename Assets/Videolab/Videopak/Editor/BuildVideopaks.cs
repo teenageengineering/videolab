@@ -9,9 +9,9 @@ public class BuildVideopakWindow : EditorWindow
     string _outputLog = "";
     static string _lastOutputPath = "";
 
-    RuntimePlatform[] platforms = { RuntimePlatform.OSXPlayer, RuntimePlatform.IPhonePlayer, RuntimePlatform.Android };
-    BuildTarget[] targets = { BuildTarget.StandaloneOSX, BuildTarget.iOS, BuildTarget.Android };
-    string[] platformNames = { "OSX", "iOS", "Android" };
+    RuntimePlatform[] platforms = { RuntimePlatform.IPhonePlayer, RuntimePlatform.Android, RuntimePlatform.OSXPlayer };
+    BuildTarget[] targets = { BuildTarget.iOS, BuildTarget.Android, BuildTarget.StandaloneOSX };
+    string[] platformNames = { "iOS", "Android", "OSX" };
 
     [MenuItem("Assets/Build Videopaks")]
     public static void ShowWindow()
