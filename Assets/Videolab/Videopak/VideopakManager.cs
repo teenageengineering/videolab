@@ -1,6 +1,17 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
+using System.IO.Compression;
+
+public class PakManifest
+{
+    public PakManifest(string _name, string _author) { name = _name; author = _author; }
+    public string name;
+    public string token;
+    public string author;
+    public string unityVersion;
+    public int version;
+    public bool encryption;
+}
 
 public class VideopakManager
 {
@@ -31,56 +42,48 @@ public class VideopakManager
         return null;
     }
 
-    public static void LoadPak(string pakRoot)
+    public static void CompressPak(string dir, string zipPath)
     {
-        Unload();
-
-        string platform = GetPlatformString(Application.platform);
-        if (platform == null)
-        {
-            Debug.Log("[VideopakManager] Unsupported platform");
-            return;
-        }
-
-        string pakName = Path.GetFileName(pakRoot);
-        string path = pakRoot + "/" + platform + "/" + pakName;
-#if !UNITY_ANDROID
-        if (!File.Exists(path))
-        {
-            Debug.Log("[VideopakManager] Missing platform payload " + path);
-            return;
-        }
-#endif
-
-        AssetBundle bundle = AssetBundle.LoadFromFile(path);
-        if (bundle == null)
-        {
-            Debug.Log("[VideopakManager] Failed to load videopak " + path);
-            return;
-        }
-
-        var scenePaths = bundle.GetAllScenePaths();
-        if (scenePaths.Length == 0)
-        {
-            Debug.Log("[VideopakManager] No scene to load");
-            return;
-        }
-
-        SceneManager.LoadScene(scenePaths[0], LoadSceneMode.Additive);
-
-        Instance._bundle = bundle;
+        if (File.Exists(zipPath))
+            File.Delete(zipPath);
+        ZipFile.CreateFromDirectory(dir, zipPath, System.IO.Compression.CompressionLevel.Fastest, true);
+        Debug.Log("Compress " + dir + " => " + zipPath);
     }
 
-    public static void Unload()
+    public static void ExtractPak(string zipPath, string dir)
     {
-        AssetBundle bundle = Instance._bundle;
+        if (Directory.Exists(dir))
+            Directory.Delete(dir, true);
+        Directory.CreateDirectory(dir);
 
-        if (bundle != null)
+        ZipFile.ExtractToDirectory(zipPath, dir);
+
+        Debug.Log("Extract " + zipPath + " => " + dir);
+    }
+
+    public static PakManifest ReadManifest(string jsonPath)
+    {
+        if (!File.Exists(jsonPath))
+            return new PakManifest("unknown", "unknown");
+        string json = File.ReadAllText(jsonPath);
+        return JsonUtility.FromJson<PakManifest>(json);
+    }
+
+    public static void WriteManifest(PakManifest manifest, string jsonPath)
+    {
+        string json = JsonUtility.ToJson(manifest, true);
+        File.WriteAllText(jsonPath, json);
+    }
+
+    public static string FindPakFolder(string rootFolder)
+    {
+        var directories = Directory.GetDirectories(rootFolder);
+        foreach (var dir in directories)
         {
-            var scenePaths = bundle.GetAllScenePaths();
-            SceneManager.UnloadScene(scenePaths[0]);
-
-            bundle.Unload(true);
+            if (Path.GetFileName(dir).StartsWith("__", System.StringComparison.InvariantCultureIgnoreCase))
+                continue;
+            return dir;
         }
+        return "";
     }
 }

@@ -24,7 +24,7 @@ namespace Bezier
             // Ignore links to external resources.
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.XmlResolver = null;
-            settings.ProhibitDtd = false;
+            settings.DtdProcessing = DtdProcessing.Parse;
 
             GameObject go = new GameObject("SVG");
             RectTransform svgElement = go.AddComponent<RectTransform>();
