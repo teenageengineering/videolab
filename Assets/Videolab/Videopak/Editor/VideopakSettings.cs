@@ -1,11 +1,17 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class VideopakSettings : ScriptableObject
 {
+    [System.Serializable]
+    public class BundleConfig
+    {
+        public string bundleName;
+        public string pakName;
+        public string author;
+        public Texture2D icon;
+    }
+
     [HideInInspector]
-    public string pakName;
-    [HideInInspector]
-    public string author;
-    [HideInInspector]
-    public Texture2D icon;
+    public List<BundleConfig> configs;
 }
