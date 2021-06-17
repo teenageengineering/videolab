@@ -44,6 +44,7 @@ namespace Klak.Midi
         SerializedProperty _interpolator;
 
         SerializedProperty _noteOnEvent;
+        SerializedProperty _noteOnNumberEvent;
         SerializedProperty _noteOnVelocityEvent;
         SerializedProperty _noteOffEvent;
         SerializedProperty _valueEvent;
@@ -67,6 +68,8 @@ namespace Klak.Midi
             _noteOnVelocityEvent = serializedObject.FindProperty("_noteOnVelocityEvent");
             _noteOffEvent = serializedObject.FindProperty("_noteOffEvent");
             _valueEvent = serializedObject.FindProperty("_valueEvent");
+
+            _noteOnNumberEvent = serializedObject.FindProperty("_noteOnNumberEvent");
         }
 
         public override void OnInspectorGUI()
@@ -100,6 +103,7 @@ namespace Klak.Midi
             EditorGUILayout.Space();
 
             EditorGUILayout.PropertyField(_noteOnEvent);
+            EditorGUILayout.PropertyField(_noteOnNumberEvent);
             EditorGUILayout.PropertyField(_noteOnVelocityEvent);
             EditorGUILayout.PropertyField(_noteOffEvent);
             EditorGUILayout.PropertyField(_valueEvent);

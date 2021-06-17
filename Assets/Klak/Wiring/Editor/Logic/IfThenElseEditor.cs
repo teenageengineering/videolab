@@ -13,6 +13,8 @@ namespace Klak.Wiring
         SerializedProperty _useGate;
         SerializedProperty _gate;
         SerializedProperty _condition2;
+        SerializedProperty _thenEvent;
+        SerializedProperty _elseEvent;
 
         void OnEnable()
         {
@@ -21,6 +23,8 @@ namespace Klak.Wiring
             _useGate = serializedObject.FindProperty("_useGate");
             _gate = serializedObject.FindProperty("_gate");
             _condition2 = serializedObject.FindProperty("_condition2");
+            _thenEvent = serializedObject.FindProperty("_thenEvent");
+            _elseEvent = serializedObject.FindProperty("_elseEvent");
         }
 
         public override void OnInspectorGUI()
@@ -46,6 +50,10 @@ namespace Klak.Wiring
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(_useGate);
             }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(_thenEvent);
+            EditorGUILayout.PropertyField(_elseEvent);
             
             serializedObject.ApplyModifiedProperties();
         }
