@@ -34,6 +34,7 @@ namespace Klak.Wiring
     {
         SerializedProperty _target;
         SerializedProperty _propertyName;
+        SerializedProperty _particleSystemModuleName;
 
         // Component list cache and its parent game object
         string[] _componentList;
@@ -43,10 +44,16 @@ namespace Klak.Wiring
         string[] _propertyList;
         Type _cachedType;
 
+        // Particle System Modules list
+        string [] _moduleList;
+        
         public virtual void OnEnable()
         {
             _target = serializedObject.FindProperty("_target");
             _propertyName = serializedObject.FindProperty("_propertyName");
+            _particleSystemModuleName = serializedObject.FindProperty("_particleSystemModuleName");
+
+            CacheModuleList();
         }
 
         void OnDisable()
@@ -59,6 +66,43 @@ namespace Klak.Wiring
 
             _propertyList = null;
             _cachedType = null;
+
+            _moduleList = null;
+            _particleSystemModuleName = null;
+        }
+
+        // Cache particle system modules with targetable properties
+        void CacheModuleList()
+        {
+            if (_moduleList != null) return;
+
+            var _fullModuleList = typeof(ParticleSystem).GetProperties().Where(x => x.PropertyType.ToString().Contains("Module")).ToArray();
+
+            int _targetableModules = 0;
+            List<int> _targetableIndices = new List<int>();
+
+            for (int i = 0; i < _fullModuleList.Length; i++)
+            {
+                var _propList = _fullModuleList[i].PropertyType.GetProperties();
+                bool _targetable = false;
+
+                foreach (var prop in _propList)
+                {
+                    if (!_targetable && IsTargetable(prop))
+                    {
+                        _targetableModules++;
+                        _targetableIndices.Add(i);
+                        _targetable = true;
+                    }
+                }
+            }
+            _moduleList = new string[_targetableModules + 1];
+            _moduleList[0] = "<none>";
+
+            for (int i = 1; i <= _targetableIndices.Count; i++)
+            {
+                _moduleList[i] = _fullModuleList[_targetableIndices[i-1]].Name;
+            }
         }
 
         // Cache component of a given game object if it's
@@ -85,6 +129,8 @@ namespace Klak.Wiring
         {
             if (_cachedType == type) return;
 
+            var _list = type.GetProperties().ToArray();
+
             _propertyList = type.GetProperties().
                 Where(x => IsTargetable(x)).Select(x => x.Name).ToArray();
 
@@ -109,30 +155,63 @@ namespace Klak.Wiring
                 // Update the component if the selection was changed.
                 if (index != newIndex)
                     _target.objectReferenceValue = component.GetComponent(_componentList[newIndex]);
-            }
+            
 
-            // If the target is set...
-            if (_target.objectReferenceValue != null)
-            {
-                // Cache the property list of the target.
-                CachePropertyList(_target.objectReferenceValue.GetType());
-                // If there are suitable candidates...
-                if (_propertyList.Length > 0)
+                if (component.GetType() == typeof(ParticleSystem))
                 {
-                    // Show the drop-down list.
-                    var index = Array.IndexOf(_propertyList, _propertyName.stringValue);
-                    var newIndex = EditorGUILayout.Popup("Property", index, _propertyList);
-                    // Update the property if the selection was changed.
-                    if (index != newIndex)
-                        _propertyName.stringValue = _propertyList[newIndex];
+                    if (_moduleList.Length > 1)
+                    {
+                        index = Array.IndexOf(_moduleList, _particleSystemModuleName.stringValue);
+                        newIndex = EditorGUILayout.Popup("Module", index, _moduleList);
+                        // Update the module if the selection was changed.
+                        if (index != newIndex)
+                            _particleSystemModuleName.stringValue = _moduleList[newIndex];
+
+                        if (!string.IsNullOrEmpty(_particleSystemModuleName.stringValue) && _particleSystemModuleName.stringValue != "<none>")
+                        {
+                            var moduleProp = typeof(ParticleSystem).GetProperty(_particleSystemModuleName.stringValue);
+                            
+                            // Cache the property list of the target module
+                            CachePropertyList(moduleProp.PropertyType);
+                            // If there are suitable candidates...
+                            if (_propertyList.Length > 0)
+                            {
+                                // Show the drop-down list.
+                                index = Array.IndexOf(_propertyList, _propertyName.stringValue);
+                                newIndex = EditorGUILayout.Popup("Property", index, _propertyList);
+                                // Update the property if the selection was changed.
+                                if (index != newIndex)
+                                _propertyName.stringValue = _propertyList[newIndex];
+                            }   
+                            
+                            else
+                                _propertyName.stringValue = ""; // reset on failure
+                        }
+                    }
                 }
-                else
-                    _propertyName.stringValue = ""; // reset on failure
+                
+                if (component.GetType() != typeof(ParticleSystem) || _particleSystemModuleName == null || _particleSystemModuleName.stringValue == "<none>")
+                {
+                    // Cache the property list of the target.
+                    CachePropertyList(_target.objectReferenceValue.GetType());
+                    // If there are suitable candidates...
+                    if (_propertyList.Length > 0)
+                    {
+                        // Show the drop-down list.
+                        index = Array.IndexOf(_propertyList, _propertyName.stringValue);
+                        newIndex = EditorGUILayout.Popup("Property", index, _propertyList);
+                        // Update the property if the selection was changed.
+                        if (index != newIndex)
+                        _propertyName.stringValue = _propertyList[newIndex];
+                    }   
+                    else
+                        _propertyName.stringValue = ""; // reset on failure
+                }
             }
             else
                 _propertyName.stringValue = ""; // reset on failure
 
             serializedObject.ApplyModifiedProperties();
-        }
+        }      
     }
 }
