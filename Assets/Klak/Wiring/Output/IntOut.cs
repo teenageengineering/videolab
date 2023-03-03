@@ -14,6 +14,9 @@ namespace Klak.Wiring
         [SerializeField]
         string _propertyName;
 
+        [SerializeField]
+        string _particleSystemModuleName = "<none>";
+
         #endregion
 
         #region Node I/O
@@ -24,7 +27,14 @@ namespace Klak.Wiring
             set
             {
                 if (!enabled || _target == null || _propertyInfo == null) return;
-                _propertyInfo.SetValue(_target, System.Convert.ToInt32(value), null);
+
+                if (_target.GetType() == typeof(ParticleSystem) && _particleSystemModuleName != "<none>")
+                {
+                    _propertyInfo.SetValue(_boxedStruct, System.Convert.ToInt32(value), null);
+                }
+                    
+                else _propertyInfo.SetValue(_target, System.Convert.ToInt32(value), null);
+                
             }
         }
 
@@ -33,11 +43,27 @@ namespace Klak.Wiring
         #region Private members
 
         PropertyInfo _propertyInfo;
+        PropertyInfo _moduleInfo;
+        object _boxedStruct;
 
         void OnEnable()
         {
             if (_target == null || string.IsNullOrEmpty(_propertyName)) return;
-            _propertyInfo = _target.GetType().GetProperty(_propertyName);
+
+            else
+            {
+                if (_target.GetType() == typeof(ParticleSystem) && _particleSystemModuleName != "<none>")
+                {
+                    _moduleInfo = _target.GetType().GetProperty(_particleSystemModuleName);
+                    _propertyInfo = _moduleInfo.PropertyType.GetProperty(_propertyName);
+                    _boxedStruct = _moduleInfo.GetValue(_target);
+                }
+
+                else
+                {
+                    _propertyInfo = _target.GetType().GetProperty(_propertyName);
+                }
+            }            
         }
 
         #endregion
