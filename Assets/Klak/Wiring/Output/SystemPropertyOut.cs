@@ -34,6 +34,8 @@ namespace Klak.Wiring
         [SerializeField]
         Material _skyboxMaterial;
 
+        static int _last_aa_value = 0;
+
         #endregion
 
         #region Node I/O
@@ -105,6 +107,23 @@ namespace Klak.Wiring
         public void SetSkybox() 
         {
             if (enabled) RenderSettings.skybox = _skyboxMaterial;
+        }
+
+        [Inlet]
+        public float antiAliasing
+        {
+            set
+            {
+                if (enabled)
+                {
+                    int value_i = (int)Mathf.Clamp(value, 0f, 4f) * 2;
+                    if (value_i != _last_aa_value)
+                    {
+                        QualitySettings.antiAliasing = value_i;
+                        _last_aa_value = value_i;
+                    }
+                }
+            }
         }
 
         #endregion
