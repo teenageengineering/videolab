@@ -26,7 +26,7 @@ namespace Klak.Wiring
         #region Private members
 
         PropertyInfo _propertyInfo;
-        float _value;
+        float _value = float.MaxValue;
 
         void OnEnable()
         {
