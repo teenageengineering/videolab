@@ -84,7 +84,8 @@ namespace Klak.Wiring
 
         void Start()
         {
-            _isPlaying = _playOnStart;
+            if (_playOnStart)
+                _isPlaying = true;
             _timeScale = 1;
         }
 

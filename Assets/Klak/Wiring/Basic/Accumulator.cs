@@ -36,7 +36,7 @@ namespace Klak.Wiring
         public float reset {
             set {
                 if (!enabled) return;
-                _floatValue = 0;
+                _floatValue = value;
                 _valueEvent.Invoke(_floatValue); 
             }
         }

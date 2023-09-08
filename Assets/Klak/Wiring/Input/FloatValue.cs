@@ -19,7 +19,7 @@ namespace Klak.Wiring
 
         #endregion
 
-        float _prevValue;
+        float _prevValue = float.MinValue;
 
         #region Monobehaviour
 
