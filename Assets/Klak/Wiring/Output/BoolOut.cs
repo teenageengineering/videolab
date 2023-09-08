@@ -50,20 +50,16 @@ namespace Klak.Wiring
         {
             if (_target == null || string.IsNullOrEmpty(_propertyName)) return;
 
+            if (_target.GetType() == typeof(ParticleSystem) && _particleSystemModuleName != "<none>")
+            {
+                _moduleInfo = _target.GetType().GetProperty(_particleSystemModuleName);
+                _propertyInfo = _moduleInfo.PropertyType.GetProperty(_propertyName);
+                _boxedStruct = _moduleInfo.GetValue(_target);
+            }
             else
             {
-                if (_target.GetType() == typeof(ParticleSystem) && _particleSystemModuleName != "<none>")
-                {
-                    _moduleInfo = _target.GetType().GetProperty(_particleSystemModuleName);
-                    _propertyInfo = _moduleInfo.PropertyType.GetProperty(_propertyName);
-                    _boxedStruct = _moduleInfo.GetValue(_target);
-                }
-
-                else
-                {
-                    _propertyInfo = _target.GetType().GetProperty(_propertyName);
-                }
-            }            
+                _propertyInfo = _target.GetType().GetProperty(_propertyName);
+            }           
         }
         #endregion
     }
