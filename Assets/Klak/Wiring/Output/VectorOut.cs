@@ -53,10 +53,10 @@ namespace Klak.Wiring
 
                 if (_target.GetType() == typeof(ParticleSystem) && _particleSystemModuleName != "<none>")
                 {
-                    _propertyInfo.SetValue(_boxedStruct, System.Convert.ToInt32(value), null);
+                    _propertyInfo.SetValue(_boxedStruct, value, null);
                 }
                     
-                else _propertyInfo.SetValue(_target, System.Convert.ToInt32(value), null);
+                else _propertyInfo.SetValue(_target, value, null);
                 
             }
         }
