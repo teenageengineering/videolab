@@ -52,6 +52,7 @@ namespace Klak.Midi
                     return;
 
                 float newValue = Mathf.Clamp(value, 0, 1);
+                ConfigMaster.SetKnobValue((int)_channel, _knobNumber, newValue);
                 destination.SendKnob(_channel, _knobNumber, newValue);
             }
         }
