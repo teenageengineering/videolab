@@ -35,43 +35,43 @@ public class ConfigMaster
     [System.Serializable]
     private class Config
     {
-        public List<ProjectConfig> projects = new List<ProjectConfig>();
+        public List<PresetConfig> presets = new List<PresetConfig>();
 
-        public ProjectConfig GetOrCreateProjectConfig(float number)
+        public PresetConfig GetOrCreatePresetConfig(float number)
         {
-            // Debug.Log("Assert project config for=" + number);
-            foreach (ProjectConfig project in projects)
+            // Debug.Log("Assert preset config for=" + number);
+            foreach (PresetConfig preset in presets)
             {
-                if (project.project == number)
+                if (preset.preset == number)
                 {
-                    return project;
+                    return preset;
                 }
             }
-            ProjectConfig projectConfig = new ProjectConfig(number);
-            projects.Add(projectConfig);
-            return projectConfig;
+            PresetConfig presetConfig = new PresetConfig(number);
+            presets.Add(presetConfig);
+            return presetConfig;
         }
 
-        public void CleanProjects()
+        public void CleanPresets()
         {
-            for (int i = projects.Count - 1; i >= 0; i--)
+            for (int i = presets.Count - 1; i >= 0; i--)
             {
-                if (projects[i].stringProperties.Count == 0 && projects[i].floatProperties.Count == 0)
-                    projects.RemoveAt(i);
+                if (presets[i].stringProperties.Count == 0 && presets[i].floatProperties.Count == 0)
+                    presets.RemoveAt(i);
             }
         }
     }
 
     [System.Serializable]
-    private class ProjectConfig
+    private class PresetConfig
     {
-        public float project;
+        public float preset;
         public List<StringProperty> stringProperties = new List<StringProperty>();
         public List<FloatProperty> floatProperties = new List<FloatProperty>();
 
-        public ProjectConfig(float project)
+        public PresetConfig(float preset)
         {
-            this.project = project;
+            this.preset = preset;
         }
 
         public StringProperty GetStringProperty(string key)
@@ -149,9 +149,6 @@ public class ConfigMaster
 
     HashSet<string> dirty = new HashSet<string>();
 
-    // Workaround for knob issue in KnobIn
-    Dictionary<int, Dictionary<int, float>> knobLevels = new Dictionary<int, Dictionary<int, float>>();
-
     float dirtyTimestamp = 0;
 
     public static ConfigMaster Instance
@@ -193,10 +190,10 @@ public class ConfigMaster
         }
     }
 
-    private ProjectConfig GetOrCreateProjectConfig(string fileName, float project)
+    private PresetConfig GetOrCreatePresetConfig(string fileName, float preset)
     {
         Config config = LoadOrCreateConfig(fileName);
-        return config.GetOrCreateProjectConfig(project);
+        return config.GetOrCreatePresetConfig(preset);
     }
 
     private void Dirty(string fileName)
@@ -205,39 +202,10 @@ public class ConfigMaster
         dirtyTimestamp = Time.time;
     }
 
-    public static void SetKnobValue(int channel, int knobNumber, float level)
+    public static string GetStringProperty(string fileName, float preset, string key)
     {
-        Dictionary<int, float> levels;
-        if (Instance.knobLevels.ContainsKey(channel))
-        {
-            levels = Instance.knobLevels[channel];
-        }
-        else
-        {
-            levels = new Dictionary<int, float>();
-            Instance.knobLevels.Add(channel, levels);
-        }
-        levels[knobNumber] = level;
-    }
-
-    public static float GetKnobValue(int channel, int knobNumber)
-    {
-        Dictionary<int, float> levels;
-        if (Instance.knobLevels.TryGetValue(channel, out levels))
-        {
-            float level;
-            if (levels.TryGetValue(knobNumber, out level))
-            {
-                return level;
-            }
-        }
-        return 0;
-    }
-
-    public static string GetStringProperty(string fileName, float project, string key)
-    {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        StringProperty property = projectConfig.GetStringProperty(key);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        StringProperty property = presetConfig.GetStringProperty(key);
         if (property == null)
         {
             return null;
@@ -248,10 +216,10 @@ public class ConfigMaster
         }
     }
 
-    public static float? GetFloatProperty(string fileName, float project, string key)
+    public static float? GetFloatProperty(string fileName, float preset, string key)
     {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        FloatProperty property = projectConfig.GetFloatProperty(key);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        FloatProperty property = presetConfig.GetFloatProperty(key);
         if (property == null)
         {
             return null;
@@ -262,31 +230,31 @@ public class ConfigMaster
         }
     }
 
-    public static void SetStringProperty(string fileName, float project, string key, string value)
+    public static void SetStringProperty(string fileName, float preset, string key, string value)
     {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        projectConfig.SetStringProperty(key, value);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        presetConfig.SetStringProperty(key, value);
         Instance.Dirty(fileName);
     }
 
-    public static void RemoveStringProperty(string fileName, float project, string key)
+    public static void RemoveStringProperty(string fileName, float preset, string key)
     {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        projectConfig.RemoveStringProperty(key);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        presetConfig.RemoveStringProperty(key);
         Instance.Dirty(fileName);
     }
 
-    public static void SetFloatProperty(string fileName, float project, string key, float value)
+    public static void SetFloatProperty(string fileName, float preset, string key, float value)
     {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        projectConfig.SetFloatProperty(key, value);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        presetConfig.SetFloatProperty(key, value);
         Instance.Dirty(fileName);
     }
 
-    public static void RemoveFloatProperty(string fileName, float project, string key)
+    public static void RemoveFloatProperty(string fileName, float preset, string key)
     {
-        ProjectConfig projectConfig = Instance.GetOrCreateProjectConfig(fileName, project);
-        projectConfig.RemoveFloatProperty(key);
+        PresetConfig presetConfig = Instance.GetOrCreatePresetConfig(fileName, preset);
+        presetConfig.RemoveFloatProperty(key);
         Instance.Dirty(fileName);
     }
 
@@ -296,28 +264,33 @@ public class ConfigMaster
         {
             Instance.dirty.Remove(fileName);
             Config config = Instance.LoadOrCreateConfig(fileName);
-            config.CleanProjects();
+            config.CleanPresets();
             string json = JsonUtility.ToJson(config, true);
             // Auto create folder
             int lastIndex = fileName.LastIndexOf('/');
+            string folderPath = GetFolder();
             if (lastIndex != -1)
             {
-                string folderPath = GetFolder() + fileName.Substring(0, lastIndex);
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
+                folderPath += fileName.Substring(0, lastIndex);
             }
-            string file = GetFolder() + fileName;
-            // Debug.Log("Saving " + file + ":" + json);
-            File.WriteAllText(file, json);
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            fileName = GetFolder() + fileName;
+            File.WriteAllText(fileName, json);
         }
+    }
+
+    public static void Revert(string fileName, float preset)
+    {
+        Instance.files.Remove(fileName);
     }
 
     public static string GetFolder()
     {
 #if UNITY_EDITOR
-            return Application.dataPath + "/Config/";
+        return Application.dataPath + "/Config/";
 #else
         return Application.persistentDataPath + "/";
 #endif

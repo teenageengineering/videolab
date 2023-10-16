@@ -121,6 +121,12 @@ namespace MidiJack
             if (cs._knobMap.ContainsKey(knobNumber)) return cs._knobMap[knobNumber];
             return defaultValue;
         }
+        public void SetKnob(int channelNumber, int knobNumber, float level)
+        {
+            _channelArray[channelNumber]._knobMap[knobNumber] = level;
+            // Do again for All-ch.
+            _channelArray[(int)MidiChannel.All]._knobMap[knobNumber] = level;
+        }
 
         public bool IsPlaying()
         {
@@ -237,9 +243,7 @@ namespace MidiJack
                     // Update the channel if it already exists, or add a new channel.
                     int knobNumber = message.data1;
                     if (_midiMap) knobNumber = _midiMap.JackValue(knobNumber);
-                    _channelArray[channelNumber]._knobMap[knobNumber] = level;
-                    // Do again for All-ch.
-                    _channelArray[(int)MidiChannel.All]._knobMap[knobNumber] = level;
+                    SetKnob(channelNumber, knobNumber, level);
                     if (knobDelegate != null)
                         knobDelegate((MidiChannel)channelNumber, knobNumber, level);
                 }

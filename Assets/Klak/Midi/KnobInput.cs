@@ -179,8 +179,7 @@ namespace Klak.Midi
             {
                 // Setting 0 as default value causes severe problems
                 // Let's ask the ConfigMaster if we have a better default value
-                float defaultValue = ConfigMaster.GetKnobValue((int)_channel, _knobNumber);
-                _lastInputValue = _source.GetKnob(_channel, _knobNumber, defaultValue);
+                _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
                 DoKnobUpdate(_lastInputValue);
 
                 _needsReset = false;

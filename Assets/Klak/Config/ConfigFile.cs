@@ -14,6 +14,10 @@ namespace Klak.Wiring
         [SerializeField]
         public float _defaultPreset = 0;
 
+        [Tooltip("When auto-save is enabled all property changes will immediately be written to the preset.")]
+        [SerializeField]
+        public bool _autoSave = false;
+
         [Inlet]
         public float preset
         {
@@ -21,10 +25,27 @@ namespace Klak.Wiring
             {
                 if (value != _preset)
                 {
+                    if (!_autoSave)
+                    {
+                        ConfigMaster.Revert(_fileName, value);
+                    }
                     _presetEvent.Invoke(value);
                     _preset = value;
                 }
             }
+        }
+
+        [Inlet]
+        public void saveNow()
+        {
+            ConfigMaster.Save(_fileName, float.MaxValue);
+        }
+
+        [Inlet]
+        public void revert()
+        {
+            ConfigMaster.Revert(_fileName, _preset);
+            _presetEvent.Invoke(_preset);
         }
 
         [SerializeField, Outlet]
@@ -43,7 +64,10 @@ namespace Klak.Wiring
 
         void Update()
         {
-            ConfigMaster.Save(_fileName, Time.time);
+            if (_autoSave)
+            {
+                ConfigMaster.Save(_fileName, Time.time);
+            }
         }
     }
 }

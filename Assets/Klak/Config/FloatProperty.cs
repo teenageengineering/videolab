@@ -11,7 +11,6 @@ namespace Klak.Wiring
         public string _key = "myNumber";
 
         [Tooltip("Default value will be sent out if no property value can be found for the selected preset")]
-
         [SerializeField]
         public float _defaultValue;
 
@@ -29,10 +28,7 @@ namespace Klak.Wiring
         {
             set
             {
-                if (value != _preset)
-                {
-                    LoadPreset(value);
-                }
+                LoadPreset(value);
             }
         }
 
@@ -45,18 +41,10 @@ namespace Klak.Wiring
             }
         }
 
-        [Inlet]
-        public void revert()
-        {
-            SetValue(_init);
-            _valueEvent.Invoke((float)_value);
-        }
-
         [SerializeField, Outlet]
         FloatEvent _valueEvent = new FloatEvent();
 
         float? _value = null;
-        float? _init = null;
         float? _preset = null;
         string _fileName = null;
 
@@ -66,9 +54,10 @@ namespace Klak.Wiring
             {
                 this._preset = preset;
                 _value = ConfigMaster.GetFloatProperty(_fileName, preset, _key);
-                if (_value == null) _value = _defaultValue;
-                _init = _value;
-                _valueEvent.Invoke((float)_value);
+                if (_value != null)
+                {
+                    _valueEvent.Invoke((float)_value);
+                }
             }
         }
 
@@ -88,7 +77,7 @@ namespace Klak.Wiring
         {
             if (_value == null)
             {
-                _value = _defaultValue;
+                SetValue(_defaultValue);
                 _valueEvent.Invoke((float)_value);
             }
         }
