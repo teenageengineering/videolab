@@ -53,7 +53,7 @@ namespace Klak.Wiring
             if (_fileName != null)
             {
                 this._preset = preset;
-                _value = ConfigMaster.GetStringProperty(_fileName, preset, _key);
+                _value = PresetMaster.GetStringProperty(_fileName, preset, _key);
                 if (_value != null)
                 {
                     _textEvent.Invoke(_value);
@@ -68,7 +68,7 @@ namespace Klak.Wiring
                 this._value = value;
                 if (_fileName != null && _preset != null)
                 {
-                    ConfigMaster.SetStringProperty(_fileName, (float)_preset, _key, _value);
+                    PresetMaster.SetStringProperty(_fileName, (float)_preset, _key, _value);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace Klak.Wiring
         {
             if (_value == null)
             {
-                SetValue(_defaultValue);
+                _value = _defaultValue;
                 _textEvent.Invoke(_value);
             }
         }

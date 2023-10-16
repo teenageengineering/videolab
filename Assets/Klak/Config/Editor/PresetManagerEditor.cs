@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace Klak.Wiring
 {
-    [CustomEditor(typeof(ConfigFile))]
+    [CustomEditor(typeof(PresetManager))]
     public class ConfigFileEditor : ScriptlessEditor 
     {
     }

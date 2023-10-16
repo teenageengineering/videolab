@@ -12,7 +12,7 @@ namespace Klak.Wiring
         {
             set
             {
-                _textEvent.Invoke(ConfigMaster.GetFolder() + value);
+                _textEvent.Invoke(PresetMaster.GetFolder() + value);
             }
         }
 

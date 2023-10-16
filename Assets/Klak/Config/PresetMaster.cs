@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 
 
-public class ConfigMaster
+public class PresetMaster
 {
     [System.Serializable]
     private class StringProperty
@@ -143,7 +143,7 @@ public class ConfigMaster
         }
     }
 
-    static ConfigMaster _instance = null;
+    static PresetMaster _instance = null;
 
     Dictionary<string, Config> files = new Dictionary<string, Config>();
 
@@ -151,12 +151,12 @@ public class ConfigMaster
 
     float dirtyTimestamp = 0;
 
-    public static ConfigMaster Instance
+    public static PresetMaster Instance
     {
         get
         {
             if (_instance == null)
-                _instance = new ConfigMaster();
+                _instance = new PresetMaster();
             return _instance;
         }
     }
@@ -282,9 +282,34 @@ public class ConfigMaster
         }
     }
 
-    public static void Revert(string fileName, float preset)
+    public static void DiscardChanges(string fileName, float preset)
+    {
+        // Removing the file will force a reload
+        Instance.files.Remove(fileName);
+    }
+
+    public static void DeletePreset(string fileName, float preset)
+    {
+        Config config = Instance.LoadOrCreateConfig(fileName);
+        for (int i = config.presets.Count - 1; i >= 0; i--)
+        {
+            if (config.presets[i].preset == preset)
+                config.presets.RemoveAt(i);
+        }
+        if (config.presets.Count == 0)
+        {
+            DeleteFile(fileName);
+        }
+        else
+        {
+            Save(fileName, float.MaxValue);
+        }
+    }
+
+    public static void DeleteFile(string fileName)
     {
         Instance.files.Remove(fileName);
+        File.Delete(GetFolder() + fileName);
     }
 
     public static string GetFolder()

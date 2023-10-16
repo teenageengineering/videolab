@@ -3,8 +3,8 @@ using System.Reflection;
 
 namespace Klak.Wiring
 {
-    [AddComponentMenu("Klak/Wiring/Config/Config File")]
-    public class ConfigFile : NodeBase
+    [AddComponentMenu("Klak/Wiring/Config/Preset Manager")]
+    public class PresetManager : NodeBase
     {
         [Tooltip("Path of the config file that will contain the connected properties.")]
         [SerializeField]
@@ -19,7 +19,7 @@ namespace Klak.Wiring
         public bool _autoSave = false;
 
         [Inlet]
-        public float preset
+        public float loadPreset
         {
             set
             {
@@ -27,7 +27,7 @@ namespace Klak.Wiring
                 {
                     if (!_autoSave)
                     {
-                        ConfigMaster.Revert(_fileName, value);
+                        PresetMaster.DiscardChanges(_fileName, value);
                     }
                     _presetEvent.Invoke(value);
                     _preset = value;
@@ -36,15 +36,30 @@ namespace Klak.Wiring
         }
 
         [Inlet]
-        public void saveNow()
+        public void savePreset()
         {
-            ConfigMaster.Save(_fileName, float.MaxValue);
+            PresetMaster.Save(_fileName, float.MaxValue);
+        }
+        
+
+        [Inlet]
+        public void deletePreset()
+        {
+            PresetMaster.DeletePreset(_fileName, _preset);
+            _presetEvent.Invoke(_preset);
         }
 
         [Inlet]
-        public void revert()
+        public void deleteAllPresets()
         {
-            ConfigMaster.Revert(_fileName, _preset);
+            PresetMaster.DeleteFile(_fileName);
+            _presetEvent.Invoke(_preset);
+        }
+
+        [Inlet]
+        public void discardChanges()
+        {
+            PresetMaster.DiscardChanges(_fileName, _preset);
             _presetEvent.Invoke(_preset);
         }
 
@@ -59,6 +74,7 @@ namespace Klak.Wiring
         void Awake()
         {
             _filenameEvent.Invoke(_fileName);
+            _preset = _defaultPreset;
             _presetEvent.Invoke(_defaultPreset);
         }
 
@@ -66,7 +82,7 @@ namespace Klak.Wiring
         {
             if (_autoSave)
             {
-                ConfigMaster.Save(_fileName, Time.time);
+                PresetMaster.Save(_fileName, Time.time);
             }
         }
     }
