@@ -10,11 +10,16 @@ namespace Klak.Midi
         #region Editable properties
 
         [SerializeField]
+        MidiSource _source;
+
+        [SerializeField]
         MidiDestination _destination;
 
-        MidiDestination destination {
-            get { 
-                if (!_destination) 
+        MidiDestination destination
+        {
+            get
+            {
+                if (!_destination)
                     _destination = MidiMaster.GetDestination();
 
                 return _destination;
@@ -26,7 +31,8 @@ namespace Klak.Midi
 
         [SerializeField]
         int _knobNumber;
-        public int knobNumber {
+        public int knobNumber
+        {
             get { return _knobNumber; }
             set { _knobNumber = value; }
         }
@@ -36,8 +42,10 @@ namespace Klak.Midi
         #region Node I/O
 
         [Inlet]
-        public float channel {
-            set {
+        public float channel
+        {
+            set
+            {
                 if (!enabled)
                     return;
 
@@ -46,19 +54,25 @@ namespace Klak.Midi
         }
 
         [Inlet]
-        public float absoluteValue {
-            set {
+        public float absoluteValue
+        {
+            set
+            {
                 if (!enabled)
                     return;
 
                 float newValue = Mathf.Clamp(value, 0, 1);
+                if (!_source) _source = MidiMaster.GetSource();
+                _source.SetKnob((int)_channel, _knobNumber, newValue);
                 destination.SendKnob(_channel, _knobNumber, newValue);
             }
         }
 
         [Inlet]
-        public float delta {
-            set {
+        public float delta
+        {
+            set
+            {
                 if (!enabled)
                     return;
 
@@ -75,7 +89,7 @@ namespace Klak.Midi
 
         void OnEnable()
         {
-            if (!_destination) 
+            if (!_destination)
                 _destination = MidiMaster.GetDestination();
         }
 

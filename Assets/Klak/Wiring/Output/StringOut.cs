@@ -31,6 +31,17 @@ namespace Klak.Wiring
             }
         }
 
+        [Inlet]
+        public string text {
+            set {
+                if (!enabled || _target == null || _propertyInfo == null) return;
+                string stringValue = value;
+                if ( _format.Contains('{') ) {
+                    stringValue = string.Format(_format, value);
+                }
+                _propertyInfo.SetValue(_target, stringValue, null);
+            }
+        }
         #endregion
 
         #region Private members

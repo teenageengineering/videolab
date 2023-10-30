@@ -59,8 +59,10 @@ namespace Klak.Midi
         #region Node I/O
 
         [Inlet]
-        public float channel {
-            set {
+        public float channel
+        {
+            set
+            {
                 if (!enabled)
                     return;
 
@@ -175,6 +177,8 @@ namespace Klak.Midi
 
             if (_needsReset)
             {
+                // Setting 0 as default value causes severe problems
+                // Let's ask the ConfigMaster if we have a better default value
                 _lastInputValue = _source.GetKnob(_channel, _knobNumber, 0);
                 DoKnobUpdate(_lastInputValue);
 
@@ -187,7 +191,7 @@ namespace Klak.Midi
 
         #endregion
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
 
         #region Editor interface
 
@@ -198,6 +202,6 @@ namespace Klak.Midi
 
         #endregion
 
-        #endif
+#endif
     }
 }
