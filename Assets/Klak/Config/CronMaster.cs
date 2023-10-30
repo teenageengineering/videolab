@@ -47,7 +47,7 @@ public class CronMaster
 
     private Config LoadConfigFile(string fileName)
     {
-        string file = GetFolder() + fileName;
+        string file = FileMaster.GetFolder() + fileName;
         if (File.Exists(file))
         {
             string json = File.ReadAllText(file);
@@ -100,34 +100,14 @@ public class CronMaster
             Instance.dirty.Remove(fileName);
             Config config = Instance.LoadOrCreateConfig(fileName);
             string json = JsonUtility.ToJson(config, true);
-            // Auto create folder
-            int lastIndex = fileName.LastIndexOf('/');
-            string folderPath = GetFolder();
-            if (lastIndex != -1)
-            {
-                folderPath += fileName.Substring(0, lastIndex);
-            }
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            fileName = GetFolder() + fileName;
-            File.WriteAllText(fileName, json);
+            FileMaster.AssureFolderExists(fileName);
+            File.WriteAllText(FileMaster.GetFolder() + fileName, json);
         }
     }
 
     public static void DeleteFile(string fileName)
     {
         Instance.files.Remove(fileName);
-        File.Delete(GetFolder() + fileName);
-    }
-
-    public static string GetFolder()
-    {
-#if UNITY_EDITOR
-        return Application.dataPath + "/Config/";
-#else
-        return Application.persistentDataPath + "/";
-#endif
+        File.Delete(FileMaster.GetFolder() + fileName);
     }
 }

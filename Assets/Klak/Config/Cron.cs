@@ -16,6 +16,17 @@ namespace Klak.Wiring
         public bool _autoSave = false;
 
         [Inlet]
+        public float value
+        {
+            set
+            {
+                // Avoid sending out events while recording events
+                _nextTimestamp = float.MaxValue;
+                CronMaster.AddEvent(_fileName, _steps, value);
+            }
+        }
+        
+        [Inlet]
         public float step
         {
             set
@@ -37,11 +48,13 @@ namespace Klak.Wiring
                     if (_steps >= _nextTimestamp)
                     {
                         _valueEvent.Invoke(_events[_index].value);
-                        if (_index < _events.Count-1)
+                        if (_index < _events.Count - 1)
                         {
                             _index++;
                             _nextTimestamp = _events[_index].timestamp;
-                        } else {
+                        }
+                        else
+                        {
                             _nextTimestamp = float.MaxValue;
                         }
                     }
@@ -57,14 +70,6 @@ namespace Klak.Wiring
             _nextTimestamp = null;
         }
 
-        [Inlet]
-        public float value
-        {
-            set
-            {
-                CronMaster.AddEvent(_fileName, _steps, value);
-            }
-        }
 
         [Inlet]
         public void saveEvents()
